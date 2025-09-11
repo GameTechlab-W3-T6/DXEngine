@@ -150,13 +150,9 @@
     <ClCompile Include="USceneComponentPropertyWindow.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ImguiConsole.cpp" />
-    <ClCompile Include="UPlaneComp.cpp" />
-    <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UCamera.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UGizmoScaleHandleComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
@@ -174,6 +170,18 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="UCubeComp.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UPlaneComp.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UClass.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ImguiConsole.cpp">
+      <Filter>Engine\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -318,19 +326,29 @@
     <ClInclude Include="Quaternion.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="UPlaneComp.h" />
-    <ClInclude Include="CubeVertices.h" />
-    <ClInclude Include="PlaneVertices.h" />
-    <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UGizmoScaleHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
-    <ClInclude Include="UClass.h" />
     <ClInclude Include="FDynamicBitset.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="UGizmoRotationHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UCubeComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UPlaneComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeVertices.h">
+      <Filter>Engine\Core\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneVertices.h">
+      <Filter>Engine\Core\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UClass.h">
+      <Filter>Engine\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
