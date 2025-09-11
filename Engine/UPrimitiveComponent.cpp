@@ -30,3 +30,12 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 	UpdateConstantBuffer(renderer);
 	renderer.DrawMesh(mesh);
 }
+
+void FTexture::LoadTexture(const std::string& path)
+{
+	//DirectX::CreateDDSTextureFromFile();
+	
+	// Load 
+	D3D11_TEXTURE2D_DESC td = {};
+
+}
