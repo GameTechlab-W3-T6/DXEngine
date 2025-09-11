@@ -23,6 +23,11 @@ private:
     bool initializedMouse = false;
     bool mouseLook = false;
     float accumDX = 0.0f, accumDY = 0.0f; // 프레임 누적 델타
+    
+    // 무한 마우스 회전을 위한 변수들
+    HWND hWndCapture = nullptr;
+    int32 centerX = 0, centerY = 0;
+    bool skipNextMouseMove = false;
 public:
     UInputManager();
     ~UInputManager();
@@ -46,6 +51,8 @@ public:
     int32 GetMouseY() const { return mouseY; }
     // Utility
     void ResetStates();
+    void SafeEndMouseLook(); // 안전한 마우스룩 종료
+    void Shutdown(); // 안전한 시스템 종료
 
 
     void OnMouseMove(int32 x, int32 y) {
@@ -64,6 +71,7 @@ public:
     void EndMouseLook() {
         mouseLook = false;
         accumDX = accumDY = 0.0f;
+        hWndCapture = nullptr;
     }
     bool IsMouseLooking() const { return mouseLook; }
 

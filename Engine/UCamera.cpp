@@ -6,7 +6,7 @@
 void UCamera::SetPerspective(float fovY, float aspect, float zn, float zf)
 {
 	mFovY = fovY; mAspect = aspect; mNearZ = zn; mFarZ = zf;
-	mProj = FMatrix::PerspectiveFovRHRow(fovY, aspect, zn, zf);
+	mProj = FMatrix::PerspectiveFovLHRow(fovY, aspect, zn, zf);
 }
 
 void UCamera::SetPerspectiveDegrees(float fovYDeg, float aspect, float zn, float zf)
@@ -39,8 +39,8 @@ void UCamera::GetBasis(FVector& outRight, FVector& outForward, FVector& outUp) c
 
 // ==== 카메라 움직임 관련 ====
 
-// target을 바라보도록 (RH, Z-up)
-// RH 크로스 사용: Right = forward x Up, Up = right x forward(기존 크로스와 다른 순서)
+// target을 바라보도록 (LH, Z-up)
+// LH 크로스 사용: Right = Up x forward, Up = forward x right
 void UCamera::LookAt(const FVector& eye, const FVector& target, const FVector& up)
 {
 	mEye = eye;
@@ -53,13 +53,13 @@ void UCamera::LookAt(const FVector& eye, const FVector& target, const FVector& u
 	RecalcAxesFromQuat();
 	UpdateView();
 }
-// 로컬 축 기준 이동 (dx=right, dy=forward, dz=up)
+// 로컬 축 기준 이동 (dx=forward, dy=right, dz=up) - Unreal 좌표계
 void UCamera::MoveLocal(float dx, float dy, float dz, float deltaTime, bool boost,
 	float baseSpeed, float boostMul)
 {
 	RecalcAxesFromQuat(); // 안전: 최신 회전 반영
 	float speed = baseSpeed * (boost ? boostMul : 1.0f);
-	FVector delta = (mRight * dx + mForward * dy + mUp * dz) * (speed * deltaTime);
+	FVector delta = (mForward * dx + mRight * dy + mUp * dz) * (speed * deltaTime);
 	mEye = mEye + delta;
 	UpdateView();
 }
@@ -157,9 +157,9 @@ void UCamera::SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg)
 // mRot로부터 mRight, mUp, mForward 갱신
 void UCamera::RecalcAxesFromQuat()
 {
-	// 로컬 단위축을 회전
-	mRight = mRot.Rotate(FVector(1, 0, 0)).Normalized(); // +X
-	mForward = mRot.Rotate(FVector(0, 1, 0)).Normalized(); // +Y
+	// 로컬 단위축을 회전 (Unreal Engine 방식: X=Forward, Y=Right, Z=Up)
+	mForward = mRot.Rotate(FVector(1, 0, 0)).Normalized(); // +X
+	mRight = mRot.Rotate(FVector(0, 1, 0)).Normalized(); // +Y
 	mUp = mRot.Rotate(FVector(0, 0, 1)).Normalized(); // +Z
 }
 
@@ -168,14 +168,14 @@ void UCamera::UpdateProj(bool leftHanded)
 {
 	if (!mUseOrtho)
 	{
-		// RH + row-vector + D3D depth [0,1]
+		// LH + row-vector + D3D depth [0,1]
 		mProj = FMatrix::PerspectiveFovLHRow(mFovY, mAspect, mNearZ, mFarZ);
 	}
 	else
 	{
-		// 직교 (요청 시 LH도 지원)
-		if (!leftHanded) mProj = FMatrix::OrthoRHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
-		else             mProj = FMatrix::OrthoLHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
+		// 직교 (기본적으로 LH 사용)
+		if (leftHanded)  mProj = FMatrix::OrthoLHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
+		else             mProj = FMatrix::OrthoRHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
 	}
 }
 

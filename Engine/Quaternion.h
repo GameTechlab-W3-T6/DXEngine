@@ -156,9 +156,10 @@ struct FQuaternion
 		FVector R = F.Cross(Uref).Normalized();
 		FVector U = R.Cross(F).Normalized(); // 재직교(수치안정)
 		FMatrix M = FMatrix::IdentityMatrix();
-		M.M[0][0] = R.X; M.M[0][1] = F.X; M.M[0][2] = U.X;
-		M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[1][2] = U.Y;
-		M.M[2][0] = R.Z; M.M[2][1] = F.Z; M.M[2][2] = U.Z;
+		// Unreal 좌표계: col0=Forward(X), col1=Right(Y), col2=Up(Z)
+		M.M[0][0] = F.X; M.M[0][1] = R.X; M.M[0][2] = U.X;
+		M.M[1][0] = F.Y; M.M[1][1] = R.Y; M.M[1][2] = U.Y;
+		M.M[2][0] = F.Z; M.M[2][1] = R.Z; M.M[2][2] = U.Z;
 		return FQuaternion::FromMatrixRow(M);
 	}
 
@@ -240,7 +241,7 @@ struct FQuaternion
 	// 단위 쿼터니언이 확실하다면 이걸 쓰는게 더 빠릅니다
 	FVector RotateUnit(const FVector& v) const
 	{
-		// q = (X,Y,Z,W), RH cross 기준
+		// q = (X,Y,Z,W), LH cross 기준
 		FVector qv(X, Y, Z);
 		FVector t = 2.0f * qv.Cross(v);
 		return v + W * t + qv.Cross(t);

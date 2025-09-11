@@ -11,6 +11,9 @@ UInputManager::UInputManager()
     , initializedMouse(false)
     , mouseLook(false)
     , accumDX(0.0f), accumDY(0.0f)
+    , hWndCapture(nullptr)
+    , centerX(0), centerY(0)
+    , skipNextMouseMove(false)
 {
     memset(keyStates, 0, sizeof(keyStates));
     memset(prevKeyStates, 0, sizeof(prevKeyStates));
@@ -20,7 +23,8 @@ UInputManager::UInputManager()
 
 UInputManager::~UInputManager()
 {
-    // Nothing specific to clean up
+    // 마우스룩 모드가 활성화되어 있으면 정리
+    SafeEndMouseLook();
 }
 
 void UInputManager::Update()
@@ -60,21 +64,33 @@ bool UInputManager::ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
         // Fall through to handle mouse position
     // === RMB로 마우스룩 진입 ===
     case WM_RBUTTONDOWN:
-        HandleMouseButton(msg, wParam);  // ← 추가!!
-        SetCapture(hWnd);
+        {
+            HandleMouseButton(msg, wParam);  // ← 추가!!
+            SetCapture(hWnd);
+            hWndCapture = hWnd;
 
-        // 커서 숨김(짝 맞춰 호출!)
-        ShowCursor(FALSE);
+            // 화면 중앙 좌표 계산
+            RECT rect;
+            GetClientRect(hWnd, &rect);
+            centerX = rect.right / 2;
+            centerY = rect.bottom / 2;
+            
+            // 커서를 화면 중앙으로 이동
+            POINT centerPoint = { centerX, centerY };
+            ClientToScreen(hWnd, &centerPoint);
+            SetCursorPos(centerPoint.x, centerPoint.y);
 
-        // ★ 여기서 인스턴스를 통해 접근해야 함
-        BeginMouseLook();
-        break;
+            // 커서 숨김(짝 맞춰 호출!)
+            ShowCursor(FALSE);
+
+            // ★ 여기서 인스턴스를 통해 접근해야 함
+            BeginMouseLook();
+            break;
+        }
     // === RMB 해제 ===
     case WM_RBUTTONUP:
-        HandleMouseButton(msg, wParam);  // ← 추가!!
-        ReleaseCapture();
-        ShowCursor(TRUE);
-        EndMouseLook();
+        HandleMouseButton(msg, wParam);
+        SafeEndMouseLook();
         break;
 
     case WM_MOUSEMOVE:
@@ -86,11 +102,7 @@ bool UInputManager::ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
         break;
         // 포커스 잃으면 안전 해제
     case WM_KILLFOCUS:
-        if (IsMouseLooking()) {
-            ReleaseCapture();
-            ShowCursor(TRUE);
-            EndMouseLook();
-        }
+        SafeEndMouseLook();
         break;
     }
 
@@ -151,6 +163,9 @@ bool UInputManager::IsMouseButtonReleased(int32 button) const
 
 void UInputManager::ResetStates()
 {
+    // 마우스룩 모드가 활성화되어 있으면 먼저 안전하게 종료
+    SafeEndMouseLook();
+
     // Clear all input states
     memset(keyStates, 0, sizeof(keyStates));
     memset(prevKeyStates, 0, sizeof(prevKeyStates));
@@ -160,6 +175,7 @@ void UInputManager::ResetStates()
     mouseX = mouseY = prevMouseX = prevMouseY = 0;
     mouseDeltaX = mouseDeltaY = 0;
     wheelDelta = 0;
+    initializedMouse = false;
 }
 
 void UInputManager::HandleKeyDown(WPARAM wParam)
@@ -193,6 +209,44 @@ void UInputManager::HandleMouseMove(LPARAM lParam)
         return;
     }
 
+    // 무한 마우스 회전을 위한 센터링 처리
+    if (mouseLook) {
+        // 중앙에서의 델타를 계산
+        int32 dx = x - centerX;
+        int32 dy = y - centerY;
+        
+        // 델타가 있을 때만 처리
+        if (dx != 0 || dy != 0) {
+            // 회전 델타 누적
+            accumDX += static_cast<float>(dx);
+            accumDY += static_cast<float>(dy);
+            
+            // 커서를 다시 중앙으로 이동 (더 안전한 방식)
+            try {
+                if (hWndCapture && IsWindow(hWndCapture)) {
+                    POINT centerPoint = { centerX, centerY };
+                    if (ClientToScreen(hWndCapture, &centerPoint)) {
+                        SetCursorPos(centerPoint.x, centerPoint.y);
+                    }
+                }
+            }
+            catch (...) {
+                // 예외 발생 시 마우스룩 모드를 안전하게 종료
+                mouseLook = false;
+                hWndCapture = nullptr;
+                ShowCursor(TRUE);
+                if (GetCapture()) {
+                    ReleaseCapture();
+                }
+            }
+        }
+        
+        // 마우스 위치를 중앙으로 업데이트
+        mouseX = centerX;
+        mouseY = centerY;
+        return;
+    }
+
     int32 dx = x - mouseX;
     int32 dy = y - mouseY;
 
@@ -201,12 +255,6 @@ void UInputManager::HandleMouseMove(LPARAM lParam)
     // 기존 누적(혹시 다른 곳에서 쓰면 계속 유지)
     mouseDeltaX += dx;
     mouseDeltaY += dy;
-
-    // ★ 마우스룩 모드일 때 회전 Δ도 함께 누적
-    if (mouseLook) {
-        accumDX += static_cast<float>(dx);
-        accumDY += static_cast<float>(dy);
-    }
 }
 
 void UInputManager::HandleMouseButton(UINT message, WPARAM wParam)
@@ -240,4 +288,35 @@ void UInputManager::HandleMouseWheel(WPARAM wParam)
 {
     // Get wheel delta (positive = forward, negative = backward)
     wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+}
+
+void UInputManager::SafeEndMouseLook()
+{
+    if (!mouseLook) return;
+
+    try {
+        if (hWndCapture && IsWindow(hWndCapture)) {
+            if (GetCapture() == hWndCapture) {
+                ReleaseCapture();
+            }
+            ShowCursor(TRUE);
+        }
+    }
+    catch (...) {
+        // Even if exception occurs, ensure we reset our state
+    }
+
+    // Always reset our internal state regardless of Windows API success
+    mouseLook = false;
+    hWndCapture = nullptr;
+    accumDX = accumDY = 0.0f;
+}
+
+void UInputManager::Shutdown()
+{
+    // 마우스룩 모드 안전 종료
+    SafeEndMouseLook();
+    
+    // 모든 입력 상태 초기화
+    ResetStates();
 }
