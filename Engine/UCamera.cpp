@@ -169,7 +169,7 @@ void UCamera::UpdateProj(bool leftHanded)
 	if (!mUseOrtho)
 	{
 		// RH + row-vector + D3D depth [0,1]
-		mProj = FMatrix::PerspectiveFovRHRow(mFovY, mAspect, mNearZ, mFarZ);
+		mProj = FMatrix::PerspectiveFovLHRow(mFovY, mAspect, mNearZ, mFarZ);
 	}
 	else
 	{
@@ -186,7 +186,7 @@ void UCamera::UpdateView()
 	// 여기서 f(Back)는 카메라가 보는 -Z 방향과 대응시키기 위해 사용
 	FVector s = mRight;                 // Right
 	FVector u = mUp;                    // Up
-	FVector f = (-mForward).Normalized(); // Back = -Forward
+	FVector f = (/*-*/mForward).Normalized(); // Back = -Forward
 	FMatrix V = FMatrix::IdentityMatrix();
 	// 회전 성분: 열에 [s u f] 배치 (row-vector 규약)
 	V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X;

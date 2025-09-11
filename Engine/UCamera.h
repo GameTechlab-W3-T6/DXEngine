@@ -128,6 +128,6 @@ private:
 
     // mRot로부터 mRight, mUp, mForward 갱신
     void RecalcAxesFromQuat();
-    void UpdateProj(bool leftHanded = false);
+    void UpdateProj(bool leftHanded = true);
     void UpdateView();
 };

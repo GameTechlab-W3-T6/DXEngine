@@ -178,7 +178,7 @@ void UScene::Update(float deltaTime)
 		float mdx = 0.f, mdy = 0.f;
 		inputManager->ConsumeMouseDelta(mdx, mdy);
 
-		const float sens = 0.005f; // 일단 크게 해서 동작 확인
+		const float sens = 0.003f; // 일단 크게 해서 동작 확인
 		camera->AddYawPitch(-mdx * sens, -mdy * sens);
 	}
 	if (inputManager->IsKeyDown('W'))

@@ -59,7 +59,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 	rayViewDir.Normalize();
 
 	// convert the camera-space ray direction to world direction
-	FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
+	FMatrix V = FMatrix::LookAtLH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
 	V = FMatrix::Inverse(V);
 	FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
