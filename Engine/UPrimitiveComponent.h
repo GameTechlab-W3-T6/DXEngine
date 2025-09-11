@@ -3,10 +3,18 @@
 #include "UMesh.h"
 #include "USceneComponent.h"
 #include "Vector.h"
-#include "UClass.h"
+#include "UClass.h" 
+
+#include <string>
+#pragma comment(lib, "DirectXTK.lib")
+#include "DDSTextureLoader.h" 
 
 class UMeshManager; // 전방 선언
-
+ 
+struct FTexture
+{
+	void LoadTexture(const std::string& path); 
+};
 
 class UPrimitiveComponent : public USceneComponent
 {
