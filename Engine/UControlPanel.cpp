@@ -213,29 +213,29 @@ void UControlPanel::CameraManagementSection()
 		ImGui::EndTable();
 	}
 
-	ImGui::Text("Camera Rotation");
-	if (ImGui::BeginTable("CameraRotTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp))
-	{
-		ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-		ImGui::TableSetColumnIndex(0); ImGui::Text("Pitch");
-		ImGui::TableSetColumnIndex(1); ImGui::Text("Yaw");
-		ImGui::TableSetColumnIndex(2); ImGui::Text("Roll");
+	//ImGui::Text("Camera Rotation");
+	//if (ImGui::BeginTable("CameraRotTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp))
+	//{
+	//	ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+	//	ImGui::TableSetColumnIndex(0); ImGui::Text("Pitch");
+	//	ImGui::TableSetColumnIndex(1); ImGui::Text("Yaw");
+	//	ImGui::TableSetColumnIndex(2); ImGui::Text("Roll");
 
-		// Camera Rotation 행
-		ImGui::TableNextRow();
-		for (int32 i = 0; i < 3; i++)
-		{
-			ImGui::TableSetColumnIndex(i);
-			ImGui::SetNextItemWidth(-1);
-			ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-				&eulerXYZ[i], 0.0f, 0.0f, "%.3f");
-			if (ImGui::IsItemDeactivatedAfterEdit())
-				rotCommitted = true;
-		}
-		// ImGui::TableSetColumnIndex(3);
+	//	// Camera Rotation 행
+	//	ImGui::TableNextRow();
+	//	for (int32 i = 0; i < 3; i++)
+	//	{
+	//		ImGui::TableSetColumnIndex(i);
+	//		ImGui::SetNextItemWidth(-1);
+	//		ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+	//			&eulerXYZ[i], 0.0f, 0.0f, "%.3f");
+	//		if (ImGui::IsItemDeactivatedAfterEdit())
+	//			rotCommitted = true;
+	//	}
+	//	// ImGui::TableSetColumnIndex(3);
 
-		ImGui::EndTable();
-	}
+	//	ImGui::EndTable();
+	//}
 
 	// World / Local 선택 (체크박스 대신, 버튼처럼 보이는 상호배타 토글)
 
