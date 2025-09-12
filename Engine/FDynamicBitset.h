@@ -38,6 +38,11 @@ struct FDynamicBitset
 
 	void Clear() { std::fill(Data.begin(), Data.end(), 0); }
 
+	void Reserve(int n) {
+		int chunkCount = (n + 63) / 64;
+		Data.reserve(chunkCount);
+	}
+
 	size_t Count() const {
 		size_t count = 0;
 		for (auto block : Data)
