@@ -1,0 +1,48 @@
+// DXEngine UCLASS System Macro Hints
+// 이 파일은 Visual Studio IntelliSense가 매크로를 올바르게 해석하도록 도와줍니다
+
+// Root UClass 매크로 힌트
+#define DECLARE_ROOT_UCLASS(ClassName) \
+public: \
+    virtual UClass* GetClass() const; \
+    static UClass* StaticClass(); \
+private: \
+    static UClass* s_StaticClass; \
+    static UObject* CreateInstance();
+
+#define IMPLEMENT_ROOT_UCLASS(ClassName) \
+UObject* ClassName::CreateInstance() { return new ClassName(); } \
+UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
+    #ClassName, &ClassName::CreateInstance, ""); \
+UClass* ClassName::StaticClass() { return s_StaticClass; } \
+UClass* ClassName::GetClass() const { return StaticClass(); }
+
+// 일반 UClass 매크로 힌트
+#define DECLARE_UCLASS(ClassName, ParentClass) \
+public: \
+    using Super = ParentClass; \
+    UClass* GetClass() const override; \
+    static UClass* StaticClass(); \
+private: \
+    static UClass* s_StaticClass; \
+    static UObject* CreateInstance();
+
+#define IMPLEMENT_UCLASS(ClassName, ParentClass) \
+UObject* ClassName::CreateInstance() { return new ClassName(); } \
+UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
+    #ClassName, &ClassName::CreateInstance, #ParentClass); \
+UClass* ClassName::StaticClass() { return s_StaticClass; } \
+UClass* ClassName::GetClass() const { return StaticClass(); }
+
+// 메타데이터 매크로 힌트
+#define UCLASS_META(ClassName, Key, Value) \
+struct _MetaRegister_##ClassName##_##Key { \
+    _MetaRegister_##ClassName##_##Key() { ClassName::StaticClass()->SetMeta(#Key, Value); } \
+} _MetaRegisterInstance_##ClassName##_##Key;
+
+// 유용한 타입 힌트
+typedef int int32;
+typedef unsigned int uint32;
+typedef long long int64;
+typedef unsigned long long uint64;
+typedef std::string FString;
