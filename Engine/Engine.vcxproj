@@ -265,6 +265,7 @@
     <ClInclude Include="UGizmoManager.h" />
     <ClInclude Include="UGizmoRotationHandleComp.h" />
     <ClInclude Include="UGizmoScaleHandleComp.h" />
+    <ClInclude Include="UObjectMacros.h" />
     <ClInclude Include="USceneComponentPropertyWindow.h" />
     <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />

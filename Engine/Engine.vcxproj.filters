@@ -350,6 +350,9 @@
     <ClInclude Include="UClass.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="UObjectMacros.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
