@@ -1,8 +1,10 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Matrix.h"
 #include "UEngineSubsystem.h"
+
+struct FTextInfo;
 
 // URenderer.h or cpp 상단
 struct CBTransform
@@ -14,7 +16,15 @@ struct CBTransform
 	float padding[3];
 };
 
-class URenderer : public UEngineSubsystem
+struct CBTextUV
+{
+	float cellIndex[2];
+	float cellSize[2];
+	float texResolution[2];
+	float padding[2];
+};
+
+class URenderer : UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
 private:
@@ -33,6 +43,7 @@ private:
 
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
+	ID3D11Buffer* textConstantBuffer;
 
 	// Viewport
 	D3D11_VIEWPORT viewport;
@@ -47,7 +58,7 @@ private:
 
 	FMatrix mVP;                 // 프레임 캐시
 	CBTransform   mCBData;
-
+	CBTextUV	mCBUVData;
 
 
 public:
@@ -96,7 +107,9 @@ public:
 	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
 
 	// Constant buffer updates
+
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
+	bool UpdateConstantBufferUV(const void* data, size_t sizeInBytes);
 
 	// Window resize handling
 	bool ResizeBuffers(int32 width, int32 height);
@@ -133,6 +146,8 @@ public:
 	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
 	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
+	void SetTextUV(FTextInfo& textInfo);
+
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
 	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;
 	// 드래그 중 호출: currentViewport만 갈아끼움

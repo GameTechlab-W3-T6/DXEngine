@@ -1,4 +1,4 @@
-﻿// UScene.cpp
+// UScene.cpp
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
@@ -41,7 +41,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UText
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager);
+			primitive->Init(meshManager, inputManager, textureManager);
 		}
 	}
 
@@ -82,7 +82,7 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager, textureManager);
+		primitive->Init(meshManager, inputManager, textureManager);
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}
@@ -177,6 +177,51 @@ void UScene::Update(float deltaTime)
 	{
 		camera->SetAspect((float)backBufferWidth / (float)backBufferHeight);
 	}
+
+	float dx = 0, dy = 0, dz = 0;
+	bool boost = inputManager->IsKeyDown(VK_SHIFT); // Shift로 가속
+
+	// --- 마우스룩: RMB 누른 동안 회전 ---
+	if (inputManager->IsMouseLooking())
+	{
+		// 마우스룩 모드는 WndProc에서 Begin/End로 관리
+		float mdx = 0.f, mdy = 0.f;
+		inputManager->ConsumeMouseDelta(mdx, mdy);
+
+		const float sens = 0.005f; // 일단 크게 해서 동작 확인
+		camera->AddYawPitch(-mdx * sens, -mdy * sens);
+	}
+	if (inputManager->IsKeyDown('W'))
+	{
+		dy += 1.0f; // 전진
+	}
+	if (inputManager->IsKeyDown('A'))
+	{
+		dx -= 1.0f; // 좌
+	}
+	if (inputManager->IsKeyDown('S'))
+	{
+		dy -= 1.0f; // 후진
+	}
+	if (inputManager->IsKeyDown('D'))
+	{
+		dx += 1.0f; // 우
+	}
+	if (inputManager->IsKeyDown('E'))
+	{
+		dz += 1.0f; // 상
+	}
+	if (inputManager->IsKeyDown('Q'))
+	{
+		dz -= 1.0f; // 하
+	} 
+	
+
+	static float t = 0.0f; t += deltaTime;
+	// 대각선 이동 속도 보정(선택): 벡터 정규화
+	float len = sqrtf(dx * dx + dy * dy + dz * dz);
+	if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
+	camera->MoveLocal(dx, dy, dz, deltaTime, boost);
 }
 
 bool UScene::OnInitialize()
