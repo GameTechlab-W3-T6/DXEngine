@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UClass.h"
 #include "UPrimitiveComponent.h"
 #include "UPlaneComp.h"
@@ -35,3 +35,4 @@ UPlaneComp::~UPlaneComp()
 		inputManager->UnregisterCallbacks(std::to_string(InternalIndex));
 	}
 }
+UCLASS_META(UPlaneComp, TextureType, "PlaneBaseColor")

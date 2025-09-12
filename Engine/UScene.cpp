@@ -7,7 +7,8 @@
 #include "UPrimitiveComponent.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
-#include "UCamera.h"
+#include "UCamera.h" 
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -25,12 +26,12 @@ UScene::~UScene()
 	}
 	delete camera;
 }
-
-bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
+bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UTextureManager* tm)
 {
 	renderer = r;
 	meshManager = mm;
 	inputManager = im;
+	textureManager = tm;
 
 	backBufferWidth = 0.0f;
 	backBufferHeight = 0.0f;
@@ -51,6 +52,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	return OnInitialize();
 }
 
+ 
 UScene* UScene::Create(json::JSON data)
 {
 	UScene* scene = new UScene();
@@ -68,13 +70,19 @@ void UScene::AddObject(USceneComponent* obj)
 		// 릴리즈 빌드에서 안전성 확보
 		return;
 	}
+	
+	if (!meshManager)
+	{
+		// 릴리즈 빌드에서 안전성 확보
+		return;
+	}
 
 	objects.push_back(obj);
 
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager);
+		primitive->Init(meshManager, textureManager);
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}

@@ -4,23 +4,17 @@
 #include "USceneComponent.h"
 #include "Vector.h"
 #include "UClass.h" 
-
-#include <string>
-#pragma comment(lib, "DirectXTK.lib")
-#include "DDSTextureLoader.h" 
+#include "FTexture.h"
 
 class UMeshManager; // 전방 선언
+class UTextureManager;
  
-struct FTexture
-{
-	void LoadTexture(const std::string& path); 
-};
-
 class UPrimitiveComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
 protected:
 	UMesh* mesh;
+	FTexture* texture;
 	FVector4 Color = { 1, 1, 1, 1 };
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
@@ -35,7 +29,7 @@ public:
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드
-	virtual bool Init(UMeshManager* meshManager);
+	virtual bool Init(UMeshManager* meshManager, UTextureManager* textureManager = nullptr);
 
 	bool CountOnInspector() override { return true; }
 

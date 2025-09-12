@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "USceneManager.h"
 #include "UScene.h"
-#include "UApplication.h"
-
+#include "UApplication.h" 
 
 IMPLEMENT_UCLASS(USceneManager, UEngineSubsystem)
 USceneManager::~USceneManager()
@@ -18,13 +17,15 @@ bool USceneManager::Initialize(UApplication* _application)
 	currentScene->Initialize(
 		&application->GetRenderer(),
 		&application->GetMeshManager(),
-		&application->GetInputManager());
+		&application->GetInputManager(),
+		&application->GetTextureManager());
 	return true;
 }
 
 UScene* USceneManager::GetScene()
 {
 	return currentScene;
+
 }
 
 void USceneManager::SetScene(UScene* scene)
@@ -39,7 +40,8 @@ void USceneManager::SetScene(UScene* scene)
 	currentScene->Initialize(
 		&application->GetRenderer(),
 		&application->GetMeshManager(),
-		&application->GetInputManager());
+		&application->GetInputManager(),
+		&application->GetTextureManager());
 
 	application->OnSceneChange();
 }

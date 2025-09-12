@@ -1,0 +1,95 @@
+﻿#include "stdafx.h"
+#include "UTextureManager.h"
+
+#pragma comment(lib, "DirectXTK.lib")
+#include "DDSTextureLoader.h"  
+#include "WICTextureLoader.h"
+
+IMPLEMENT_UCLASS(UTextureManager, UEngineSubsystem)
+
+
+bool UTextureManager::Initialize(URenderer* renderer)
+{  
+	textures["PlaneBaseColor"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\fire.png", false);
+	textures["Font"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\font.png", false);
+	
+	BindPS(renderer->GetDeviceContext(), textures["BaseColor"], 0, 0);
+	return true;
+}
+
+
+FTexture* UTextureManager::LoadFromFile(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
+	const std::wstring& path, bool isDDS)
+{
+	FTexture* texture = new FTexture();  
+
+	HRESULT hr;
+	if (isDDS)
+	{
+		hr = DirectX::CreateDDSTextureFromFile(device, path.c_str(), nullptr, &(texture->srv));
+
+	}
+
+	else
+	{
+		hr = DirectX::CreateWICTextureFromFile(device, path.c_str(), nullptr, &(texture->srv));
+	}
+
+	if (FAILED(hr))
+	{
+		UE_LOG("Failed to load texture: %s \n", path.c_str());
+	}
+
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	hr = device->CreateSamplerState(&samplerDesc, &(texture->samplerState));
+
+	return texture;
+
+}
+FTexture* UTextureManager::RetrieveTexture(FString textureName)
+{
+	auto itr = textures.find(textureName);
+	if (itr == textures.end()) return nullptr;
+	return itr->second;
+}
+FTexture* UTextureManager::CreateTextureInternal()
+{ 
+	return nullptr;
+}
+
+
+void UTextureManager::BindPS(ID3D11DeviceContext* deviceContext, FTexture* texture, UINT textureSlot, UINT samplerSlot)
+{
+	deviceContext->PSSetShaderResources(textureSlot, 1, &(texture->srv));
+	
+	if(samplerSlot >= 0)
+		deviceContext->PSSetSamplers(samplerSlot, 1, &(texture->samplerState));
+}
+
+void UTextureManager::UnBindPS(ID3D11DeviceContext* deviceContext, UINT textureSlot, UINT samplerSlot)
+{
+	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+	ID3D11SamplerState* nullSampler[1] = { nullptr };
+
+	deviceContext->PSSetShaderResources(textureSlot, 1, nullSRV);
+	deviceContext->PSSetSamplers(samplerSlot, 1, nullSampler);
+}
+
+
+
+
+UTextureManager::UTextureManager()
+{
+	//textures["fire"] = CreateTextureInternal();
+}
+
+UTextureManager::~UTextureManager()
+{
+}
+

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "FVertexPosColor.h"
 #include "TArray.h"
 
@@ -13,4 +13,15 @@ inline TArray<FVertexPosColor> plane_vertices = {
 	{  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f}, // 우상 - Green
 	{ -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f}, // 좌하 - Blue
 	{  0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f}  // 우하 - Yellow
+};
+inline TArray<FVertexPosUV> plane_vertices2 = {
+	// 첫 번째 삼각형 (CW: 좌상 -> 우상 -> 좌하)
+	{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f/*1.0f, 0.0f, 0.0f, 1.0f */}, // 좌상 - Red
+	{  0.5f,  0.5f, 0.0f, 1.0f, 0.0f/*0.0f, 1.0f, 0.0f, 1.0f */}, // 우상 - Green
+	{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f/*0.0f, 0.0f, 1.0f, 1.0f */}, // 좌하 - Blue
+
+	// 두 번째 삼각형 (CW: 우상 -> 우하 -> 좌하)
+	{  0.5f,  0.5f, 0.0f, 1.0f, 0.0f/*0.0f, 1.0f, 0.0f, 1.0f*/}, // 우상 - Green
+	{  0.5f, -0.5f, 0.0f, 1.0f, 1.0f/*1.0f, 1.0f, 0.0f, 1.0f*/}, // 우하 - Yellow
+	{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f/*0.0f, 0.0f, 1.0f, 1.0f*/}  // 좌하 - Blue
 };

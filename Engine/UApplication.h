@@ -8,6 +8,7 @@
 #include "URaycastManager.h"
 #include "USceneManager.h"
 #include "UGizmoManager.h"
+#include "UTextureManager.h"
 
 class UApplication
 {
@@ -21,6 +22,7 @@ private:
 	UMeshManager meshManager;
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
+	UTextureManager textureManager;
 
 	// Application state
 	bool bIsRunning;
@@ -60,6 +62,7 @@ public:
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }
 	URaycastManager& GetRaycastManager() { return raycastManager; }
+	UTextureManager& GetTextureManager() { return textureManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return hWnd; }

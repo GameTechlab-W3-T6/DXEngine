@@ -4,10 +4,11 @@
 #include "UMeshManager.h"
 #include "USceneManager.h"
 #include "json.hpp"
-#include "UGizmoManager.h"
+#include "UGizmoManager.h" 
 
 class UCamera;
 class URaycastManager;
+class UTextureManager;
 
 class UScene : public UObject
 {
@@ -25,6 +26,7 @@ protected:
 	UInputManager* inputManager;
 	//URaycastManager* RaycastManager;
 	//UGizmoManager* GizmoManager;
+	UTextureManager* textureManager;
 
 	//UScene owns camera
 	UCamera* camera;
@@ -34,8 +36,8 @@ protected:
 public:
 	UScene();
 	virtual ~UScene();
-	virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr);
-
+	//virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr); 
+	virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr, UTextureManager* tm= nullptr); 
 	virtual void Render();
 	virtual void Update(float deltaTime);
 	virtual bool OnInitialize();
@@ -57,6 +59,7 @@ public:
 	UCamera* GetCamera() { return camera; }
 	URenderer* GetRenderer() { return renderer; }
 	UInputManager* GetInputManager() { return inputManager; }
+	UTextureManager* GetTextureManger() { return textureManager; }
 
 	int32 GetBackBufferWidth() { return backBufferWidth; };
 	int32 GetBackBufferHeight() { return backBufferHeight; };
