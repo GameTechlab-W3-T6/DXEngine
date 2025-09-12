@@ -2,6 +2,7 @@
 #include "UEngineStatics.h"
 #include "FDynamicBitset.h"
 #include "json.hpp"
+#include "UObjectMacros.h"
 #include "UObject.h"
 #include <memory>
 
