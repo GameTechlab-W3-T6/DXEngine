@@ -519,6 +519,19 @@ void URenderer::DrawMesh(UMesh* mesh)
 	deviceContext->Draw(mesh->NumVertices, 0);
 }
 
+void URenderer::DrawLine(UMesh* mesh)
+{
+	if (!mesh || !mesh->IsInitialized())
+		return;
+
+	UINT offset = 0;
+
+	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+	deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	deviceContext->Draw(mesh->NumVertices, 0);
+}
+
 void URenderer::DrawMeshOnTop(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())

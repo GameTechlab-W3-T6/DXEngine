@@ -16,122 +16,223 @@ void EditorApplication::Update(float deltaTime)
 	UApplication::Update(deltaTime);
 	gizmoManager.Update(deltaTime);
 
-	if (GetInputManager().IsKeyDown(VK_ESCAPE))
+	// Handle input in organized sections
+	HandleKeyboardInput();
+	HandleCameraInput(deltaTime);
+	HandleMouseInput();
+}
+
+void EditorApplication::HandleKeyboardInput()
+{
+	UInputManager& inputManager = GetInputManager();
+
+	// Application controls
+	if (inputManager.IsKeyDown(VK_ESCAPE))
 	{
 		RequestExit();
 	}
 
-	if (GetInputManager().IsKeyPressed(VK_SPACE))
+	// Gizmo controls
+	if (inputManager.IsKeyPressed(VK_SPACE))
 	{
 		gizmoManager.NextTranslation();
 	}
 
-	if (GetInputManager().IsKeyPressed('X'))
+	if (inputManager.IsKeyPressed('X'))
 	{
 		gizmoManager.ChangeGizmoSpace();
 	}
+}
 
-	FVector outImpactPoint;
+void EditorApplication::HandleCameraInput(float deltaTime)
+{
+	UInputManager& inputManager = GetInputManager();
+	UScene* scene = GetSceneManager().GetScene();
+	if (!scene) return;
+
+	UCamera* camera = scene->GetCamera();
+	if (!camera) return;
+
+	// Mouse look handling
+	if (inputManager.IsMouseLooking())
+	{
+		float mdx = 0.f, mdy = 0.f;
+		inputManager.ConsumeMouseDelta(mdx, mdy);
+		const float mouseSensitivity = 0.0015f;
+		camera->AddYawPitch(mdx * mouseSensitivity, mdy * mouseSensitivity);
+	}
+
+	// Movement input
+	FVector movementInput(0.f, 0.f, 0.f);
+	
+	if (inputManager.IsKeyDown('W')) movementInput.X += 1.0f;  // Forward
+	if (inputManager.IsKeyDown('S')) movementInput.X -= 1.0f;  // Backward
+	if (inputManager.IsKeyDown('A')) movementInput.Y -= 1.0f;  // Left
+	if (inputManager.IsKeyDown('D')) movementInput.Y += 1.0f;  // Right
+	if (inputManager.IsKeyDown('E')) movementInput.Z += 1.0f;  // Up
+	if (inputManager.IsKeyDown('Q')) movementInput.Z -= 1.0f;  // Down
+
+	// Normalize diagonal movement
+	float inputLength = sqrtf(movementInput.X * movementInput.X + 
+							 movementInput.Y * movementInput.Y + 
+							 movementInput.Z * movementInput.Z);
+	
+	if (inputLength > 0.f)
+	{
+		movementInput.X /= inputLength;
+		movementInput.Y /= inputLength;
+		movementInput.Z /= inputLength;
+
+		bool boost = inputManager.IsKeyDown(VK_SHIFT);
+		camera->MoveLocal(movementInput.X, movementInput.Y, movementInput.Z, deltaTime, boost);
+	}
+}
+
+void EditorApplication::HandleMouseInput()
+{
+	UInputManager& inputManager = GetInputManager();
+
+	// Early exit if ImGui wants mouse control
+	if (ImGui::GetIO().WantCaptureMouse) return;
+
+	// Handle mouse release - end drag operations
+	if (inputManager.IsMouseButtonReleased(0))
+	{
+		EndDragOperation();
+		return;
+	}
+
+	// Handle ongoing drag operations
+	if (gizmoManager.IsDragging())
+	{
+		UpdateDragOperation();
+		return;
+	}
+
+	// Handle mouse press - start new selection/drag
+	if (inputManager.IsMouseButtonPressed(0))
+	{
+		HandleMouseClick();
+	}
+}
+
+void EditorApplication::EndDragOperation()
+{
+	// Clear gizmo selections
+	TArray<UGizmoComponent*>& gizmos = gizmoManager.GetRaycastableGizmos();
+	for (UGizmoComponent* gizmo : gizmos)
+	{
+		gizmo->bIsSelected = false;
+	}
+	gizmoManager.EndDrag();
+}
+
+void EditorApplication::UpdateDragOperation()
+{
+	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
+	if (!camera) return;
+
+	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(camera);
+	gizmoManager.UpdateDrag(ray);
+}
+
+void EditorApplication::HandleMouseClick()
+{
+	TArray<UPrimitiveComponent*> primitives;
+	TArray<UGizmoComponent*> gizmos;
+
+	// Collect raycastable objects
+	CollectRaycastableObjects(gizmos, primitives);
+
+	// Check for gizmo hits first (higher priority)
+	FVector impactPoint;
 	UGizmoComponent* hitGizmo = nullptr;
 	UPrimitiveComponent* hitPrimitive = nullptr;
 
-	if (GetInputManager().IsMouseButtonReleased(0))
+	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint))
 	{
-		TArray<UGizmoComponent*> gizmos;
+		HandleGizmoHit(hitGizmo, impactPoint);
+	}
+	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint))
+	{
+		HandlePrimitiveHit(hitPrimitive);
+	}
+	else
+	{
+		HandleEmptySpaceClick();
+	}
+}
 
-		TArray<UGizmoComponent*>& g = gizmoManager.GetRaycastableGizmos();
-		if (g.size() > 0)
-		{
-			for (UGizmoComponent* gizmo : g)
-			{
-				gizmos.push_back(gizmo);
-				gizmo->bIsSelected = false;
-			}
-		}
-		gizmoManager.EndDrag();
-		return;
+void EditorApplication::CollectRaycastableObjects(TArray<UGizmoComponent*>& outGizmos, TArray<UPrimitiveComponent*>& outPrimitives)
+{
+	// Collect gizmos
+	TArray<UGizmoComponent*>& gizmos = gizmoManager.GetRaycastableGizmos();
+	for (UGizmoComponent* gizmo : gizmos)
+	{
+		outGizmos.push_back(gizmo);
+		gizmo->bIsSelected = false;
 	}
 
-	// 드래그 하고 있을때
-	if (gizmoManager.IsDragging())
+	// Collect primitives
+	for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
 	{
-		FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
-		gizmoManager.UpdateDrag(ray);
-		return;
-	}
-
-	if (ImGui::GetIO().WantCaptureMouse) return;
-
-	if (GetInputManager().IsMouseButtonPressed(0))
-	{
-		TArray<UPrimitiveComponent*> primitives;
-		TArray<UGizmoComponent*> gizmos;
-
-		TArray<UGizmoComponent*>& g = gizmoManager.GetRaycastableGizmos();
-		if (g.size() > 0)
+		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			for (UGizmoComponent* gizmo : g)
+			if (primitive->GetMesh())
 			{
-				gizmos.push_back(gizmo);
-				gizmo->bIsSelected = false;
+				outPrimitives.push_back(primitive);
 			}
-		}
-
-		for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
-		{
-			if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
-			{
-				if (primitive->GetMesh()) primitives.push_back(primitive);
-				primitive->bIsSelected = false;
-			}
-		}
-
-		// std::cout << "gizmos.size() : " << gizmos.size();
-		// std::cout << " primitives.size() : " << primitives.size() << std::endl;
-		if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, outImpactPoint))
-		{
-			// std::cout << "hitGizmo : " << hitGizmo << std::endl;
-			if (auto target = gizmoManager.GetTarget())
-			{
-				target->bIsSelected = true;
-				hitGizmo->bIsSelected = true;
-				UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>();
-
-				FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
-
-				// UGizmoArrowComp로 캐스팅 시도
-				if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
-				{
-					gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint, GetSceneManager().GetScene());
-				}
-				// UGizmoRotationHandleComp로 캐스팅 시도
-				else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
-				{
-					gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint, GetSceneManager().GetScene()); // 스케일 드래그 시작 로직 추가
-				}
-				// UGizmoScaleHandleComp로 캐스팅 시도
-				else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
-				{
-					gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint, GetSceneManager().GetScene()); // 스케일 드래그 시작 로직 추가
-				}
-
-				if (target->IsManageable())
-					propertyWindow->SetTarget(target);
-			}
-		}
-		else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, outImpactPoint))
-		{
-			gizmoManager.SetTarget(hitPrimitive);
-			hitPrimitive->bIsSelected = true;
-			if (hitPrimitive->IsManageable())
-				propertyWindow->SetTarget(hitPrimitive);
-		}
-		else
-		{
-			gizmoManager.SetTarget(nullptr);
-			propertyWindow->SetTarget(nullptr);
+			primitive->bIsSelected = false;
 		}
 	}
+}
+
+void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint)
+{
+	auto target = gizmoManager.GetTarget();
+	if (!target) return;
+
+	target->bIsSelected = true;
+	hitGizmo->bIsSelected = true;
+
+	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+
+	// Handle different gizmo types
+	if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
+	{
+		gizmoManager.BeginDrag(ray, arrow->Axis, impactPoint, GetSceneManager().GetScene());
+	}
+	else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
+	{
+		gizmoManager.BeginDrag(ray, rotationHandle->Axis, impactPoint, GetSceneManager().GetScene());
+	}
+	else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
+	{
+		gizmoManager.BeginDrag(ray, scaleHandle->Axis, impactPoint, GetSceneManager().GetScene());
+	}
+
+	if (target->IsManageable())
+	{
+		propertyWindow->SetTarget(target);
+	}
+}
+
+void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
+{
+	gizmoManager.SetTarget(hitPrimitive);
+	hitPrimitive->bIsSelected = true;
+
+	if (hitPrimitive->IsManageable())
+	{
+		propertyWindow->SetTarget(hitPrimitive);
+	}
+}
+
+void EditorApplication::HandleEmptySpaceClick()
+{
+	gizmoManager.SetTarget(nullptr);
+	propertyWindow->SetTarget(nullptr);
+
 }
 
 void EditorApplication::Render()

@@ -86,6 +86,7 @@ public:
 	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
 	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
 	void DrawMesh(UMesh* mesh);
+	void DrawLine(UMesh* mesh);
 	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding

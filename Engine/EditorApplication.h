@@ -37,4 +37,19 @@ protected:
 	void RenderGUI() override;
 	bool OnInitialize() override;
 	void OnResize(int32 width, int32 height) override;
+
+private:
+	// Input handling methods
+	void HandleKeyboardInput();
+	void HandleCameraInput(float deltaTime);
+	void HandleMouseInput();
+
+	// Mouse interaction methods
+	void EndDragOperation();
+	void UpdateDragOperation();
+	void HandleMouseClick();
+	void CollectRaycastableObjects(TArray<UGizmoComponent*>& outGizmos, TArray<UPrimitiveComponent*>& outPrimitives);
+	void HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint);
+	void HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive);
+	void HandleEmptySpaceClick();
 };
