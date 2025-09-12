@@ -2,15 +2,25 @@
 #include "UPrimitiveComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
-bool UPrimitiveComponent::Init(UMeshManager* meshManager)
+bool UPrimitiveComponent::Init(UMeshManager* meshManager, UTextureManager* textureManager)
 {
+	if (textureManager && meshManager)
+	{
+		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
+		texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextureType"));
+
+		return mesh != nullptr;
+	}
+
 	if (meshManager)
 	{
 		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 		return mesh != nullptr;
 	}
+
 	return false;
 }
 
@@ -29,13 +39,4 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 
 	UpdateConstantBuffer(renderer);
 	renderer.DrawMesh(mesh);
-}
-
-void FTexture::LoadTexture(const std::string& path)
-{
-	//DirectX::CreateDDSTextureFromFile();
-	
-	// Load 
-	D3D11_TEXTURE2D_DESC td = {};
-
 }
