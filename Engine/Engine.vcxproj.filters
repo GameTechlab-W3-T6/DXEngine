@@ -168,9 +168,6 @@
     <ClCompile Include="USphereComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>PCH</Filter>
-    </ClCompile>
     <ClCompile Include="UCubeComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
@@ -182,6 +179,15 @@
     </ClCompile>
     <ClCompile Include="ImguiConsole.cpp">
       <Filter>Engine\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderReflector.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -352,6 +358,18 @@
     </ClInclude>
     <ClInclude Include="UObjectMacros.h">
       <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderReflector.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

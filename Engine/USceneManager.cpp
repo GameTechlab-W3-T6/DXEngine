@@ -18,7 +18,7 @@ bool USceneManager::Initialize(UApplication* _application)
 	currentScene = _application->CreateDefaultScene();
 	currentScene->Initialize(
 		&application->GetRenderer(),
-		&application->GetMeshManager(),
+		&application->GetMeshManager(), 
 		&application->GetInputManager());
 	return true;
 }
