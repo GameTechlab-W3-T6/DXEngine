@@ -183,6 +183,12 @@
     <ClCompile Include="ImguiConsole.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
+    <ClCompile Include="FTexture.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UTextureManager.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -350,6 +356,12 @@
     <ClInclude Include="UClass.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="FTexture.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UTextureManager.h">
+      <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
@@ -358,5 +370,13 @@
     <None Include="ShaderW0.vs">
       <Filter>Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="TexTestPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexTestVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

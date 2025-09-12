@@ -16,8 +16,11 @@ bool UDefaultScene::OnInitialize()
     {
         // 컴포넌트 생성
         USphereComp* sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
+        UPlaneComp* plane = new UPlaneComp({ 0.0f ,0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f});
 
-        AddObject(sphere);
+        //AddObject(sphere);
+        AddObject(plane);
+
         IsFirstTime = false;
     }
 

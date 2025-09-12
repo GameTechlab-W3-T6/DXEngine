@@ -16,11 +16,21 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	return mesh;
 }
 
+UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
+	D3D_PRIMITIVE_TOPOLOGY primitiveType)
+{
+	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
+	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	UMesh* mesh = new UMesh(convertedVertices, primitiveType);
+	return mesh;
+}
+
 // 생성자
 UMeshManager::UMeshManager()
 {
 	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
-	meshes["Plane"] = CreateMeshInternal(plane_vertices);
+	//meshes["Plane"] = CreateMeshInternal(plane_vertices);
+ 	meshes["Plane"] = CreateMeshInternal(plane_vertices2);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
 	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
@@ -46,7 +56,17 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	{
 		for (const auto& var : meshes)
 		{
-			var.second->Init(renderer->GetDevice());
+			// Vertices(FVertexPosColor4) 데이터가 있으면 isFVertexPosColor를 true로 전달
+			if (var.second->Vertices.size() > 0)
+			{
+				var.second->Init(renderer->GetDevice(), true);
+
+			}
+			// Vertices2(FVertexPosUV) 데이터만 있으면 isFVertexPosColor를 false로 전달
+			else
+			{
+				var.second->Init(renderer->GetDevice(), false);
+			}
 		}
 	}
 	catch (const std::exception& e)

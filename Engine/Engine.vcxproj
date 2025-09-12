@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FTexture.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
     <ClCompile Include="ImguiConsole.cpp" />
@@ -231,6 +232,7 @@
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
+    <ClCompile Include="UTextureManager.cpp" />
     <ClCompile Include="UTimeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
@@ -241,6 +243,7 @@
   <ItemGroup>
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FDynamicBitset.h" />
+    <ClInclude Include="FTexture.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="UCamera.h" />
@@ -286,6 +289,7 @@
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
+    <ClInclude Include="UTextureManager.h" />
     <ClInclude Include="UTimeManager.h" />
     <ClInclude Include="UGUI.h" />
     <ClInclude Include="UInputManager.h" />
@@ -307,6 +311,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="TexTestPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="TexTestVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

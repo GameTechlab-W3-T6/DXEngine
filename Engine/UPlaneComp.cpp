@@ -6,3 +6,4 @@
 IMPLEMENT_UCLASS(UPlaneComp, UPrimitiveComponent)
 UCLASS_META(UPlaneComp, DisplayName, "Plane")
 UCLASS_META(UPlaneComp, MeshName, "Plane")
+UCLASS_META(UPlaneComp, TextureType, "PlaneBaseColor")
