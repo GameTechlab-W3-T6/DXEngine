@@ -36,3 +36,4 @@ UPlaneComp::~UPlaneComp()
 	}
 }
 UCLASS_META(UPlaneComp, TextureType, "PlaneBaseColor")
+UCLASS_META(UPlaneComp, TextInfo, "TextInfo");
