@@ -107,6 +107,8 @@ bool UScene::Deserialize(const json::JSON& data)
 	// nextUUID = data.at("NextUUID").ToInt();
 
 	objects.clear();
+
+	if (!data.hasKey("Primitives")) return false;
 	json::JSON primitivesJson = data.at("Primitives");
 
 	UEngineStatics::SetUUIDGeneration(false);
