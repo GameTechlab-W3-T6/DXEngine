@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "UEngineSubSystem.h"
 
-class UTimeManager : UEngineSubsystem
+class UTimeManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UTimeManager, UEngineSubsystem)
 private:

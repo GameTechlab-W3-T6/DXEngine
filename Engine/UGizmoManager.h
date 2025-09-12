@@ -18,7 +18,7 @@ struct FPlane
 	FVector Normal;
 };
 
-class UGizmoManager : UEngineSubsystem
+class UGizmoManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UGizmoManager, UEngineSubsystem)
 public:

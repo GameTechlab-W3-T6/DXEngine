@@ -182,6 +182,12 @@ void UInputManager::HandleKeyDown(WPARAM wParam)
 {
     if (wParam < 256)
     {
+        for (const auto& keyCallback : keyCallbacks)
+        {
+            if(!keyStates[wParam])
+                keyCallback.second(wParam);
+        }
+
         keyStates[wParam] = true;
     }
 }
@@ -319,4 +325,28 @@ void UInputManager::Shutdown()
     
     // 모든 입력 상태 초기화
     ResetStates();
+    
+}
+
+// 콜백 시스템 구현
+void UInputManager::RegisterKeyCallback(const FString& id, KeyCallback callback)
+{
+    keyCallbacks[id] = callback;
+}
+
+void UInputManager::RegisterMouseCallback(const FString& id, MouseCallback callback)
+{
+    mouseCallbacks[id] = callback;
+}
+
+void UInputManager::UnregisterCallbacks(const FString& id)
+{
+    keyCallbacks.erase(id);
+    mouseCallbacks.erase(id);
+}
+
+void UInputManager::UnregisterAllCallbacks()
+{
+    keyCallbacks.clear();
+    mouseCallbacks.clear();
 }

@@ -41,6 +41,11 @@ using TFunction = std::function<T>;
 template<typename T>
 using TOptional = std::optional<T>;
 
+// Forward declarations
+class UObject;
+class UEngineSubsystem;
+class UClass;
+
 class UEngineStatics
 {
 public:
@@ -74,6 +79,22 @@ public:
     {
         isEnabled = enabled;        
     }
+
+    // RTTI 기반 서브시스템 접근
+    template<typename T>
+    static T* GetSubsystem()
+    {
+        static_assert(std::is_base_of_v<UEngineSubsystem, T>, "T must inherit from UEngineSubsystem");
+        return static_cast<T*>(FindSubsystemByClass(T::StaticClass()));
+    }
+
+    // 서브시스템 등록/해제
+    static void RegisterSubsystem(UEngineSubsystem* subsystem);
+    static void UnregisterSubsystem(UEngineSubsystem* subsystem);
+    static void ShutdownAllSubsystems();
+
+private:
+    static UEngineSubsystem* FindSubsystemByClass(UClass* targetClass);
     
 private:
     static uint32 NextUUID;

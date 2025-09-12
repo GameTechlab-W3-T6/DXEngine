@@ -4,7 +4,7 @@
 #include "URenderer.h"
 #include "UEngineSubsystem.h"
 
-class UMeshManager : UEngineSubsystem
+class UMeshManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)
 private:

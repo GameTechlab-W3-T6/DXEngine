@@ -20,6 +20,8 @@ public:
 	virtual FMatrix GetWorldTransform();
 
 	virtual bool IsManageable() { return false; }
+	virtual void Update(float deltaTime) {}
+	virtual void OnShutdown(){}
 
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }

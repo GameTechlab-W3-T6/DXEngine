@@ -4,7 +4,7 @@
 class UScene;
 class UApplication;
 
-class USceneManager : UEngineSubsystem
+class USceneManager : public UEngineSubsystem
 {
     DECLARE_UCLASS(USceneManager, UEngineSubsystem)
 private:

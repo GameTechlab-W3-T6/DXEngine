@@ -2,10 +2,11 @@
 #include "stdafx.h"
 #include "UEngineSubsystem.h"
 
-class UInputManager : UEngineSubsystem
+class UInputManager : public UEngineSubsystem
 {
     DECLARE_UCLASS(UInputManager, UEngineSubsystem)
 private:
+
     // Key states
     bool keyStates[256];
     bool prevKeyStates[256];
@@ -80,6 +81,19 @@ public:
         dx = accumDX; dy = accumDY;
         accumDX = accumDY = 0.0f;
     }
+
+    // 개선된 콜백 시스템 - ID 기반
+    using KeyCallback = TFunction<void(int32)>;
+    using MouseCallback = TFunction<void(int32, int32, int32)>; // button, x, y
+    
+    void RegisterKeyCallback(const FString& id, KeyCallback callback);
+    void RegisterMouseCallback(const FString& id, MouseCallback callback);
+    void UnregisterCallbacks(const FString& id);
+    void UnregisterAllCallbacks();
+
+private:
+    TMap<FString, KeyCallback> keyCallbacks;
+    TMap<FString, MouseCallback> mouseCallbacks;
 private:
     void HandleKeyDown(WPARAM wParam);
     void HandleKeyUp(WPARAM wParam);

@@ -14,7 +14,7 @@ struct CBTransform
 	float padding[3];
 };
 
-class URenderer : UEngineSubsystem
+class URenderer : public UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
 private:
