@@ -5,5 +5,8 @@ struct FTexture
 	ID3D11ShaderResourceView* srv = nullptr;
 	ID3D11SamplerState* samplerState = nullptr;
 
+	int width;
+	int height;
+
 	void Release();
 };

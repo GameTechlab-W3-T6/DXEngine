@@ -103,7 +103,7 @@ bool UInputManager::IsKeyDown(int32 keyCode) const
         return false;
 
     return keyStates[keyCode];
-}
+} 
 
 bool UInputManager::IsKeyPressed(int32 keyCode) const
 {

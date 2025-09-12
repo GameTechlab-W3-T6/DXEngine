@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "URenderer.h"
 #include "UClass.h"
+#include "FTextInfo.h"
 
 IMPLEMENT_UCLASS(URenderer, UEngineSubsystem)
 
@@ -14,6 +15,7 @@ URenderer::URenderer()
 	, pixelShader(nullptr)
 	, inputLayout(nullptr)
 	, constantBuffer(nullptr)
+	, textConstantBuffer(nullptr)
 	, rasterizerState(nullptr)
 	, hWnd(nullptr)
 	, bIsInitialized(false)
@@ -204,7 +206,18 @@ bool URenderer::CreateConstantBuffer()
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	HRESULT hr = device->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
+	
+	D3D11_BUFFER_DESC textBufferDesc = {};
+
+	textBufferDesc.ByteWidth = sizeof(CBTextUV);   // ← 변경
+	textBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	textBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	textBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	hr =  device->CreateBuffer(&textBufferDesc, nullptr, &textConstantBuffer);
+
 	return CheckResult(hr, "CreateConstantBuffer");
+	 
 }
 
 ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes)
@@ -248,6 +261,26 @@ bool URenderer::UpdateConstantBuffer(const void* data, size_t sizeInBytes)
 
 	memcpy(mappedResource.pData, data, sizeInBytes);
 	deviceContext->Unmap(constantBuffer, 0);
+
+	return true;
+}
+
+bool URenderer::UpdateConstantBufferUV(const void* data, size_t sizeInBytes)
+{
+	if (!textConstantBuffer || !data)
+		return false;
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(textConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	if (FAILED(hr))
+	{
+		LogError("UV textConstantBuffer", hr);
+		return false;
+	}
+
+	memcpy(mappedResource.pData, data, sizeInBytes);
+	deviceContext->Unmap(textConstantBuffer, 0);
 
 	return true;
 }
@@ -300,6 +333,7 @@ void URenderer::ReleaseShader()
 void URenderer::ReleaseConstantBuffer()
 {
 	SAFE_RELEASE(constantBuffer);
+	SAFE_RELEASE(textConstantBuffer);
 }
 
 bool URenderer::ReleaseVertexBuffer(ID3D11Buffer* buffer)
@@ -466,6 +500,11 @@ void URenderer::PrepareShader()
 	if (constantBuffer)
 	{
 		deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
+	}
+
+	if (textConstantBuffer) 
+	{
+		deviceContext->PSSetConstantBuffers(0, 1, &textConstantBuffer);
 	}
 }
 
@@ -776,6 +815,34 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	memcpy(mCBData.MeshColor, &color, sizeof(float) * 4);
 	mCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
 	UpdateConstantBuffer(&mCBData, sizeof(mCBData));
+}
+
+void URenderer::SetTextUV(FTextInfo& textInfo)
+{
+	
+	//FMatrix MVP = M * mVP;
+
+	//calculate place 
+	int cellIndex = (int)U'a';
+	//int cellIndex = textInfo.keyCode;
+	int indexH = cellIndex / (int)textInfo.cellsPerRow;
+	int indexW = cellIndex % (int)textInfo.cellsPerRow;
+	
+	//textInfo->u = (orderW * textInfo->cellWidth / textTex->width);
+	//textInfo->v = (orderH * textInfo->cellHeight / textTex->height);
+	mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
+	mCBUVData.cellSize[1] = (float)textInfo.cellHeight;
+
+	mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;
+	mCBUVData.texResolution[1] = (float)textInfo.textTexture->height;
+
+	mCBUVData.cellIndex[0] = (float)indexW; // X = col
+	mCBUVData.cellIndex[1] = (float)indexH; // Y = row
+	 
+	
+	(&mCBUVData, sizeof(mCBUVData));
+
+	UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
 }
 
 D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const

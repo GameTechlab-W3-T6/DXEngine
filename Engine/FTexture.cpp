@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "FTexture.h"
  
- 
-
+  
 void FTexture::Release()
 {
 	if (samplerState)

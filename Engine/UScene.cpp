@@ -41,7 +41,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UText
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager);
+			primitive->Init(meshManager, inputManager, textureManager);
 		}
 	}
 
@@ -82,7 +82,7 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager, textureManager);
+		primitive->Init(meshManager, inputManager, textureManager);
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}
@@ -212,7 +212,8 @@ void UScene::Update(float deltaTime)
 	if (inputManager->IsKeyDown('Q'))
 	{
 		dz -= 1.0f; // 하
-	}
+	} 
+	
 
 	static float t = 0.0f; t += deltaTime;
 	// 대각선 이동 속도 보정(선택): 벡터 정규화
