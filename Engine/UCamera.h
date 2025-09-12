@@ -4,7 +4,7 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 // =====================
-// UCamera (RH, row-vector, Z-up)
+// UCamera (LH, row-vector, Z-up)
 // =====================
 
 
@@ -72,7 +72,7 @@ public:
     void SetLocation(const FVector& eye) { mEye = eye; UpdateView(); }
     void SetRotation(const FQuaternion& q) { mRot = q.Normalized(); UpdateView(); }
     void SetLockRoll(bool on) { bLockRoll = on; UpdateView(); }
-	// 카메라가 특정 지점을 바라보도록 설정 (RH, Z-up)
+	// 카메라가 특정 지점을 바라보도록 설정 (LH, Z-up)
     void LookAt(const FVector& eye, const FVector& target, const FVector& up = FVector(0, 0, 1));
     // 로컬축 기준 이동 (dx=right, dy=forward, dz=up)
     void MoveLocal(float dx, float dy, float dz, float deltaTime, bool boost = false,

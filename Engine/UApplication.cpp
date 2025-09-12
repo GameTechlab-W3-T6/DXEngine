@@ -140,7 +140,8 @@ void UApplication::Shutdown()
 	// Allow derived classes to cleanup
 	OnShutdown();
 
-	// Shutdown core systems
+	// Shutdown core systems in reverse order
+	inputManager.Shutdown();  // 먼저 입력 시스템 안전 종료
 	gui.Shutdown();
 	renderer.ReleaseConstantBuffer();
 	renderer.ReleaseShader();
@@ -270,6 +271,11 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	switch (message)
 	{
 	case WM_DESTROY:
+		// 윈도우 종료 시 입력 시스템 안전 종료
+		if (g_pApplication && g_pApplication->bIsInitialized)
+		{
+			g_pApplication->inputManager.SafeEndMouseLook();
+		}
 		PostQuitMessage(0);
 		break;
 

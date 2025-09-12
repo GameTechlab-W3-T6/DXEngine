@@ -6,6 +6,27 @@
 #include "CubeVertices.h"
 #include "UClass.h"
 
+// Triangle winding order flip utility function
+TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& vertices)
+{
+	TArray<FVertexPosColor> flipped;
+	flipped.reserve(vertices.size());
+	
+	// Process every 3 vertices (triangle) and flip the order
+	for (size_t i = 0; i < vertices.size(); i += 3)
+	{
+		if (i + 2 < vertices.size())
+		{
+			// Flip triangle: ABC -> ACB
+			flipped.push_back(vertices[i]);     // A
+			flipped.push_back(vertices[i + 2]); // C  
+			flipped.push_back(vertices[i + 1]); // B
+		}
+	}
+	
+	return flipped;
+}
+
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
 UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
@@ -19,7 +40,8 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 // 생성자
 UMeshManager::UMeshManager()
 {
-	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
+	// Sphere needs winding order flip for LH coordinate system
+	meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
 	meshes["Plane"] = CreateMeshInternal(plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
 	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);

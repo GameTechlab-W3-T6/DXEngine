@@ -21,6 +21,13 @@ UClass* UClass::RegisterToFactory(const FString& typeName, const TFunction<UObje
 
 void UClass::ResolveTypeBitsets()
 {
+	// 모든 비트셋을 실제 클래스 수에 맞게 사전 할당
+	size_t totalClasses = classList.size();
+	for (const TUniquePtr<UClass>& _class : classList)
+	{
+		_class->typeBitset.Reserve(totalClasses);
+	}
+
 	for (const TUniquePtr<UClass>& _class : classList)
 	{
         if (!_class->superClassTypeName.empty()) {

@@ -178,24 +178,24 @@ void UScene::Update(float deltaTime)
 		float mdx = 0.f, mdy = 0.f;
 		inputManager->ConsumeMouseDelta(mdx, mdy);
 
-		const float sens = 0.003f; // 일단 크게 해서 동작 확인
-		camera->AddYawPitch(-mdx * sens, -mdy * sens);
+		const float sens = 0.0015f;
+		camera->AddYawPitch(mdx * sens, mdy * sens);
 	}
 	if (inputManager->IsKeyDown('W'))
 	{
-		dy += 1.0f; // 전진
+		dx += 1.0f; // 전진 (Forward = +X in Unreal)
 	}
 	if (inputManager->IsKeyDown('A'))
 	{
-		dx -= 1.0f; // 좌
+		dy -= 1.0f; // 좌 (Left = -Y in Unreal)
 	}
 	if (inputManager->IsKeyDown('S'))
 	{
-		dy -= 1.0f; // 후진
+		dx -= 1.0f; // 후진 (Back = -X in Unreal)
 	}
 	if (inputManager->IsKeyDown('D'))
 	{
-		dx += 1.0f; // 우
+		dy += 1.0f; // 우 (Right = +Y in Unreal)
 	}
 	if (inputManager->IsKeyDown('E'))
 	{
