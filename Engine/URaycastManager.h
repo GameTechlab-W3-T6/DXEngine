@@ -36,11 +36,13 @@ public:
 	void SetInputManager(UInputManager* inputManager) { InputManager = inputManager; }
 
 	template <typename T>
-	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint);
+	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint, FVector& outMinPos, FVector& outMaxPos);
 
 	TOptional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
 
 	FRay CreateRayFromScreenPosition(UCamera* camera);
+
+	void MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax);
 
 private:
 	URenderer* Renderer;
@@ -54,4 +56,5 @@ private:
 
 	FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
 	FVector TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world);
+	FVector TransformVertexToWorld(const FVector& vertex, const FMatrix& world);
 };

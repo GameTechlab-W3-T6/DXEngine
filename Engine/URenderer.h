@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Matrix.h"
@@ -45,6 +45,7 @@ private:
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
 	ID3D11Buffer* textConstantBuffer;
+	ID3D11Buffer* aabbLineVB; 
 
 	// Viewport
 	D3D11_VIEWPORT viewport;
@@ -101,6 +102,11 @@ public:
 	void DrawMesh(UMesh* mesh);
 	void DrawLine(UMesh* mesh);
 	void DrawMeshOnTop(UMesh* mesh);
+
+	// Drawing AABB 
+	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out);
+ 	void EnsureAabbLineVB(UINT bytes);
+	void DrawAABBLines(const FVector& mn, const FVector& mx);
 
 	// Resource binding
 	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);

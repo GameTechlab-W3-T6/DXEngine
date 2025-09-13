@@ -21,10 +21,16 @@ SamplerState testSampler : register(s0);
 
 float4 main(PS_INPUT input) : SV_Target
 {
+    
     //UV
     float2 cellScale = cellSize / texResolution;
     float2 cellOffsetUV = cellIndex * cellScale;
     float2 uv = input.UV * cellScale + cellOffsetUV;
 
-    return testText.Sample(testSampler, uv);
+    if (testText)
+    {
+        return testText.Sample(testSampler, uv);
+    }
+    else
+        return input.Color;
 }

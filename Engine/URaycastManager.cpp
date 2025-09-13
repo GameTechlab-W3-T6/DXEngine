@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "URaycastManager.h"
-
 #include "ImguiConsole.h"
 #include "Vector.h"
 #include "URenderer.h"
@@ -67,7 +66,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 }
 
 template <typename T>
-bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint)
+bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint, FVector& outMinPos, FVector& outMaxPos)
 {
 	MouseX = static_cast<float>(InputManager->GetMouseX());
 	MouseY = static_cast<float>(InputManager->GetMouseY());
@@ -86,7 +85,7 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	bool hit = false;
 	float closestHit = FLT_MAX;
 	T* closestComponent = nullptr;
-
+	 
 	for (T* component : components)
 	{
 		UMesh* mesh = component->GetMesh();
@@ -95,13 +94,21 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 		if (mesh->NumVertices < 3) continue;
 
 		for (int32 i = 0; i + 2 < mesh->NumVertices; i += 3)
-		{
-			FVector triangleVertices[3] = {
-				TransformVertexToWorld(mesh->Vertices[i], worldTransform),
-				TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
-				TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
-			};
-
+		{ 
+			FVector triangleVertices[3];
+			if (mesh->Vertices.size() > 0)
+			{
+				triangleVertices[0] = TransformVertexToWorld(mesh->Vertices[i], worldTransform);
+				triangleVertices[1] = TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform);
+				triangleVertices[2] = TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform);  
+			}
+			else
+			{
+				triangleVertices[0] = TransformVertexToWorld(mesh->Vertices2[i], worldTransform);
+				triangleVertices[1] = TransformVertexToWorld(mesh->Vertices2[i + 1], worldTransform);
+				triangleVertices[2] = TransformVertexToWorld(mesh->Vertices2[i + 2], worldTransform);
+			}
+			
 			// std::cout << "Triangle: V0(" 
 		 //  << triangleVertices[0].X << ", " << triangleVertices[0].Y << ", " << triangleVertices[0].Z 
 		 //  << ") V1(" 
@@ -115,16 +122,21 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 			{
 				float t = (*result - RayOrigin).Length(); // distance along ray
 				if (t < closestHit)
-				{
+				{  					
 					closestHit = t;
 					hit = true;
 					closestComponent = component;
-					outImpactPoint = *result;
+					outImpactPoint = *result; 
+
+					// AABB 구하기 위한 min, max Pos 
+					// 여기서는 model space이기 때문에 world space로 재계산 
+					MakeAABBInfo(mesh, outMinPos, outMaxPos);
+					outMinPos = TransformVertexToWorld(outMinPos, worldTransform);
+					outMaxPos = TransformVertexToWorld(outMaxPos, worldTransform); 
 				}
 			}
 		}
 	}
-
 	if (hit)
 	{
 		hitComponent = closestComponent;
@@ -132,8 +144,8 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	return hit;
 }
 
-template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&, FVector&);
-template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&);
+template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&, FVector& ,FVector&, FVector&);
+template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&, FVector&, FVector&);
 
 
 TOptional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
@@ -182,6 +194,13 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, 
 FVector URaycastManager::TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world)
 {
 	FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
+	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
+	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
+}
+
+FVector URaycastManager::TransformVertexToWorld(const FVector& vertex, const FMatrix& world)
+{
+	FVector4 pos4(vertex.X, vertex.Y, vertex.Z, 1.0f);
 	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
 	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
@@ -255,4 +274,36 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	//UE_LOG("%f %f %f / %f %f %f", resultRay.Origin.X, resultRay.Origin.Y, resultRay.Origin.Z, resultRay.Direction.X, resultRay.Direction.Y, resultRay.Direction.Z);
 
 	return resultRay;
+}
+
+void URaycastManager::MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax)
+{
+	if (mesh->Vertices.size() == 0) return;
+
+	float maxPos[3] = { INT_MIN, INT_MIN, INT_MIN };
+	float minPos[3] = { INT_MAX, INT_MAX,INT_MAX };
+
+	auto UpdateMinMax = [&](const FVector& p)
+		{
+			minPos[0] = (p.X < minPos[0]) ? p.X : minPos[0];
+			minPos[1] = (p.Y < minPos[1]) ? p.Y : minPos[1];
+			minPos[2] = (p.Z < minPos[2]) ? p.Z : minPos[2];
+
+			// max 갱신: 더 크면 교체
+			maxPos[0] = (p.X > maxPos[0]) ? p.X : maxPos[0];
+			maxPos[1] = (p.Y > maxPos[1]) ? p.Y : maxPos[1];
+			maxPos[2] = (p.Z > maxPos[2]) ? p.Z : maxPos[2];
+		};
+
+	for (auto v : mesh->Vertices)
+	{
+		UpdateMinMax({v.x, v.y, v.z});
+	}
+	outMin.X = minPos[0];
+	outMin.Y = minPos[1];
+	outMin.Z = minPos[2];
+
+	outMax.X = maxPos[0];
+	outMax.Y = maxPos[1];
+	outMax.Z = maxPos[2];   
 }

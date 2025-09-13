@@ -48,7 +48,7 @@ public:
 
 	static UScene* Create(json::JSON data);
 
-	void AddObject(USceneComponent* obj);
+	void AddObject(USceneComponent* obj, bool hasText = false);
 	void SetVersion(int32 v) { version = v; }
 
 	json::JSON Serialize() const override;

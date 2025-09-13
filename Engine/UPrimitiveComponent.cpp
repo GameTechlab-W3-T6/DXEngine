@@ -46,10 +46,10 @@ void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected);
 
-	if (textInfo != nullptr)
+	if (textInfo->textTexture != nullptr)
 	{
 		renderer.SetTextUV(*textInfo);
-	}
+	} 
 } 
 
 void UPrimitiveComponent::Draw(URenderer& renderer)

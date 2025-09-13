@@ -148,14 +148,17 @@ void EditorApplication::HandleMouseClick()
 	FVector impactPoint;
 	UGizmoComponent* hitGizmo = nullptr;
 	UPrimitiveComponent* hitPrimitive = nullptr;
+	FVector minPos;
+	FVector maxPos;
 
-	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint))
+	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint, minPos, maxPos))
 	{
 		HandleGizmoHit(hitGizmo, impactPoint);
 	}
-	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint))
+	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint, minPos, maxPos))
 	{
-		HandlePrimitiveHit(hitPrimitive);
+		GetRenderer().DrawAABBLines(minPos, maxPos);
+		HandlePrimitiveHit(hitPrimitive); 
 	}
 	else
 	{
@@ -234,6 +237,7 @@ void EditorApplication::HandleEmptySpaceClick()
 	propertyWindow->SetTarget(nullptr);
 
 }
+ 
 
 void EditorApplication::Render()
 {

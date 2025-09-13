@@ -16,6 +16,7 @@ URenderer::URenderer()
 	, inputLayout(nullptr)
 	, constantBuffer(nullptr)
 	, textConstantBuffer(nullptr)
+	, aabbLineVB(nullptr)
 	, rasterizerState(nullptr) 
 	, hWnd(nullptr)
 	, bIsInitialized(false)
@@ -241,7 +242,7 @@ ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes
 	{
 		LogError("CreateVertexBuffer", hr);
 		return nullptr;
-	}
+	} 
 
 	return buffer;
 }
@@ -615,6 +616,80 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
 	// Release local COM objects
 	SAFE_RELEASE(pOldState);
 	SAFE_RELEASE(pDSState);
+}
+
+void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out)
+{
+	out.clear(); 
+	out.reserve(24);
+
+	auto V = [&](float x, float y, float z) {
+		FVertexPosColor4 v{};
+		v.x = x; v.y = y; v.z = z; v.w = 1.0f;
+		v.r = 1.0f; v.g = 1.0f; v.b = 1.0f; v.a = 1.0f;
+		out.push_back(v);
+		};
+
+	// 8 corners
+	FVector c000{ mn.X,mn.Y,mn.Z }, c100{ mx.X,mn.Y,mn.Z },
+		c110{ mx.X,mx.Y,mn.Z }, c010{ mn.X,mx.Y,mn.Z },
+		c001{ mn.X,mn.Y,mx.Z }, c101{ mx.X,mn.Y,mx.Z },
+		c111{ mx.X,mx.Y,mx.Z }, c011{ mn.X,mx.Y,mx.Z };
+
+	// bottom face
+	V(c000.X, c000.Y, c000.Z); V(c100.X, c100.Y, c100.Z);
+	V(c100.X, c100.Y, c100.Z); V(c110.X, c110.Y, c110.Z);
+	V(c110.X, c110.Y, c110.Z); V(c010.X, c010.Y, c010.Z);
+	V(c010.X, c010.Y, c010.Z); V(c000.X, c000.Y, c000.Z);
+	// top face
+	V(c001.X, c001.Y, c001.Z); V(c101.X, c101.Y, c101.Z);
+	V(c101.X, c101.Y, c101.Z); V(c111.X, c111.Y, c111.Z);
+	V(c111.X, c111.Y, c111.Z); V(c011.X, c011.Y, c011.Z);
+	V(c011.X, c011.Y, c011.Z); V(c001.X, c001.Y, c001.Z);
+	// verticals
+	V(c000.X, c000.Y, c000.Z); V(c001.X, c001.Y, c001.Z);
+	V(c100.X, c100.Y, c100.Z); V(c101.X, c101.Y, c101.Z);
+	V(c110.X, c110.Y, c110.Z); V(c111.X, c111.Y, c111.Z);
+	V(c010.X, c010.Y, c010.Z); V(c011.X, c011.Y, c011.Z);
+}
+
+void URenderer::EnsureAabbLineVB(UINT bytes)
+{  
+	if (aabbLineVB != nullptr) return;
+
+	D3D11_BUFFER_DESC bd{};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = bytes;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	HRESULT hr = device->CreateBuffer(&bd, nullptr, &aabbLineVB);
+
+	if (FAILED(hr))
+	{
+		LogError("AABB BUFFER ERROR", hr);
+		return;
+	}
+}
+
+void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
+{
+	TArray<FVertexPosColor4> verts;
+	BuildAabbLineVerts(mn, mx,verts);
+
+	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosColor4));
+	EnsureAabbLineVB(bytes);
+
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+	deviceContext->Map(aabbLineVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	memcpy(mapped.pData, verts.data(), bytes);
+	deviceContext->Unmap(aabbLineVB, 0);
+
+	UINT stride = sizeof(FVertexPosColor4), offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &aabbLineVB, &stride, &offset);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	  
+	deviceContext->Draw((UINT)verts.size(), 0);
 }
 
 void URenderer::SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset)

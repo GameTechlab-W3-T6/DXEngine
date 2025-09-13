@@ -99,5 +99,5 @@ void UTextholderComp::Draw(URenderer& renderer)
 
 	//UpdateConstantBuffer(renderer);
 
-	RenderTextLine(renderer);
+ 	RenderTextLine(renderer);
 }

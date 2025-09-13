@@ -61,7 +61,7 @@ UScene* UScene::Create(json::JSON data)
 	return scene;
 }
 
-void UScene::AddObject(USceneComponent* obj)
+void UScene::AddObject(USceneComponent* obj, bool hasText)
 {
 	// 런타임에서만 사용 - Scene이 Initialize된 후에 호출할 것
 	assert(meshManager != nullptr && "AddObject should only be called after Scene initialization");
@@ -83,7 +83,14 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager, inputManager, textureManager, camera);
+		if (hasText)
+		{
+			primitive->Init(meshManager, inputManager, textureManager, camera);
+		}
+		else
+		{
+			primitive->Init(meshManager, inputManager, textureManager);
+		}
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}
@@ -195,7 +202,7 @@ void UScene::Update(float deltaTime)
 	}
 	if (inputManager->IsKeyPressed(VK_CONTROL))
 	{
-		AddObject(new UTextholderComp);
+		AddObject(new UTextholderComp, true);
 	}
 
 	static float t = 0.0f; t += deltaTime;
