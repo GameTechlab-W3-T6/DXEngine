@@ -14,7 +14,7 @@ URenderer::URenderer()
 	, pixelShader(nullptr)
 	, inputLayout(nullptr)
 	, constantBuffer(nullptr)
-	, rasterizerState(nullptr)
+	, rasterizerState_solid(nullptr)
 	, hWnd(nullptr)
 	, bIsInitialized(false)
 {
@@ -69,6 +69,8 @@ bool URenderer::Initialize(HWND windowHandle)
 		LogError("CreateRasterizerState", E_FAIL);
 		return false;
 	}
+
+	// SetRasterizerMode();
 
 	bIsInitialized = true;
 	return true;
@@ -186,8 +188,14 @@ bool URenderer::CreateRasterizerState()
 	rasterizerDesc.MultisampleEnable = FALSE;
 	rasterizerDesc.AntialiasedLineEnable = FALSE;
 
-	HRESULT hr = device->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
-	return CheckResult(hr, "CreateRasterizerState");
+	HRESULT hr = device->CreateRasterizerState(&rasterizerDesc, &rasterizerState_solid);
+	if (!CheckResult(hr, "CreateRasterizerState"))
+		return false;
+
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	hr = device->CreateRasterizerState(&rasterizerDesc, &rasterizerState_wireframe);
+
+	return (!CheckResult(hr, "CreateRasterizerState"));
 }
 
 bool URenderer::CreateConstantBuffer()
@@ -274,7 +282,8 @@ void URenderer::Release()
 	ReleaseShader();
 	ReleaseConstantBuffer();
 
-	SAFE_RELEASE(rasterizerState);
+	SAFE_RELEASE(rasterizerState_solid);
+	SAFE_RELEASE(rasterizerState_wireframe);
 	SAFE_RELEASE(depthStencilView);
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(swapChain);
@@ -452,9 +461,9 @@ void URenderer::PrepareShader()
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Set rasterizer state (와인딩 순서 적용)
-	if (rasterizerState)
+	if (rasterizerState_solid)
 	{
-		deviceContext->RSSetState(rasterizerState);
+		deviceContext->RSSetState(rasterizerState_solid);
 	}
 
 	// Set constant buffer
@@ -603,6 +612,14 @@ void URenderer::SetTexture(ID3D11ShaderResourceView* srv, UINT slot)
 	{
 		deviceContext->PSSetShaderResources(slot, 1, &srv);
 	}
+}
+
+void URenderer::SetRasterizerMode(bool isSolid)
+{
+	auto& rss = isSolid ? rasterizerState_solid : rasterizerState_wireframe;
+	if (!rss)
+		return;
+	deviceContext->RSSetState(rss);
 }
 
 bool URenderer::ResizeBuffers(int32 width, int32 height)
