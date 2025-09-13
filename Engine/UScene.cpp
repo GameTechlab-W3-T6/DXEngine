@@ -1,4 +1,4 @@
-// UScene.cpp
+﻿// UScene.cpp
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
@@ -9,6 +9,7 @@
 #include "URaycastManager.h"
 #include "UCamera.h" 
 #include "UTextureManager.h"
+#include "UTextholderComp.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -215,7 +216,10 @@ void UScene::Update(float deltaTime)
 	{
 		dz -= 1.0f; // 하
 	} 
-	
+	if (inputManager->IsKeyPressed(VK_CONTROL))
+	{
+		AddObject(new UTextholderComp);
+	}
 
 	static float t = 0.0f; t += deltaTime;
 	// 대각선 이동 속도 보정(선택): 벡터 정규화

@@ -233,6 +233,7 @@
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
+    <ClCompile Include="UTextholderComp.cpp" />
     <ClCompile Include="UTextureManager.cpp" />
     <ClCompile Include="UTimeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
@@ -292,6 +293,7 @@
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
+    <ClInclude Include="UTextholderComp.h" />
     <ClInclude Include="UTextureManager.h" />
     <ClInclude Include="UTimeManager.h" />
     <ClInclude Include="UGUI.h" />
