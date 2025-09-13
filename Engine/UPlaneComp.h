@@ -13,5 +13,6 @@ public:
 	UPlaneComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
 		:UPrimitiveComponent(pos, rot, scl)
 	{
+
 	}
 };

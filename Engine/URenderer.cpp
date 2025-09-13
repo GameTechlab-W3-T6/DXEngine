@@ -818,30 +818,25 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 }
 
 void URenderer::SetTextUV(FTextInfo& textInfo)
-{
-	
-	//FMatrix MVP = M * mVP;
-
-	//calculate place 
-	int cellIndex = (int)U'a';
-	//int cellIndex = textInfo.keyCode;
-	int indexH = cellIndex / (int)textInfo.cellsPerRow;
-	int indexW = cellIndex % (int)textInfo.cellsPerRow;
-	
-	//textInfo->u = (orderW * textInfo->cellWidth / textTex->width);
-	//textInfo->v = (orderH * textInfo->cellHeight / textTex->height);
+{ 
+	int cellIndex = textInfo.keyCode;  
+	//cell 크기/ 텍스처 해상도 업로드
 	mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
-	mCBUVData.cellSize[1] = (float)textInfo.cellHeight;
-
-	mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;
+	mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
+	mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
 	mCBUVData.texResolution[1] = (float)textInfo.textTexture->height;
-
+	
+	int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
+	
+	int cols = (int)textInfo.cellsPerRow;
+	//int column = (int)textInfo.cellsPerColumn;
+	int indexH = code / cols;
+	int indexW = code % cols;
+	
 	mCBUVData.cellIndex[0] = (float)indexW; // X = col
 	mCBUVData.cellIndex[1] = (float)indexH; // Y = row
-	 
+	  
 	
-	(&mCBUVData, sizeof(mCBUVData));
-
 	UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
 }
 
