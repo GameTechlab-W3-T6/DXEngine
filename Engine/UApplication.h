@@ -45,12 +45,12 @@ public:
 	// Application lifecycle
 	bool Initialize(HINSTANCE hInstance, const std::wstring& title = L"Engine Application",
 		int32 width = 1024, int32 height = 768);
-	void Run();
+	void Run(bool bIsShaderReflectionEnabled);
 	void Shutdown();
 
 	// Core update loop - can be overridden by derived classes
 	virtual void Update(float deltaTime);
-	virtual void Render();
+	virtual void Render(bool bIsShaderReflectionEnabled);
 
 	// System access
 	URenderer& GetRenderer() { return renderer; }
@@ -75,7 +75,7 @@ protected:
 	bool CreateMainWindow(HINSTANCE hInstance);
 	void ProcessMessages();
 	void InternalUpdate();
-	void InternalRender();
+	void InternalRender(bool bIsShaderReflectionEnabled);
 
 	// Window procedure
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

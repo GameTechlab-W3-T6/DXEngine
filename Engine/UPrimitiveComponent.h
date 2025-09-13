@@ -22,8 +22,8 @@ public:
 
 	bool bIsSelected = false;
 
-	virtual void Draw(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer);
+	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드

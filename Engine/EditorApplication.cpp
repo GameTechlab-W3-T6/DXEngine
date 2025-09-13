@@ -134,10 +134,10 @@ void EditorApplication::Update(float deltaTime)
 	}
 }
 
-void EditorApplication::Render()
+void EditorApplication::Render(bool bIsShaderReflectionEnabled)
 {
-	UApplication::Render();
-	gizmoManager.Draw(GetRenderer());
+	UApplication::Render(bIsShaderReflectionEnabled);
+	gizmoManager.Draw(GetRenderer(), bIsShaderReflectionEnabled);
 }
 
 void EditorApplication::RenderGUI()

@@ -14,19 +14,19 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager)
 	return false;
 }
 
-void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
+void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, Color, bIsSelected);
+	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
 }
 
-void UPrimitiveComponent::Draw(URenderer& renderer)
+void UPrimitiveComponent::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	if (!mesh || !mesh->VertexBuffer)
 	{
 		return;
 	}
 
-	UpdateConstantBuffer(renderer);
+	UpdateConstantBuffer(renderer, bIsShaderReflectionEnabled);
 	renderer.DrawMesh(mesh);
 }
