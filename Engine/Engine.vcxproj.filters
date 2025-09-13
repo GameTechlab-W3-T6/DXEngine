@@ -192,6 +192,7 @@
     <ClCompile Include="FTextInfo.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="UTextholderComp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -374,6 +375,7 @@
     <ClInclude Include="FTextInfo.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="UTextholderComp.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TexTestPS.hlsl">

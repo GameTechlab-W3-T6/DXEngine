@@ -15,10 +15,10 @@ bool UDefaultScene::OnInitialize()
     if (IsFirstTime)
     {
         // 컴포넌트 생성
-        UPlaneComp* plane = new UPlaneComp({ 0.0f ,0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f});
+        // UPlaneComp* plane = new UPlaneComp({ 0.0f ,0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f});
 
         //AddObject(sphere);
-        AddObject(plane);
+        // AddObject(plane);
 
         IsFirstTime = false;
     }

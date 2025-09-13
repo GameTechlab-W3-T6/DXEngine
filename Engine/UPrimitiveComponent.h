@@ -19,10 +19,6 @@ protected:
 	
 	FTextInfo* textInfo;
 	UCamera* camera;
-
-
-
-
 	FVector4 Color = { 1, 1, 1, 1 };
 	
 	//임시
@@ -32,21 +28,15 @@ protected:
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr), textInfo(new FTextInfo())
-	{
-	}
-	 
-	void CaptureTypedChars();                 // 이번 프레임 타이핑된 글자들을 수집
-	void RenderTextLine(URenderer& renderer); // 수집된 글자를 가로로 나열 렌더
-
-	bool bIsSelected = false;
-
-	virtual void Draw(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer); 
-
+	{}
 	virtual ~UPrimitiveComponent() {}
+	
+	bool bIsSelected = false;
 
 	// 별도의 초기화 메서드
 	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
+	virtual void Draw(URenderer& renderer);
+	virtual void UpdateConstantBuffer(URenderer& renderer); 
 
 	bool CountOnInspector() override { return true; }
 
