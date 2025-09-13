@@ -11,6 +11,7 @@ cbuffer TextConstantBuffer : register(b0)
     float2 cellSize;
     float2 texResolution;
     float2 padding;
+    
 };
 
 Texture2D testText : register(t0);

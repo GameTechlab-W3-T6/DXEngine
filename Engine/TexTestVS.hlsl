@@ -31,6 +31,9 @@ cbuffer ConstantBuffer : register(b0)
     float padding[3];
 };
 
+// camera pos 
+// { }
+
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;

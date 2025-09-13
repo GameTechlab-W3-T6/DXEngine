@@ -41,7 +41,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UText
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager, inputManager, textureManager);
+			primitive->Init(meshManager, inputManager, textureManager, camera);
 		}
 	}
 
@@ -82,7 +82,7 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager, inputManager, textureManager);
+		primitive->Init(meshManager, inputManager, textureManager, camera);
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}

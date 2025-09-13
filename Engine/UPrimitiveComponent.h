@@ -7,7 +7,7 @@
 #include "FTextInfo.h"
 class UMeshManager; // 전방 선언
 class UTextureManager;
-//struct FTextInfo;
+class UCamera;
 struct FTexture;
 
 class UPrimitiveComponent : public USceneComponent
@@ -16,9 +16,12 @@ class UPrimitiveComponent : public USceneComponent
 protected:
 	UMesh* mesh;
 	FTexture* texture;
-	 
+	
 	FTextInfo* textInfo;
-	 
+	UCamera* camera;
+
+
+
 
 	FVector4 Color = { 1, 1, 1, 1 };
 	
@@ -43,7 +46,7 @@ public:
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드
-	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr);
+	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
 
 	bool CountOnInspector() override { return true; }
 
