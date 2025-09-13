@@ -23,7 +23,7 @@ UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY pr
 void UMesh::Init(ID3D11Device* device , bool isFVertexPosColor) {
 	D3D11_BUFFER_DESC vbd = {};
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = isFVertexPosColor ? sizeof(FVertexPosColor4) * NumVertices : sizeof(FVertexPosUV4) * NumVertices;
+	vbd.ByteWidth = isFVertexPosColor ? sizeof(FVertexPosUV4) * NumVertices : sizeof(FVertexPosUV4) * NumVertices;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
