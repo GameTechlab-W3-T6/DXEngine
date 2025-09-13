@@ -35,6 +35,7 @@ private:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11DepthStencilView* depthStencilView;
 	ID3D11RasterizerState* rasterizerState;
+	 
 
 	// Shader objects
 	ID3D11VertexShader* vertexShader;
@@ -69,10 +70,11 @@ public:
 	bool Initialize(HWND windowHandle);
 	bool CreateShader();
 	bool CreateRasterizerState();
-	bool CreateConstantBuffer();
+	bool CreateConstantBuffer(); 
+
 	void Release();
 	void ReleaseShader();
-	void ReleaseConstantBuffer();
+	void ReleaseConstantBuffer(); 
 
 	// Buffer creation
 	ID3D11Buffer* CreateVertexBuffer(const void* data, size_t sizeInBytes);
