@@ -14,7 +14,6 @@ USceneManager::~USceneManager()
 bool USceneManager::Initialize(UApplication* _application)
 {
 	application = _application;
-	UEngineStatics::SetNextUUID(100000);
 	currentScene = _application->CreateDefaultScene();
 	currentScene->Initialize(
 		&application->GetRenderer(),

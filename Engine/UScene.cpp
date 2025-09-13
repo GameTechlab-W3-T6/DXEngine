@@ -104,7 +104,7 @@ json::JSON UScene::Serialize() const
 bool UScene::Deserialize(const json::JSON& data)
 {
 	version = data.at("Version").ToInt();
-	// nextUUID = data.at("NextUUID").ToInt();
+	//nextUUID = data.at("NextUUID").ToInt();
 
 	objects.clear();
 

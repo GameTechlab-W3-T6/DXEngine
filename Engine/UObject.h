@@ -19,34 +19,43 @@ public:
     uint32 UUID;
     uint32 InternalIndex;
 
-    UObject()
+    static void AddTrackedObject(UObject* obj)
     {
-        UUID = UEngineStatics::GenUUID();
-
         // 방법 1: 빠른 추가 - 재사용 인덱스 우선 사용
         if (!FreeIndices.empty())
         {
             // 삭제된 슬롯 재사용 (O(1))
-            InternalIndex = FreeIndices.back();
+            obj->InternalIndex = FreeIndices.back();
             FreeIndices.pop_back();
-            GUObjectArray[InternalIndex] = this;
+            GUObjectArray[obj->InternalIndex] = obj;
         }
         else
         {
             // 새 슬롯 할당 (O(1) amortized)
-            InternalIndex = NextFreshIndex++;
-            GUObjectArray.push_back(this);
+            obj->InternalIndex = NextFreshIndex++;
+            GUObjectArray.push_back(obj);
         }
+    }
+
+    static void RemoveTrackedObject(UObject* obj)
+    {
+        // 방법 1: 빠른 삭제 - nullptr 마킹 + 인덱스 재사용 큐에 추가
+        if (obj->InternalIndex < GUObjectArray.size() && GUObjectArray[obj->InternalIndex] == obj)
+        {
+            GUObjectArray[obj->InternalIndex] = nullptr;  // O(1)
+            FreeIndices.push_back(obj->InternalIndex);    // O(1)
+        }
+    }
+
+    UObject()
+    {
+        UUID = UINT_MAX;
+        AddTrackedObject(this);
     }
 
     virtual ~UObject()
     {
-        // 방법 1: 빠른 삭제 - nullptr 마킹 + 인덱스 재사용 큐에 추가
-        if (InternalIndex < GUObjectArray.size() && GUObjectArray[InternalIndex] == this)
-        {
-            GUObjectArray[InternalIndex] = nullptr;  // O(1)
-            FreeIndices.push_back(InternalIndex);    // O(1)
-        }
+        RemoveTrackedObject(this);
     }
 
     virtual bool CountOnInspector() {

@@ -49,11 +49,13 @@ class UClass;
 class UEngineStatics
 {
 public:
-    static uint32 GenUUID()
+
+    static bool IsInitialized()
     {
-        if (!isEnabled) return UINT_MAX;
-        return NextUUID++;
+        return isInitialized;
     }
+
+    static uint32 GenUUID();
 
     static uint32 GetNextUUID() { return NextUUID; }
     static void SetNextUUID(uint32 nextUUID) { 
@@ -101,4 +103,5 @@ private:
     static uint32 TotalAllocationBytes;
     static uint32 TotalAllocationCount;
     static bool isEnabled;
+    static bool isInitialized;
 };

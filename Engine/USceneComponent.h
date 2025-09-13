@@ -15,6 +15,7 @@ public:
 		: RelativeLocation(pos), //RelativeRotation(rot), 
 		RelativeScale3D(scl), RelativeQuaternion(FQuaternion::FromEulerXYZDeg(rot))
 	{
+		UUID = UEngineStatics::GenUUID();
 	}
 
 	virtual FMatrix GetWorldTransform();

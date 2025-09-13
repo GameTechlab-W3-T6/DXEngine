@@ -2,14 +2,23 @@
 #include "UEngineStatics.h"
 #include "UEngineSubsystem.h"
 #include "UClass.h"
+#include "UObject.h"
 
-uint32 UEngineStatics::NextUUID = 1;
+uint32 UEngineStatics::NextUUID = 0x00000001;
 uint32 UEngineStatics::TotalAllocationBytes = 0;
 uint32 UEngineStatics::TotalAllocationCount = 0;
 bool UEngineStatics::isEnabled = true;
+bool UEngineStatics::isInitialized = false;
 
 // 서브시스템 레지스트리
 static TArray<UEngineSubsystem*> RegisteredSubsystems;
+
+uint32 UEngineStatics::GenUUID()
+{
+    if (!isEnabled) return UINT_MAX;
+
+    return NextUUID++;
+}
 
 void UEngineStatics::RegisterSubsystem(UEngineSubsystem* subsystem)
 {
