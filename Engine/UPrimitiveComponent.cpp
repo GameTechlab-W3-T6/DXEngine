@@ -23,14 +23,8 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTe
 		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 		texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextureType")); 
 		
-		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-		//TODO: 정리
-		textInfo = new FTextInfo();
-		textInfo->textTexture = textTex; 
-		textInfo->cellsPerColumn = 16;
-		textInfo->cellsPerRow = 16;
-		textInfo->cellWidth = textTex->width / textInfo->cellsPerRow;
-		textInfo->cellHeight = textTex->height / textInfo->cellsPerColumn;
+		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo")); 
+		textInfo->SetParam(textTex, 16, 16); 
 		  
 		return mesh != nullptr;
 	}
@@ -54,29 +48,24 @@ void UPrimitiveComponent::CaptureTypedChars()
 	{
 		if (inputManager->IsKeyPressed(vk))
 		{
-			// 글자 하나당 새 FTextInfo 생성
-			FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-			if (!textTex) continue;
-
 			if (textInfo == nullptr)
-			{
-				textInfo = new FTextInfo();
-
-				textInfo->textTexture = textTex;
-				textInfo->cellsPerColumn = 16;
-				textInfo->cellsPerRow = 16;
-				textInfo->cellWidth = textTex->width / textInfo->cellsPerRow;
-				textInfo->cellHeight = textTex->height / textInfo->cellsPerColumn;
-				 
-				textInfo->orderOfChar.push_back(vk);
-			} 
-
+			{  
+				OutputDebugStringA("TextInfo Error:\n"); 
+			}  
 			else
 			{  
 				textInfo->orderOfChar.push_back(vk);  
 			}
 		}
 	}
+	if (inputManager->IsKeyPressed('\b'))
+	{
+		if (!textInfo->orderOfChar.empty())
+		{
+			textInfo->orderOfChar.pop_back();
+		}
+	}
+
 }
 
 void UPrimitiveComponent::RenderTextLine(URenderer& renderer)
@@ -90,13 +79,10 @@ void UPrimitiveComponent::RenderTextLine(URenderer& renderer)
 		//addobject
 		textInfo->keyCode = textInfo->orderOfChar[i];
 		renderer.SetTextUV(*textInfo); 
-		 
-		//FMatrix M = GetWorldTransform(); 
-		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) ;
-		//FMatrix::TranslationRow()
+		  
+		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) ; 
 		renderer.SetModel(M, Color, bIsSelected); 
-		renderer.DrawMesh(mesh);
-		 
+		renderer.DrawMesh(mesh); 
 
 		penX += textInfo->cellWidth * 0.01f;
 	}
