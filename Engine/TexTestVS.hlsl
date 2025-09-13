@@ -1,8 +1,13 @@
 // ShaderW0.vs
+//struct VS_INPUT
+//{
+//    float4 Position : POSITION;
+//    //float4 Color    : COLOR;
+//    float2 UV : TEXCOORD;
+//};
 struct VS_INPUT
 {
     float4 Position : POSITION;
-    //float4 Color    : COLOR;
     float2 UV : TEXCOORD;
 };
 

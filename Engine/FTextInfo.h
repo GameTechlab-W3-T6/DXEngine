@@ -1,18 +1,17 @@
 ﻿#pragma once
 #include "FTexture.h"
-
+ 
 struct FTextInfo
-{
+{ 
 	std::vector<int> orderOfChar;
 
+	int keyCode = 0;
 	FTexture* textTexture; 
-	  
-	int keyCode;
+	   
+	int cellIndex[2];
 	float cellsPerRow, cellsPerColumn; 
-	float cellWidth, cellHeight; 
-	float u, v;
+	float cellWidth, cellHeight;  
 
-	float space = 1.0f; 
-
-	void CallCharacter(int keyCode);
+	float size[2] = { 1.0f ,1.0f };
+  
 };

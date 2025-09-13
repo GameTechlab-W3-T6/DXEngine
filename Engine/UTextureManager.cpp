@@ -103,7 +103,7 @@ void UTextureManager::CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl ,
 { 
 	////TODO: 정리
 	FTextInfo* textInfo = new FTextInfo();
-	FTexture* textTex = RetrieveTexture(cl->GetMeta("TextInfo"));
+	FTexture* textTex = RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 	textInfo->keyCode = key;
 	textInfo->textTexture = textTex;
 	textInfo->cellsPerColumn = 16;

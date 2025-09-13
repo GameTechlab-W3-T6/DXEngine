@@ -16,9 +16,9 @@ class UPrimitiveComponent : public USceneComponent
 protected:
 	UMesh* mesh;
 	FTexture* texture;
-
+	 
 	FTextInfo* textInfo;
-	TArray<FTextInfo*> stringList;
+	 
 
 	FVector4 Color = { 1, 1, 1, 1 };
 	
@@ -31,6 +31,9 @@ public:
 		: USceneComponent(loc, rot, scl), mesh(nullptr)
 	{
 	}
+	 
+	void CaptureTypedChars();                 // 이번 프레임 타이핑된 글자들을 수집
+	void RenderTextLine(URenderer& renderer); // 수집된 글자를 가로로 나열 렌더
 
 	bool bIsSelected = false;
 
