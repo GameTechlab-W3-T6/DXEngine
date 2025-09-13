@@ -15,6 +15,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 #include <functional>
 #include <cassert>
@@ -24,6 +25,8 @@
 #include <climits>
 #include <bitset>
 #include <stack>
+#include <unordered_set>
+#include <set>
 
 // DirectX 관련
 #include <d3d11.h>

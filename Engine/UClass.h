@@ -91,7 +91,15 @@ public:
 	}
 
 	UObject* CreateDefaultObject() const {
-		return createFunction ? createFunction() : nullptr;
+		UObject* defaultObject = nullptr;
+		
+		if (createFunction)
+		{
+			defaultObject = createFunction();
+			defaultObject->name = FName(GetDisplayName());
+		}
+
+		return defaultObject;
 	}
 
 };

@@ -58,7 +58,7 @@ UScene* UScene::Create(json::JSON data)
 	return scene;
 }
 
-void UScene::AddObject(USceneComponent* obj)
+void UScene::AddObject(AActor* obj)
 {
 	// 런타임에서만 사용 - Scene이 Initialize된 후에 호출할 것
 	assert(meshManager != nullptr && "AddObject should only be called after Scene initialization");
@@ -72,7 +72,7 @@ void UScene::AddObject(USceneComponent* obj)
 	objects.push_back(obj);
 
 	// 일단 표준 RTTI 사용
-	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
+	if (UPrimitiveComponent* primitive = obj->GetComponentByClass<UPrimitiveComponent>())
 	{
 		primitive->Init(meshManager);
 		if (obj->CountOnInspector())
@@ -125,18 +125,25 @@ bool UScene::Deserialize(const json::JSON& data)
 		component->Deserialize(_data);
 		component->SetUUID(uuid);
 
-		objects.push_back(component);
+		AActor* actor = new AActor();
+		// TODO : Add Component to actor
 		if (component->CountOnInspector())
 			++primitiveCount;
+		objects.push_back(actor);
 	}
 
-	USceneComponent* gizmoGrid = new UGizmoGridComp(
+	AActor* actor = new AActor();
+	//USceneComponent* gizmoGrid = new UGizmoGridComp(
+	//	{ 0.3f, 0.3f, 0.3f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 0.2f, 0.2f, 0.2f }
+	//);
+	//objects.push_back(gizmoGrid);
+	actor->AddComponentByClass<UGizmoGridComp, FVector, FVector, FVector>(
 		{ 0.3f, 0.3f, 0.3f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.2f, 0.2f, 0.2f }
 	);
-	objects.push_back(gizmoGrid);
-
 	FString uuidStr = data.at("NextUUID").ToString();
 
 	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));

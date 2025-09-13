@@ -36,6 +36,21 @@ template<typename T, typename U>
 using TMap = std::unordered_map<T, U>;
 
 template<typename T>
+using TDeque = std::deque<T>;
+
+template<typename T>
+using TList = std::list<T>;
+
+template<typename T>
+using TSet = std::unordered_set<T>;
+
+template<typename T, typename U>
+using TOrderedMap = std::map<T, U>;
+
+template<typename T, typename U>
+using TOrderedMultiMap = std::multimap<T, U>;
+
+template<typename T>
 using TFunction = std::function<T>;
 
 template<typename T>

@@ -18,6 +18,7 @@ json::JSON USceneComponent::Serialize() const
     result["Rotation"] = json::Array( tmpRot.X, tmpRot.Y, tmpRot.Z);
     result["Scale"] = json::Array(RelativeScale3D.X, RelativeScale3D.Y, RelativeScale3D.Z);
     result["Type"] = GetClass()->GetDisplayName();
+    result["Name"] = name.ToString();
     return result;
 }
 
@@ -40,6 +41,8 @@ bool USceneComponent::Deserialize(const json::JSON& data)
     auto scale = data.at("Scale");
     if (scale.size() != 3) return false;
     RelativeScale3D = FVector(scale[0].ToFloat(), scale[1].ToFloat(), scale[2].ToFloat());
+
+    name = FName(data.at("Name").ToString());
 
     return true;
 }

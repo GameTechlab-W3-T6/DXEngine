@@ -1,9 +1,10 @@
 ﻿#pragma once
+#include <type_traits>
 #include "UEngineStatics.h"
 #include "TArray.h"
 #include "ISerializable.h"
 #include "UObjectMacros.h"
-#include <type_traits>
+#include "FName.h"
 
 typedef int int32;
 typedef unsigned int uint32;
@@ -18,6 +19,7 @@ public:
     static inline TArray<UObject*> GUObjectArray;
     uint32 UUID;
     uint32 InternalIndex;
+    FName name;
 
     static void AddTrackedObject(UObject* obj)
     {
