@@ -165,7 +165,8 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Draw(*renderer);
+			if(primitive->GetVisible())
+				primitive->Draw(*renderer);
 		}
 	}
 }
@@ -190,32 +191,8 @@ void UScene::Update(float deltaTime)
 		inputManager->ConsumeMouseDelta(mdx, mdy);
 
 		const float sens = 0.005f; // 일단 크게 해서 동작 확인
-		camera->AddYawPitch(-mdx * sens, -mdy * sens);
+		camera->AddYawPitch(mdx * sens, mdy * sens);
 	}
-	if (inputManager->IsKeyDown('W'))
-	{
-		dx += 1.0f; // 전진
-	}
-	if (inputManager->IsKeyDown('A'))
-	{
-		dy -= 1.0f; // 좌
-	}
-	if (inputManager->IsKeyDown('S'))
-	{
-		dx -= 1.0f; // 후진
-	}
-	if (inputManager->IsKeyDown('D'))
-	{
-		dy += 1.0f; // 우
-	}
-	if (inputManager->IsKeyDown('E'))
-	{
-		dz += 1.0f; // 상
-	}
-	if (inputManager->IsKeyDown('Q'))
-	{
-		dz -= 1.0f; // 하
-	} 
 	if (inputManager->IsKeyPressed(VK_CONTROL))
 	{
 		AddObject(new UTextholderComp);
