@@ -179,6 +179,13 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, 
 	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
 
+FVector URaycastManager::TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world)
+{
+	FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
+	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
+	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
+}
+
 // bool RaycastManager::RayIntersectsSphere(FVector& rayOrigin, FVector& rayDirection, USphereComp& sphere, float& tHit)
 // {
 //     // R(t) = O + tD

@@ -10,15 +10,15 @@ UMesh::UMesh()
 {
 }
 
+UMesh::UMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosUV4))
+{
+}
 UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+	: Vertices2(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
 {
 }
 
-UMesh::UMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices2(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosUV4))
-{
-}
 
 void UMesh::Init(ID3D11Device* device , bool isFVertexPosColor) {
 	D3D11_BUFFER_DESC vbd = {};

@@ -14,8 +14,8 @@ private:
 	bool isInitialized = false;
 public:
 	ID3D11Buffer* VertexBuffer = nullptr;
-	TArray<FVertexPosColor4> Vertices;
-	TArray<FVertexPosUV4> Vertices2; 
+	TArray<FVertexPosColor4> Vertices2;
+	TArray<FVertexPosUV4> Vertices; 
 
 	int32 NumVertices = 0;
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;

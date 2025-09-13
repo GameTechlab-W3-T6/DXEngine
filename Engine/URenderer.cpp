@@ -183,7 +183,7 @@ bool URenderer::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;           // 뒷면 제거
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;// D3D11_CULL_BACK;       //TODO    // 뒷면 제거
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
@@ -831,6 +831,9 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 
 void URenderer::SetTextUV(FTextInfo& textInfo)
 { 
+	//임시  
+	if (textInfo.textTexture == nullptr) return; 
+
 	int cellIndex = textInfo.keyCode;  
 	//cell 크기/ 텍스처 해상도 업로드
 	mCBUVData.cellSize[0] = (float)textInfo.cellWidth;

@@ -30,7 +30,8 @@ struct FVertexPosColor
 
 struct FVertexPosUV
 {
-	float x, y, z;
+	float x, y, z; 
+
 	float u, v;
 
 	// 정적 함수 ChangeAxis 구현
