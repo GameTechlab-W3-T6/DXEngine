@@ -30,7 +30,8 @@ struct FVertexPosColor
 
 struct FVertexPosUV
 {
-	float x, y, z;
+	float x, y, z; 
+	float r, g, b, a;
 	float u, v;
 
 	// 정적 함수 ChangeAxis 구현
@@ -56,6 +57,7 @@ struct FVertexPosUV
 struct FVertexPosUV4
 {
 	float x, y, z, w;
+	float r, g, b, a;
 	float u, v;
 
 	// 정적 함수 ChangeAxis 구현
@@ -127,6 +129,11 @@ struct FVertexPosColor4
 			newVertex.y = oldVertices[i].y;
 			newVertex.z = oldVertices[i].z;
 			newVertex.w = 1.0f;  // 동차좌표 w 컴포넌트
+
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
 
 			// Color: 그대로 복사
 			newVertex.u = oldVertices[i].u;

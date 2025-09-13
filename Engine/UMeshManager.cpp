@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UMeshManager.h"
 #include "GizmoVertices.h"
 #include "Sphere.h"
@@ -51,7 +51,7 @@ UMeshManager::UMeshManager()
 {
 	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
 	//meshes["Plane"] = CreateMeshInternal(plane_vertices);
- 	meshes["Plane"] = CreateMeshInternal(plane_vertices2);
+ 	meshes["Plane"] = CreateMeshInternal(plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
 	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);

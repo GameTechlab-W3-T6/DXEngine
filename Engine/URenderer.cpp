@@ -128,7 +128,8 @@ bool URenderer::CreateShader()
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0 ,16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 
@@ -183,7 +184,7 @@ bool URenderer::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;           // 뒷면 제거
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;// D3D11_CULL_BACK;       //TODO    // 뒷면 제거
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
@@ -831,6 +832,9 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 
 void URenderer::SetTextUV(FTextInfo& textInfo)
 { 
+	//임시  
+	if (textInfo.textTexture == nullptr) return; 
+
 	int cellIndex = textInfo.keyCode;  
 	//cell 크기/ 텍스처 해상도 업로드
 	mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
