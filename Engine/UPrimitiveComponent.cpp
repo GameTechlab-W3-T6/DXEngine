@@ -6,6 +6,7 @@
 #include "FTextInfo.h"
 #include "FTexture.h"
 #include "UInputManager.h"
+#include "UCamera.h"
 
 //#include <fstream>
 //#include <sstream>
@@ -13,11 +14,11 @@
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 UCLASS_META(UPrimitiveComponent, TextInfo, "TextInfo");
 
-bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTextureManager* tm)
+bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTextureManager* tm, UCamera* cam)
 {
 	inputManager = in;
 	textureManager = tm;
-
+	
 	if (textureManager && meshManager)
 	{
 		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
@@ -25,7 +26,8 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTe
 		
 		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo")); 
 		textInfo->SetParam(textTex, 16, 16); 
-		  
+		camera = cam;
+
 		return mesh != nullptr;
 	}
 
@@ -34,6 +36,7 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTe
 		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 		return mesh != nullptr;
 	}
+	 
 
 	return false;
 }
@@ -72,20 +75,29 @@ void UPrimitiveComponent::RenderTextLine(URenderer& renderer)
 {
 	if (!mesh || !mesh->VertexBuffer) return;
 
-	float penX = 0.0f; // 왼→오 펜 위치 
+	// atlas  구별 임시
+	
+	if (camera == nullptr) return;
 
+	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
+	float penX = -totalWidth * 0.5f;
+	textInfo->center = totalWidth * 0.5f;
+	
+	FMatrix view = camera->GetView(); 
+	FMatrix bill = textInfo->MakeBillboard(view); 
 	for(int i = 0; i < textInfo->orderOfChar.size(); i++)
 	{
 		//addobject
 		textInfo->keyCode = textInfo->orderOfChar[i];
-		renderer.SetTextUV(*textInfo); 
-		  
-		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) ; 
+		renderer.SetTextUV(*textInfo);  
+
+		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0);
+		FMatrix M = FMatrix::TranslationRow(penX, 0, 0)  * bill;
 		renderer.SetModel(M, Color, bIsSelected); 
 		renderer.DrawMesh(mesh); 
 
-		penX += textInfo->cellWidth * 0.01f;
-	}
+		penX += textInfo->cellWidth * 0.01f; 
+	}   
 }
 
 void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
@@ -132,4 +144,6 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 	//UpdateConstantBuffer(renderer);
 
 	RenderTextLine(renderer);
+
+	renderer.DrawMesh(mesh);
 }
