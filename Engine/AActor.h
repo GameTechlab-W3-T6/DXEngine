@@ -2,6 +2,8 @@
 #include <type_traits>
 #include "UClass.h"
 #include "UEngineStatics.h"
+#include "UActorComponent.h"
+
 class UActorComponent; // Forward Declaration
 class USceneComponent;
 class AActor : public UObject

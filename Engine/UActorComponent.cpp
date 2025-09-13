@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
 #include "UActorComponent.h"
+#include "UObject.h"
 
-IMPLEMENT_UCLASS(UActorComponent, USceneComponent)
+IMPLEMENT_UCLASS(UActorComponent, UObject)

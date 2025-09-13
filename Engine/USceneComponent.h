@@ -3,10 +3,11 @@
 #include "UObject.h"
 #include "Vector.h"
 #include "Quaternion.h"
+#include "UActorComponent.h"
 
-class USceneComponent : public UObject
+class USceneComponent : public UActorComponent
 {
-	DECLARE_UCLASS(USceneComponent, UObject)
+	DECLARE_UCLASS(USceneComponent, UActorComponent)
 public:
 	FVector RelativeLocation;
 	FVector RelativeScale3D;

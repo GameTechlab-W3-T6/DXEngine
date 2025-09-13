@@ -15,9 +15,10 @@ bool UDefaultScene::OnInitialize()
     if (IsFirstTime)
     {
         // 컴포넌트 생성
-        USphereComp* sphere = USphereComp::StaticClass()->CreateDefaultObject()->Cast<USphereComp>();
+        AActor* actor = new AActor();
+        actor->AddComponentByClass<USphereComp>();
 
-        AddObject(sphere);
+        AddObject(actor);
         IsFirstTime = false;
     }
 

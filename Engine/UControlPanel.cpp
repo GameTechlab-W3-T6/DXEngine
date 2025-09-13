@@ -94,7 +94,10 @@ void UControlPanel::SpawnPrimitiveSection()
 				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
 				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
 			));
-			SceneManager->GetScene()->AddObject(sceneComponent);
+			AActor* actor = new AActor();
+			// TODO : Implement AddComponentByUClass
+			//actor->AddComponentByClass<USceneComponent>();
+			SceneManager->GetScene()->AddObject(actor);
 		}
 	}
 	ImGui::SameLine();

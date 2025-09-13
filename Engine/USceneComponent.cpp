@@ -3,8 +3,10 @@
 #include "USceneComponent.h"
 #include "json.hpp"
 #include "UClass.h"
+#include "UActorComponent.h"
 
-IMPLEMENT_UCLASS(USceneComponent, UObject)
+IMPLEMENT_UCLASS(USceneComponent, UActorComponent)
+
 FMatrix USceneComponent::GetWorldTransform()
 {
     return FMatrix::SRTRowQuaternion(RelativeLocation, RelativeQuaternion.ToMatrixRow(), RelativeScale3D);

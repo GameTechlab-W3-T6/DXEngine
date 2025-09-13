@@ -144,6 +144,7 @@ bool UScene::Deserialize(const json::JSON& data)
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.2f, 0.2f, 0.2f }
 	);
+
 	FString uuidStr = data.at("NextUUID").ToString();
 
 	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));
