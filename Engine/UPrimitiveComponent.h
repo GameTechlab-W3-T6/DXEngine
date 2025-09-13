@@ -25,15 +25,14 @@ protected:
 	UInputManager* inputManager;
 	UTextureManager* textureManager;
 
-	// 해당 primitive 활성화 여부
-	bool bVisible = true;
-
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr), textInfo(new FTextInfo())
 	{}
 	virtual ~UPrimitiveComponent() {}
-	
+
+	// 해당 primitive 활성화 여부
+	bool bVisible = true;
 	bool bIsSelected = false;
 
 	// 별도의 초기화 메서드
@@ -44,7 +43,6 @@ public:
 	bool CountOnInspector() override { return true; }
 
 	UMesh* GetMesh() { return mesh; }
-	bool GetVisible() { return bVisible; }
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
 	FVector4 GetColor() const { return Color; }

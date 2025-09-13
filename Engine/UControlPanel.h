@@ -28,6 +28,7 @@ public:
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	void HeirachyManagementSection();
 	USceneComponent* CreateSceneComponentFromChoice(int index);
 };
 
