@@ -53,4 +53,7 @@ private:
 	void HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive);
 	void HandleEmptySpaceClick();
 	  
+	bool AABBFlag = false;
+	FVector minPos, maxPos;
+
 };

@@ -19,7 +19,7 @@ void EditorApplication::Update(float deltaTime)
 	// Handle input in organized sections
 	HandleKeyboardInput();
 	HandleCameraInput(deltaTime);
-	HandleMouseInput();
+	HandleMouseInput(); 
 }
 
 void EditorApplication::HandleKeyboardInput()
@@ -148,8 +148,7 @@ void EditorApplication::HandleMouseClick()
 	FVector impactPoint;
 	UGizmoComponent* hitGizmo = nullptr;
 	UPrimitiveComponent* hitPrimitive = nullptr;
-	FVector minPos;
-	FVector maxPos;
+	 
 
 	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint, minPos, maxPos))
 	{
@@ -157,12 +156,13 @@ void EditorApplication::HandleMouseClick()
 	}
 	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint, minPos, maxPos))
 	{
-		GetRenderer().DrawAABBLines(minPos, maxPos);
 		HandlePrimitiveHit(hitPrimitive); 
+		AABBFlag = true;
 	}
 	else
 	{
 		HandleEmptySpaceClick();
+		AABBFlag = false;
 	}
 }
 
@@ -243,6 +243,12 @@ void EditorApplication::Render()
 {
 	UApplication::Render();
 	gizmoManager.Draw(GetRenderer());
+
+	if (AABBFlag)
+	{
+		GetRenderer().DrawAABBLines(minPos, maxPos);
+	}
+
 }
 
 void EditorApplication::RenderGUI()

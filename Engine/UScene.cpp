@@ -172,7 +172,7 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			if(primitive->GetVisible())
+			if(primitive->bVisible)
 				primitive->Draw(*renderer);
 		}
 	}
