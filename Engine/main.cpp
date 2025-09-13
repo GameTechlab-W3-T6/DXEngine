@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "UApplication.h"
 #include "EditorApplication.h"
+#include "IniFile.h"
 
 #ifdef _DEBUG
 
@@ -25,6 +26,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	IniFile ini;
+	if (!ini.load("editor.ini"))
+	{
+		assert(false && "Failed to open 'editor.ini'.");
+	}
+
+	bool bIsShaderReflectionEnabled = ini.getBool("Graphics", "ShaderReflection", false);
+
 	// Create application instance
 	EditorApplication app;
 
@@ -36,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Run main loop
-	app.Run();
+	app.Run(bIsShaderReflectionEnabled);
 
 	app.Shutdown();
 	_CrtDumpMemoryLeaks();

@@ -145,7 +145,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	return true;
 }
 
-void UScene::Render()
+void UScene::Render(bool bIsShaderReflectionEnabled)
 {
 	// 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
 	renderer->SetTargetAspect(camera->GetAspect());
@@ -156,7 +156,7 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Draw(*renderer);
+			primitive->Draw(*renderer, bIsShaderReflectionEnabled);
 		}
 	}
 }

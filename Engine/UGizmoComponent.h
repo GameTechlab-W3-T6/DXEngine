@@ -25,9 +25,9 @@ public:
 	FMatrix GetWorldTransform() override;
 
 	virtual void Update(float deltaTime);
-	virtual void Draw(URenderer& renderer);
-	virtual void DrawOnTop(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer);
+	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void DrawOnTop(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
 
 	UMesh* GetMesh() { return mesh; }
 

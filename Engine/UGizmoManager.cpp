@@ -206,12 +206,12 @@ void UGizmoManager::Update(float deltaTime)
 	}
 }
 
-void UGizmoManager::Draw(URenderer& renderer)
+void UGizmoManager::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	// --- 파트 1: 타겟 유무와 상관없이 항상 그리는 요소 ---
 	if (gridPrimitive)
 	{
-		gridPrimitive->Draw(renderer);
+		gridPrimitive->Draw(renderer, bIsShaderReflectionEnabled);
 	}
 
 	// --- 파트 2: 타겟이 있을 때만 그리는 요소 ---
@@ -256,7 +256,7 @@ void UGizmoManager::Draw(URenderer& renderer)
 				float gizmoScale = (targetObject->RelativeLocation - camera->GetLocation()).Length() * 0.15f;
 				gizmoPart->SetScale({ gizmoScale, gizmoScale, gizmoScale });
 
-				gizmoPart->DrawOnTop(renderer);
+				gizmoPart->DrawOnTop(renderer, bIsShaderReflectionEnabled);
 			}
 		}
 	}

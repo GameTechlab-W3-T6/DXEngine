@@ -68,6 +68,12 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
+	if (!renderer.CreateShader_SR())
+	{
+		MessageBox(hWnd, L"Failed to create SR shaders", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
 	if (!renderer.CreateConstantBuffer())
 	{
 		MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
@@ -107,7 +113,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	return true;
 }
 
-void UApplication::Run()
+void UApplication::Run(bool bIsShaderReflectionEnabled)
 {
 	if (!bIsInitialized)
 		return;
@@ -123,7 +129,7 @@ void UApplication::Run()
 			break;
 
 		InternalUpdate();
-		InternalRender();
+		InternalRender(bIsShaderReflectionEnabled);
 
 		timeManager.EndFrame();
 		timeManager.WaitForTargetFrameTime();
@@ -158,12 +164,12 @@ void UApplication::Update(float deltaTime)
 	sceneManager.GetScene()->Update(deltaTime);
 }
 
-void UApplication::Render()
+void UApplication::Render(bool bIsShaderReflectionEnabled)
 {
 	// Base class render - handles GUI rendering
 	// Derived classes should call this after their rendering
 
-	sceneManager.GetScene()->Render();
+	sceneManager.GetScene()->Render(bIsShaderReflectionEnabled);
 }
 
 bool UApplication::CreateMainWindow(HINSTANCE hInstance)
@@ -235,14 +241,14 @@ void UApplication::InternalUpdate()
 	Update(deltaTime);
 }
 
-void UApplication::InternalRender()
+void UApplication::InternalRender(bool bIsShaderReflectionEnabled)
 {
 	// Prepare rendering
 	renderer.Prepare();
-	renderer.PrepareShader();
+	renderer.PrepareShader(bIsShaderReflectionEnabled);
 
 	// Call derived class render
-	Render();
+	Render(bIsShaderReflectionEnabled);
 
 	// Render GUI
 	gui.BeginFrame();

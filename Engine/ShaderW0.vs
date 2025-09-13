@@ -12,8 +12,7 @@ cbuffer ConstantBuffer : register(b0)
 {
     row_major float4x4 MVP; // Model   (row-vector)
     float4 MeshColor;
-    float IsSelected;
-    float padding[3];
+    bool IsSelected;
 };
 
 VS_OUTPUT main(VS_INPUT input)
