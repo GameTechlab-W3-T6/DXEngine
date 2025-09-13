@@ -16,7 +16,7 @@ URenderer::URenderer()
 	, inputLayout(nullptr)
 	, constantBuffer(nullptr)
 	, textConstantBuffer(nullptr)
-	, rasterizerState(nullptr)
+	, rasterizerState(nullptr) 
 	, hWnd(nullptr)
 	, bIsInitialized(false)
 {
@@ -70,7 +70,7 @@ bool URenderer::Initialize(HWND windowHandle)
 	{
 		LogError("CreateRasterizerState", E_FAIL);
 		return false;
-	}
+	} 
 
 	bIsInitialized = true;
 	return true;
@@ -313,7 +313,7 @@ void URenderer::Release()
 	ReleaseConstantBuffer();
 
 	SAFE_RELEASE(rasterizerState);
-	SAFE_RELEASE(depthStencilView);
+	SAFE_RELEASE(depthStencilView); 
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(swapChain);
 	SAFE_RELEASE(deviceContext);
@@ -553,10 +553,9 @@ void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 void URenderer::DrawMesh(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
-		return;
-
-	UINT offset = 0;
-
+		return;  
+	 
+	UINT offset = 0;  
 	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
 	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
 

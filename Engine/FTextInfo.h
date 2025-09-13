@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "FTexture.h"
+#include "UEngineStatics.h"
  
 struct FTextInfo
 { 
@@ -10,8 +11,8 @@ struct FTextInfo
 	   
 	int cellIndex[2];
 	float cellsPerRow, cellsPerColumn; 
-	float cellWidth, cellHeight;  
-
+	float cellWidth, cellHeight;   
 	float size[2] = { 1.0f ,1.0f };
-  
+
+	void SetParam(FTexture* textTex, int32 PerRow, int32 PerCol);
 };

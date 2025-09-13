@@ -4,10 +4,10 @@
 #include "USceneComponent.h"
 #include "Vector.h"
 #include "UClass.h" 
-
+#include "FTextInfo.h"
 class UMeshManager; // 전방 선언
 class UTextureManager;
-struct FTextInfo;
+//struct FTextInfo;
 struct FTexture;
 
 class UPrimitiveComponent : public USceneComponent
@@ -28,7 +28,7 @@ protected:
 
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(loc, rot, scl), mesh(nullptr)
+		: USceneComponent(loc, rot, scl), mesh(nullptr), textInfo(new FTextInfo())
 	{
 	}
 	 
