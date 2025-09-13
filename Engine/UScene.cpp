@@ -194,19 +194,19 @@ void UScene::Update(float deltaTime)
 	}
 	if (inputManager->IsKeyDown('W'))
 	{
-		dy += 1.0f; // 전진
+		dx += 1.0f; // 전진
 	}
 	if (inputManager->IsKeyDown('A'))
 	{
-		dx -= 1.0f; // 좌
+		dy -= 1.0f; // 좌
 	}
 	if (inputManager->IsKeyDown('S'))
 	{
-		dy -= 1.0f; // 후진
+		dx -= 1.0f; // 후진
 	}
 	if (inputManager->IsKeyDown('D'))
 	{
-		dx += 1.0f; // 우
+		dy += 1.0f; // 우
 	}
 	if (inputManager->IsKeyDown('E'))
 	{
