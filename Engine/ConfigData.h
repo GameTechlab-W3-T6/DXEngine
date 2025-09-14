@@ -6,14 +6,15 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <filesystem>
 
-class IniFile {
+class ConfigData {
 public:
     std::map<std::string, std::map<std::string, std::string>> data;
 
-    bool load(const std::string& filename) {
-        std::ifstream file(filename);
-        if (!file.is_open()) return false;
+    ConfigData(const std::filesystem::path& configPath) {
+        std::ifstream file(configPath);
+        assert(file.is_open());
 
         std::string line, currentSection;
         while (std::getline(file, line)) {
@@ -35,7 +36,6 @@ public:
             toLower(key);
             data[currentSection][key] = value;
         }
-        return true;
     }
 
     std::string getString(const std::string& section, const std::string& key, const std::string& defaultValue = "") const {

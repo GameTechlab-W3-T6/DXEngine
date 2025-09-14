@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
     <ClCompile Include="ImguiConsole.cpp" />
@@ -232,11 +233,13 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="DynamicBuffer.h" />
     <ClInclude Include="FDynamicBitset.h" />
+    <ClInclude Include="FName.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
-    <ClInclude Include="IniFile.h" />
+    <ClInclude Include="ConfigData.h" />
     <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
@@ -293,6 +296,7 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="editor.ini" />
     <None Include="ShaderW0.ps">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
