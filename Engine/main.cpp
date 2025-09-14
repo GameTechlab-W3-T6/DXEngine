@@ -4,13 +4,13 @@
 #include "stdafx.h"
 #include "UApplication.h"
 #include "EditorApplication.h"
-#include "IniFile.h"
 
 #ifdef _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include "ConfigManager.h"
 
 #ifndef DBG_NEW 
 #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
@@ -26,13 +26,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	IniFile ini;
-	if (!ini.load("editor.ini"))
+	ConfigData* editorConfig = ConfigManager::GetInstance()->GetConfig("editor");
+	if (editorConfig == nullptr)
 	{
 		assert(false && "Failed to open 'editor.ini'.");
 	}
 
-	bool bIsShaderReflectionEnabled = ini.getBool("Graphics", "ShaderReflection", false);
+	bool bIsShaderReflectionEnabled = editorConfig->getBool("Graphics", "ShaderReflection", false);
 
 	// Create application instance
 	EditorApplication app;
