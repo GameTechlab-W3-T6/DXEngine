@@ -36,8 +36,6 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTe
 		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 		return mesh != nullptr;
 	}
-	 
-
 	return false;
 }
 
