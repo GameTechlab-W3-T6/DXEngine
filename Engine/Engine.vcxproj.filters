@@ -195,7 +195,9 @@
     <ClCompile Include="UTextholderComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="UStaticMeshComponent.cpp" />
+    <ClCompile Include="UStaticMeshComponent.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -385,8 +387,10 @@
     <ClInclude Include="UTextholderComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
-    <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="RenderTypes.h" />
+    <ClInclude Include="UStaticMeshComponent.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TexTestPS.hlsl">

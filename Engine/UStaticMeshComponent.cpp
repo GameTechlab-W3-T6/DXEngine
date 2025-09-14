@@ -2,11 +2,7 @@
 #include "UStaticMeshComponent.h"
 #include "UMeshManager.h"
 
-UStaticMeshComponent::UStaticMeshComponent()
-{
-	uuidQuad.SetText(UUID);
-}
-
+IMPLEMENT_UCLASS(UStaticMeshComponent, UPrimitiveComponent)
 void UStaticMeshComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
 	// draw quad too!
