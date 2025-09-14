@@ -19,6 +19,9 @@ public:
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 
+	// TODO : code review - indice buffer 슬쩍 추가
+	TArray<uint32> Indices;
+
 	UMesh();
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
 	UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
