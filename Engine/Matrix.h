@@ -6,6 +6,9 @@
 
 //struct FQuaternion; // 전방 선언
 
+/**
+ * @brief 4x4 matrix structure for 3D transformations and projections
+ */
 struct FMatrix
 {
 	float M[4][4];

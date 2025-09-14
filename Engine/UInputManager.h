@@ -2,6 +2,9 @@
 #include "stdafx.h"
 #include "UEngineSubsystem.h"
 
+/**
+ * @brief Input handling subsystem managing keyboard and mouse input with callback support
+ */
 class UInputManager : public UEngineSubsystem
 {
     DECLARE_UCLASS(UInputManager, UEngineSubsystem)

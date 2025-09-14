@@ -1,13 +1,17 @@
 ﻿#pragma once
 #include "stdafx.h"
 
-// ================================================ //
-// NOTE: Temporary struct for supporting float2
+/**
+ * @brief 2D vector structure for float2 support
+ */
 struct FVector2
 {
     float X, Y;
 };
 
+/**
+ * @brief 3D vector structure with mathematical operations
+ */
 struct FVector
 {
     float X, Y, Z;

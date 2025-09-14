@@ -5,6 +5,9 @@
 #include "FVertexPosColor.h"
 #include "Vector.h"
 
+/**
+ * @brief Cube primitive component for rendering cube meshes
+ */
 class UCubeComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UCubeComp, UPrimitiveComponent)

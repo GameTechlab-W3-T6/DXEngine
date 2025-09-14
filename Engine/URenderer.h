@@ -15,6 +15,9 @@ struct CBTransform
 	float padding[3];
 };
 
+/**
+ * @brief Direct3D 11 rendering subsystem managing graphics pipeline and resources
+ */
 class URenderer : public UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)

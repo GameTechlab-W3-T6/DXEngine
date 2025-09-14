@@ -2,6 +2,9 @@
 #include "UObject.h"
 #include "UClass.h"
 
+/**
+ * @brief Base class for engine subsystems providing core functionality
+ */
 class UEngineSubsystem : public UObject
 {
     DECLARE_UCLASS(UEngineSubsystem, UObject)

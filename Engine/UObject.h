@@ -8,6 +8,9 @@
 typedef int int32;
 typedef unsigned int uint32;
 
+/**
+ * @brief Base class for all engine objects with serialization and object tracking
+ */
 class UObject : public ISerializable
 {
     DECLARE_ROOT_UCLASS(UObject)

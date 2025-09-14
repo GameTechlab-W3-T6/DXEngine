@@ -4,6 +4,9 @@
 class UScene;
 class UApplication;
 
+/**
+ * @brief Scene management subsystem handling scene loading, saving, and transitions
+ */
 class USceneManager : public UEngineSubsystem
 {
     DECLARE_UCLASS(USceneManager, UEngineSubsystem)

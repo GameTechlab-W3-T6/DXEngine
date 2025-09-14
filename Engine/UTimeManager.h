@@ -2,6 +2,9 @@
 #include "stdafx.h"
 #include "UEngineSubSystem.h"
 
+/**
+ * @brief Time management subsystem providing delta time and frame rate control
+ */
 class UTimeManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UTimeManager, UEngineSubsystem)

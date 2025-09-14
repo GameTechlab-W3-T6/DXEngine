@@ -10,6 +10,9 @@ inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 inline float ToDeg(float r) { return r * (180.0f / (float)PI); }
 inline FVector ToRad(FVector v) { return { ToRad(v.X), ToRad(v.Y), ToRad(v.Z) }; }
 inline FVector ToDeg(FVector v) { return { ToDeg(v.X), ToDeg(v.Y), ToDeg(v.Z) }; }
+/**
+ * @brief Quaternion structure for 3D rotations with SLERP support
+ */
 struct FQuaternion
 {
 	// (x,y,z,w) with w = scalar

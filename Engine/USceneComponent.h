@@ -4,6 +4,9 @@
 #include "Vector.h"
 #include "Quaternion.h"
 
+/**
+ * @brief Base component for objects with transform in 3D space
+ */
 class USceneComponent : public UObject
 {
 	DECLARE_UCLASS(USceneComponent, UObject)

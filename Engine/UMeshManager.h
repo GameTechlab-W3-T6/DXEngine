@@ -4,6 +4,9 @@
 #include "URenderer.h"
 #include "UEngineSubsystem.h"
 
+/**
+ * @brief Mesh resource manager handling mesh creation and retrieval
+ */
 class UMeshManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)

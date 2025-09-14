@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "json.hpp"
 
+/**
+ * @brief Interface for objects that can be serialized to/from JSON
+ */
 class ISerializable {
 public:
     virtual ~ISerializable() = default;

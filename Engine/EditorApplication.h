@@ -6,7 +6,9 @@
 #include "UControlPanel.h"
 #include "USceneComponentPropertyWindow.h"
 
-// Simple application that inherits from UApplication
+/**
+ * @brief Editor application with gizmo management and object selection
+ */
 class EditorApplication : public UApplication
 {
 private:

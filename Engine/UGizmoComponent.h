@@ -6,6 +6,9 @@
 
 class UMeshManager; // 전방 선언
 
+/**
+ * @brief Interactive gizmo component for editor manipulation
+ */
 class UGizmoComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UGizmoComponent, USceneComponent)

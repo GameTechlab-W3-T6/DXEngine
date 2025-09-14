@@ -18,6 +18,9 @@ struct FPlane
 	FVector Normal;
 };
 
+/**
+ * @brief Gizmo management subsystem handling 3D manipulation tools for objects
+ */
 class UGizmoManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UGizmoManager, UEngineSubsystem)

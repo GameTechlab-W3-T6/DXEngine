@@ -8,6 +8,9 @@
 class UMeshManager; // 전방 선언
 
 
+/**
+ * @brief Renderable component with mesh and material properties
+ */
 class UPrimitiveComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)

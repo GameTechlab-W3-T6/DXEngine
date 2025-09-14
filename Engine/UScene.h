@@ -9,6 +9,9 @@
 class UCamera;
 class URaycastManager;
 
+/**
+ * @brief Container for all scene objects with rendering and update functionality
+ */
 class UScene : public UObject
 {
 	DECLARE_UCLASS(UScene, UObject)

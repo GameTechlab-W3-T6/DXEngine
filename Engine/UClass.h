@@ -6,6 +6,9 @@
 #include "UObject.h"
 #include <memory>
 
+/**
+ * @brief Reflection system class for type information and object creation
+ */
 class UClass : public UObject
 {
 	DECLARE_UCLASS(UClass, UObject)

@@ -4,6 +4,9 @@
 #include "UPrimitiveComponent.h"
 #include "Vector.h"
 
+/**
+ * @brief Plane primitive component for rendering plane meshes
+ */
 class UPlaneComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UPlaneComp, UPrimitiveComponent)

@@ -5,6 +5,9 @@
 #include "FVertexPosColor.h"
 #include "Vector.h"
 
+/**
+ * @brief Sphere primitive component for rendering sphere meshes
+ */
 class USphereComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(USphereComp, UPrimitiveComponent)

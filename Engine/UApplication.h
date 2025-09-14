@@ -9,6 +9,9 @@
 #include "USceneManager.h"
 #include "UGizmoManager.h"
 
+/**
+ * @brief Main application class managing the engine's core systems and lifecycle
+ */
 class UApplication
 {
 private:
