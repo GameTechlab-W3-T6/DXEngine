@@ -18,48 +18,18 @@ struct CBTransform
 class URenderer : public UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
-private:
-	// Core D3D11 objects
-	ID3D11Device* device;
-	ID3D11DeviceContext* deviceContext;
-	IDXGISwapChain* swapChain;
-	ID3D11RenderTargetView* renderTargetView;
-	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterizerState;
-
-	// Shader objects
-	ID3D11VertexShader* vertexShader;
-	ID3D11PixelShader* pixelShader;
-	ID3D11InputLayout* inputLayout;
-
-	TUniquePtr<UShader> VertexShader_SR;
-	TUniquePtr<UShader> PixelShader_SR;
-
-	// Constant buffer
-	ID3D11Buffer* constantBuffer;
-
-	// Viewport
-	D3D11_VIEWPORT viewport;
-	D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
-	float targetAspect = 16.0f / 9.0f;
-
-	// Window handle
-	HWND hWnd;
-
-	// Render state
-	bool bIsInitialized;
-
-	FMatrix mVP;                 // 프레임 캐시
-	CBTransform   mCBData;
-
-
-
 public:
-	URenderer();
 	~URenderer();
 
-	// Initialization and cleanup
-	bool Initialize(HWND windowHandle);
+	URenderer();
+
+// ========================================================================== 
+// Renderer Core (Resource Managment)
+
+/** @todo: Refactor resource management by using ComPtr. */
+public:
+	/** Initialization and cleanup */
+	bool Initialize(HWND hWnd);
 	bool CreateShader();
 	bool CreateShader_SR();
 	bool CreateRasterizerState();
@@ -68,87 +38,159 @@ public:
 	void ReleaseShader();
 	void ReleaseConstantBuffer();
 
-	// Buffer creation
-	ID3D11Buffer* CreateVertexBuffer(const void* data, size_t sizeInBytes);
-	ID3D11Buffer* CreateIndexBuffer(const void* data, size_t sizeInBytes);
-	bool ReleaseVertexBuffer(ID3D11Buffer* buffer);
-	bool ReleaseIndexBuffer(ID3D11Buffer* buffer);
+	/** Buffer */
+	ID3D11Buffer* CreateVertexBuffer(const void* Data, size_t Size);
+	ID3D11Buffer* CreateIndexBuffer(const void* Data, size_t Size);
+	bool ReleaseVertexBuffer(ID3D11Buffer* Buffer);
+	bool ReleaseIndexBuffer(ID3D11Buffer* Buffer);
 
-	// Texture creation
-	ID3D11Texture2D* CreateTexture2D(int32 width, int32 height, DXGI_FORMAT format,
-		const void* data = nullptr);
-	ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Texture2D* texture);
-	bool ReleaseTexture(ID3D11Texture2D* texture);
-	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* srv);
+	/** Texture */
+	ID3D11Texture2D* CreateTexture2D(int32 Width, int32 Height, DXGI_FORMAT Format, const void* Data = nullptr);
+	ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Texture2D* Texture);
+	bool ReleaseTexture(ID3D11Texture2D* Texture);
+	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* ShaderResourceView);
 
-	// Rendering operations
+	/** Getters */
+	ID3D11Device* GetDevice() const { return Device; }
+	ID3D11DeviceContext* GetDeviceContext() const { return DeviceContext; }
+	IDXGISwapChain* GetSwapChain() const { return SwapChain; }
+	bool IsInitialized() const { return bIsInitialized; }
+
+private:
+	/** Renderer State */
+	bool bIsInitialized;
+
+	/** Core D3D11 Objects */
+	ID3D11Device* Device;
+	ID3D11DeviceContext* DeviceContext;
+	IDXGISwapChain* SwapChain;
+	ID3D11RenderTargetView* RenderTargetView;
+	ID3D11DepthStencilView* DepthStencilView;
+	ID3D11RasterizerState* RasterizerState;
+
+	/** Shader Objects */
+	ID3D11VertexShader* VertexShader;
+	ID3D11PixelShader* PixelShader;
+	ID3D11InputLayout* InputLayout;
+
+	/** Shader Objects using Shader Reflection */
+	TUniquePtr<UShader> VertexShader_SR;
+	TUniquePtr<UShader> PixelShader_SR;
+
+	ID3D11Buffer* ConstantBuffer; 
+
+	/** Window handle */
+	HWND hWnd; 
+
+// ========================================================================== 
+// Rendering Features
+
+public:
+	/** Rendering operations */
 	void Prepare();
 	void PrepareShader(bool bIsShaderReflectionEnabled);
 	void SwapBuffer();
-	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
+	void Clear(float Red = 0.0f, float Green = 0.0f, float Blue = 0.0f, float Alpha = 1.0f);
 
 	// Drawing operations
-	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
-	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
-	void DrawMesh(UMesh* mesh);
-	void DrawLine(UMesh* mesh);
-	void DrawMeshOnTop(UMesh* mesh);
+	void DrawIndexed(UINT IndexCount, UINT StartIndexLocation = 0, INT BaseVertexLocation = 0);
+	/** @note: Use Draw() or DrawMesh() to track number of draw calls */
+	void Draw(UINT VertexCount, UINT StartVertexLocation = 0);
+	void DrawMesh(UMesh* Mesh);
 
-	// Resource binding
-	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
-	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
-	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
-	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
+	/** @note: These helper functions use Draw() or DrawMesh() Internally. */
+	void DrawLine(UMesh* Mesh);
+	void DrawMeshOnTop(UMesh* Mesh);
 
-	// Constant buffer updates
+	/** Resource binding */
+	void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
+	void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
+	void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
+	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
+
+	/** Constant buffer updates */
+	void SetViewProj(const FMatrix& View, const FMatrix& Projection); // 내부에 VP 캐시
+	void SetModel(const FMatrix& Model, const FVector4& Color, bool IsSelected, bool bIsShaderReflectionEnabled);                      // M*VP → b0 업로드
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
 
-	// Window resize handling
+	/** Window resize handling */
 	bool ResizeBuffers(int32 width, int32 height);
 
-	// Getters
-	ID3D11Device* GetDevice() const { return device; }
-	ID3D11DeviceContext* GetDeviceContext() const { return deviceContext; }
-	IDXGISwapChain* GetSwapChain() const { return swapChain; }
-	bool IsInitialized() const { return bIsInitialized; }
+	/** Viewport */
+	void SetTargetAspect(float Aspect) 
+	{ 
+		if (Aspect > 0.0f)
+		{
+			TargetAspect = Aspect;
+		}
+	}
 
-	// Utility functions
-	bool CheckDeviceState();
-	void GetBackBufferSize(int32& width, int32& height);
+	// targetAspect를 내부에서 사용 (카메라에 의존 X)
+	D3D11_VIEWPORT MakeAspectFitViewport(int32 Width, int32 Height) const;
+
+	// 드래그 중 호출: currentViewport만 갈아끼움
+	void UseAspectFitViewport(int32 Width, int32 Height) 
+	{ 
+		CurrentViewport = MakeAspectFitViewport(Width, Height); 
+	}
+
+	// 평소엔 풀 윈도우
+	void UseFullWindowViewport() 
+	{ 
+		CurrentViewport = Viewport; 
+	}
 
 private:
-	// Internal helper functions
+	/** Internal helper functions */
 	bool CreateDeviceAndSwapChain(HWND windowHandle);
 	bool CreateRenderTargetView();
 	bool CreateDepthStencilView(int32 width, int32 height);
 	bool SetupViewport(int32 width, int32 height);
 
-	// Error handling
-	void LogError(const char* function, HRESULT hr);
-	bool CheckResult(HRESULT hr, const char* function);
+private:
+	/** Viewport */
+	D3D11_VIEWPORT Viewport;
+	D3D11_VIEWPORT CurrentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
+	float TargetAspect = 16.0f / 9.0f;
 
-	// 행렬 복사 핼퍼
-	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
+	FMatrix VP;                 // 프레임 캐시
+	CBTransform MCBData;
+
+// ========================================================================== //
+// Utility Features
+public:	
+	bool CheckDeviceState();
+	void GetBackBufferSize(int32& Width, int32& Height);
+	void IncrementDrawCallCount()
 	{
-		for (int32 r = 0; r < 4; ++r)
-			for (int32 c = 0; c < 4; ++c)
-				dst[r * 4 + c] = src.M[r][c];
+		++DrawCallCount;
+#ifndef NDEBUG
+		if (DrawCallCount % 100 == 0)
+		{
+			UE_LOG("Draw Call: %d", DrawCallCount);
+		}
+#endif
 	}
-public:
-	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
-	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected, bool bIsShaderReflectionEnabled);                      // M*VP → b0 업로드
-	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
-	// targetAspect를 내부에서 사용 (카메라에 의존 X)
-	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;
-	// 드래그 중 호출: currentViewport만 갈아끼움
-	void UseAspectFitViewport(int32 winW, int32 winH)
+	uint32 GetDrawCallCount() const
 	{
-		currentViewport = MakeAspectFitViewport(winW, winH);
-	}
-	// 평소엔 풀 윈도우
-	void UseFullWindowViewport()
-	{
-		currentViewport = viewport;
+		return DrawCallCount;
 	}
 
+private:
+	/** Error handling */
+	void LogError(HRESULT hResult, const char* Function);
+	bool CheckResult(HRESULT hResult, const char* Function);
+
+	/** @brief: Helper function for copying matrix. */
+	static inline void CopyRowMajor(float Destination[16], const FMatrix& Source)
+	{
+		for (int32 Row = 0; Row < 4; ++Row) {
+			for (int32 Column = 0; Column < 4; ++Column) {
+				Destination[Row * 4 + Column] = Source.M[Row][Column];
+			}
+		}
+	}
+
+private:
+	uint32 DrawCallCount;
 };
