@@ -54,6 +54,7 @@ private:
 	void HandleEmptySpaceClick();
 	  
 	bool AABBFlag = false;
-	FVector minPos, maxPos;
+	UPrimitiveComponent* SelectedPrimitive = nullptr;
+	FVector MinWSPos, MaxWSPos;
 
 };

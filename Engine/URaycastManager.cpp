@@ -66,7 +66,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 }
 
 template <typename T>
-bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint, FVector& outMinPos, FVector& outMaxPos)
+bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint)
 {
 	MouseX = static_cast<float>(InputManager->GetMouseX());
 	MouseY = static_cast<float>(InputManager->GetMouseY());
@@ -130,9 +130,9 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 
 					// AABB 구하기 위한 min, max Pos 
 					// 여기서는 model space이기 때문에 world space로 재계산 
-					MakeAABBInfo(mesh, outMinPos, outMaxPos);
-					outMinPos = TransformVertexToWorld(outMinPos, worldTransform);
-					outMaxPos = TransformVertexToWorld(outMaxPos, worldTransform); 
+					//MakeAABBInfo(mesh, outMinPos, outMaxPos);
+					//outMinPos = TransformVertexToWorld(outMinPos, worldTransform);
+					//outMaxPos = TransformVertexToWorld(outMaxPos, worldTransform); 
 				}
 			}
 		}
@@ -140,22 +140,14 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	if (hit)
 	{
 		hitComponent = closestComponent;
-
-
-		UMesh* mesh = hitComponent->GetMesh();
-		FVector localMin, localMax;
-		MakeAABBInfo(mesh, localMin, localMax);
-
-		ComputeWorldAABB_BruteForce(
-			hitComponent->GetWorldTransform(), localMin, localMax,
-			outMinPos, outMaxPos);
+		  
 
 	}
 	return hit;
 }
 
-template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&, FVector& ,FVector&, FVector&);
-template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&, FVector&, FVector&);
+template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&, FVector& );
+template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&);
 
 
 TOptional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
@@ -286,9 +278,9 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	return resultRay;
 }
 
-void URaycastManager::MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax)
+bool URaycastManager::MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax)
 {
-	if (mesh->Vertices.size() == 0) return;
+	if (mesh->Vertices.size() == 0) return false;
 
 	float maxPos[3] = { INT_MIN, INT_MIN, INT_MIN };
 	float minPos[3] = { INT_MAX, INT_MAX,INT_MAX };
@@ -344,6 +336,5 @@ void URaycastManager::ComputeWorldAABB_BruteForce(const FMatrix& M, const FVecto
 		worldMax.X = max(worldMax.X, w.X);
 		worldMax.Y = max(worldMax.Y, w.Y);
 		worldMax.Z = max(worldMax.Z, w.Z);
-	}
-
+	} 
 }

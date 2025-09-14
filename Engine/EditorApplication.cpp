@@ -132,6 +132,13 @@ void EditorApplication::UpdateDragOperation()
 	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
 	if (!camera) return;
 
+	FVector localMin, localMax;
+	if (GetRaycastManager().MakeAABBInfo(SelectedPrimitive->GetMesh(), localMin, localMax)) {
+		GetRaycastManager().ComputeWorldAABB_BruteForce(SelectedPrimitive->GetWorldTransform(),
+			localMin, localMax, MinWSPos, MaxWSPos);
+		AABBFlag = true;
+	}
+
 	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(camera);
 	gizmoManager.UpdateDrag(ray);
 }
@@ -150,11 +157,12 @@ void EditorApplication::HandleMouseClick()
 	UPrimitiveComponent* hitPrimitive = nullptr;
 	 
 
-	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint, minPos, maxPos))
+	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint))
 	{
 		HandleGizmoHit(hitGizmo, impactPoint);
+		AABBFlag = true;
 	}
-	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint, minPos, maxPos))
+	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint))
 	{
 		HandlePrimitiveHit(hitPrimitive); 
 		AABBFlag = true;
@@ -162,7 +170,7 @@ void EditorApplication::HandleMouseClick()
 	else
 	{
 		HandleEmptySpaceClick();
-		AABBFlag = false;
+		AABBFlag = false; 
 	}
 }
 
@@ -197,7 +205,7 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 	target->bIsSelected = true;
 	hitGizmo->bIsSelected = true;
-
+	 
 	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
 
 	// Handle different gizmo types
@@ -224,6 +232,17 @@ void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
 	gizmoManager.SetTarget(hitPrimitive);
 	hitPrimitive->bIsSelected = true;
+	SelectedPrimitive = hitPrimitive;
+	FVector localMin, localMax;
+
+	if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), localMin, localMax)) { 
+		GetRaycastManager().ComputeWorldAABB_BruteForce(hitPrimitive->GetWorldTransform(),
+			localMin, localMax, MinWSPos, MaxWSPos);
+		AABBFlag = true;
+	}
+	else {
+		AABBFlag = false;
+	}
 
 	if (hitPrimitive->IsManageable())
 	{
@@ -236,6 +255,7 @@ void EditorApplication::HandleEmptySpaceClick()
 	gizmoManager.SetTarget(nullptr);
 	propertyWindow->SetTarget(nullptr);
 
+	SelectedPrimitive = nullptr;
 }
  
 
@@ -243,9 +263,10 @@ void EditorApplication::Render(bool bIsShaderReflectionEnabled)
 {
 	if (AABBFlag)
 	{
-		GetRenderer().DrawAABBLines(minPos, maxPos);
-		UE_LOG("min %.2f, %.2f, %.2f", minPos.X, minPos.Y, minPos.Z);
-		UE_LOG("max %.2f, %.2f, %.2f", maxPos.X, maxPos.Y, maxPos.Z);
+		GetRenderer().DrawAABBLines(MinWSPos, MaxWSPos);
+
+		//UE_LOG("min %.2f, %.2f, %.2f", minPos.X, minPos.Y, minPos.Z);
+		//UE_LOG("max %.2f, %.2f, %.2f", maxPos.X, maxPos.Y, maxPos.Z);
 	}
 
 	UApplication::Render(bIsShaderReflectionEnabled);

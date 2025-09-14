@@ -36,13 +36,13 @@ public:
 	void SetInputManager(UInputManager* inputManager) { InputManager = inputManager; }
 
 	template <typename T>
-	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint, FVector& outMinPos, FVector& outMaxPos);
+	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint);
 
 	TOptional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
 
 	FRay CreateRayFromScreenPosition(UCamera* camera);
 
-	void MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax);
+	bool MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax);
 	void ComputeWorldAABB_BruteForce(const FMatrix& M, const FVector& localMin, const FVector& localMax, FVector& worldMin, FVector& worldMax);
 
 private:
