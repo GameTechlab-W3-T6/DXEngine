@@ -22,6 +22,7 @@ public:
 	// TODO : code review - IndexBuffer 슬쩍 추가
 	ID3D11Buffer* IndexBuffer = nullptr;
 	TArray<uint32> Indices;
+	int32 NumIndices = 0;
 
 	UMesh();
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성

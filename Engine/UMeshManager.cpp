@@ -78,6 +78,8 @@ UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& 
 	// 메시 생성: 토폴로지는 반드시 LINELIST
 	UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	mesh->Indices = lineIdx;
+	mesh->NumIndices = sizeof(lineIdx);
+	
 	return mesh;
 }
 
@@ -85,7 +87,8 @@ UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& 
 UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
-	meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
+	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
+	meshes["Sphere"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["Plane"] = CreateMeshInternal(plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
 
@@ -94,7 +97,7 @@ UMeshManager::UMeshManager()
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
 
-	// meshes["SphereWireframe"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	// meshes["SphereWireframe"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 
 // 소멸자 (메모리 해제)

@@ -514,14 +514,18 @@ void URenderer::DrawMesh(UMesh* mesh)
 
 	UINT offset = 0;
 
+	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
 	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+	
 	if (mesh->IndexBuffer)
 	{
 		deviceContext->IASetIndexBuffer(mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->DrawIndexed(mesh->NumIndices, 0, 0);
 	}
-	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
-
-	deviceContext->Draw(mesh->NumVertices, 0);
+	else
+	{
+		deviceContext->Draw(mesh->NumVertices, 0);
+	}
 }
 
 void URenderer::DrawLine(UMesh* mesh)
