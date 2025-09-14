@@ -70,8 +70,6 @@ bool URenderer::Initialize(HWND windowHandle)
 		return false;
 	}
 
-	// SetRasterizerMode();
-
 	bIsInitialized = true;
 	return true;
 }
@@ -195,7 +193,7 @@ bool URenderer::CreateRasterizerState()
 	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 	hr = device->CreateRasterizerState(&rasterizerDesc, &rasterizerState_wireframe);
 
-	return (!CheckResult(hr, "CreateRasterizerState"));
+	return CheckResult(hr, "CreateRasterizerState");
 }
 
 bool URenderer::CreateConstantBuffer()
@@ -459,12 +457,6 @@ void URenderer::PrepareShader()
 
 	// Set primitive topology (default to triangle list)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Set rasterizer state (와인딩 순서 적용)
-	if (rasterizerState_solid)
-	{
-		deviceContext->RSSetState(rasterizerState_solid);
-	}
 
 	// Set constant buffer
 	if (constantBuffer)
