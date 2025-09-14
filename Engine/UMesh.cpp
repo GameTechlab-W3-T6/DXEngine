@@ -16,22 +16,40 @@ UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY pr
 }
 
 void UMesh::Init(ID3D11Device* device) {
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
+	D3D11_BUFFER_DESC vertexBufferDesc = {};
+	vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vertexBufferDesc.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA vertexData = {};
-	vertexData.pSysMem = Vertices.data();
+	D3D11_SUBRESOURCE_DATA vertexBufferSRD = {};
+	vertexBufferSRD.pSysMem = Vertices.data();
 
-	HRESULT hr = device->CreateBuffer(&vbd, &vertexData, &VertexBuffer);
+	HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferSRD, &VertexBuffer);
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create vertex buffer for mesh");
 	}
 
+	if (Indices.size() > 0)
+	{
+		D3D11_BUFFER_DESC indexBufferDesc = {};
+		indexBufferDesc.ByteWidth = sizeof(Indices);
+		indexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		indexBufferDesc.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA indexBufferSRD = {};
+		indexBufferSRD.pSysMem = Indices.data();
+
+		hr = device->CreateBuffer(&indexBufferDesc, &indexBufferSRD, &IndexBuffer);
+		if (FAILED(hr))
+		{
+			throw std::runtime_error("Failed to create index buffer for mesh");
+		}
+	}
+	
 	isInitialized = true;
 }

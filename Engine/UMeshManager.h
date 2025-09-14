@@ -15,6 +15,9 @@ private:
 
 	UMesh* CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UMesh* CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices,
+		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 public:
 	UMeshManager();
 	~UMeshManager();

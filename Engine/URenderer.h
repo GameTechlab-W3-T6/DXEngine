@@ -28,7 +28,9 @@ private:
 	IDXGISwapChain* swapChain;
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterizerState;
+
+	ID3D11RasterizerState* rasterizerState_solid;
+	ID3D11RasterizerState* rasterizerState_wireframe;
 
 	// Shader objects
 	ID3D11VertexShader* vertexShader;
@@ -102,6 +104,7 @@ public:
 	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
 	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
 	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
+	void SetRasterizerMode(bool isSolid);
 
 	// Constant buffer updates
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);

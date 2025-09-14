@@ -268,7 +268,7 @@ bool EditorApplication::OnInitialize()
 	UApplication::OnInitialize();
 	// 리사이즈/초기화
 
-	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager);
+	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetRenderer());
 	propertyWindow = new USceneComponentPropertyWindow();
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))

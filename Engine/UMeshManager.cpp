@@ -37,17 +37,67 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	return mesh;
 }
 
+static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
+{
+	if (a > b) std::swap(a, b);                 // 무방향 키(작은,큰)
+	return (uint64_t(a) << 32) | uint64_t(b);
+}
+
+UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+{
+	const size_t v = vertices.size();
+	if (v % 3 != 0) {
+		// 로깅/예외 처리
+	}
+	const size_t triCount = v / 3;
+
+	TSet<uint64_t> unique;
+	unique.reserve(triCount * 3);
+
+	TArray<uint32> lineIdx;
+	lineIdx.reserve(triCount * 6);              // 라인 인덱스는 엣지당 2개
+
+	auto AddEdge = [&](uint32_t a, uint32_t b)
+		{
+			const uint64_t k = MakeEdgeKey(a, b);
+			if (unique.emplace(k).second) {         // 새로 추가된 경우만 push
+				lineIdx.push_back(a);
+				lineIdx.push_back(b);
+			}
+		};
+
+	for (uint32_t i = 0; i < v; i += 3) {
+		AddEdge(i, i + 1);
+		AddEdge(i + 1, i + 2);
+		AddEdge(i + 2, i);
+	}
+	
+	// 정점 포맷 변환(필요시)
+	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+
+	// 메시 생성: 토폴로지는 반드시 LINELIST
+	UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	mesh->Indices = lineIdx;
+	mesh->NumIndices = lineIdx.size();
+	
+	return mesh;
+}
+
 // 생성자
 UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
+	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
 	meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
 	meshes["Plane"] = CreateMeshInternal(plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
+
 	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
+
+	// meshes["SphereWireframe"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 
 // 소멸자 (메모리 해제)

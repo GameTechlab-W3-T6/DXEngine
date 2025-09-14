@@ -19,6 +19,11 @@ public:
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 
+	// TODO : code review - IndexBuffer 슬쩍 추가
+	ID3D11Buffer* IndexBuffer = nullptr;
+	TArray<uint32> Indices;
+	int32 NumIndices = 0;
+
 	UMesh();
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
 	UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

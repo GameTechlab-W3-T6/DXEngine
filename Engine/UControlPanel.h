@@ -1,13 +1,15 @@
 ﻿#pragma once
 #include "ImGuiWindowWrapper.h"
-#include "USceneManager.h"
-#include "USceneComponent.h"
-#include "UGizmoManager.h"
 
+class USceneComponent;
+class USceneManager;
+class UGizmoManager;
+class URenderer;
 class UControlPanel : public ImGuiWindowWrapper
 {
 	USceneManager* SceneManager;
 	UGizmoManager* GizmoManager;
+	URenderer* Renderer;
 
 	// Spawn Primitive Section
 	TArray<UClass*> registeredTypes;
@@ -19,10 +21,9 @@ class UControlPanel : public ImGuiWindowWrapper
 	char sceneName[256] = "Default";
 
 	// Camera Management Section
-
-
+	bool isSolid = true;
 public:
-	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager);
+	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, URenderer* renderer);
 	void RenderContent() override;
 	void PrimaryInformationSection();
 	void SpawnPrimitiveSection();
