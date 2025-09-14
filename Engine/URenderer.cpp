@@ -919,7 +919,7 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 		(*VertexShader_SR)["ConstantBuffer"]["MVP"] = MVP;
 		(*VertexShader_SR)["ConstantBuffer"]["MeshColor"] = color;
 		(*VertexShader_SR)["ConstantBuffer"]["IsSelected"] = bIsSelected;
-
+		 
 		/** @brief: For now, binding should be done here. */
 		VertexShader_SR->Bind(GetDeviceContext(), "ConstantBuffer");
 		PixelShader_SR->Bind(GetDeviceContext());
@@ -933,30 +933,55 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	}
 }
 
-void URenderer::SetTextUV(FTextInfo& textInfo)
-{ 
+void URenderer::SetTextUV(FTextInfo& textInfo, bool bIsShaderReflectionEnabled)
+{
 	//임시  
-	if (textInfo.textTexture == nullptr) return; 
+	if (textInfo.textTexture == nullptr) return;
 
+	FVector2 cellSize = { (float)textInfo.cellWidth , (float)textInfo.cellHeight };
+	FVector2 texResolution = { (float)textInfo.textTexture->width, (float)textInfo.textTexture->height };
+
+	int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
+
+	int cols = (int)textInfo.cellsPerRow;
+	int column = (int)textInfo.cellsPerColumn;
+
+	int indexH = code / cols; 
+	int indexW = code % cols;
+	
+	FVector2 cellIndex = { (float)indexW, (float)indexH};
+
+
+	if (bIsShaderReflectionEnabled)
+	{
+		(*PixelShader_SR)["TextConstantBuffer"]["cellIndex"] = cellIndex;
+		(*PixelShader_SR)["TextConstantBuffer"]["cellSize"] = cellSize;
+		(*PixelShader_SR)["TextConstantBuffer"]["texResolution"] = texResolution;
+
+		//VertexShader_SR->Bind(GetDeviceContext(), "ConstantBuffer");
+		PixelShader_SR->Bind(GetDeviceContext(),"TextConstantBuffer");
+	}
+	else
+	{ 
 	int cellIndex = textInfo.keyCode;  
 	//cell 크기/ 텍스처 해상도 업로드
-	mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
-	mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
-	mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
-	mCBUVData.texResolution[1] = (float)textInfo.textTexture->height;
+	//mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
+	//mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
+	//mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
+	//mCBUVData.texResolution[1] = (float)textInfo.textTexture->height;
 	
-	int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
+	//int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
 	
-	int cols = (int)textInfo.cellsPerRow;
+	//int cols = (int)textInfo.cellsPerRow;
 	//int column = (int)textInfo.cellsPerColumn;
-	int indexH = code / cols;
-	int indexW = code % cols;
+	
 	
 	mCBUVData.cellIndex[0] = (float)indexW; // X = col
 	mCBUVData.cellIndex[1] = (float)indexH; // Y = row
 	  
 	
 	UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
+	}
 }
 
 D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const

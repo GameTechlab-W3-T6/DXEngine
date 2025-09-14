@@ -79,7 +79,7 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 	{
 		//addobject
 		textInfo->keyCode = textInfo->orderOfChar[i];
-		renderer.SetTextUV(*textInfo);
+		renderer.SetTextUV(*textInfo, bIsShaderReflectionEnabled);
 
 		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0);
 		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;

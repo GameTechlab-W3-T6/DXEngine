@@ -6,14 +6,12 @@ struct PS_INPUT
     float2 UV : TEXCOORD0;
 };
 
-
-
 cbuffer TextConstantBuffer : register(b0)
 {
     float2 cellIndex; 
     float2 cellSize;
     float2 texResolution;  
-    float2 padding; 
+    //float2 padding; 
 };
 
 Texture2D testText : register(t0);
