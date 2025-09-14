@@ -9,7 +9,6 @@
 #include "URaycastManager.h"
 #include "UCamera.h" 
 #include "UTextureManager.h"
-#include "UTextholderComp.h"
 #include "FTextInfo.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
@@ -43,7 +42,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UText
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager, inputManager, textureManager, camera);
+			primitive->Init(renderer, meshManager, inputManager, textureManager, camera);
 		}
 	}
 
@@ -86,11 +85,11 @@ void UScene::AddObject(USceneComponent* obj, bool hasText)
 	{
 		if (hasText)
 		{
-			primitive->Init(meshManager, inputManager, textureManager, camera);
+			primitive->Init(renderer, meshManager, inputManager, textureManager, camera);
 		}
 		else
 		{
-			primitive->Init(meshManager, inputManager, textureManager);
+			primitive->Init(renderer, meshManager, inputManager, textureManager);
 		}
 		if (obj->CountOnInspector())
 			++primitiveCount;

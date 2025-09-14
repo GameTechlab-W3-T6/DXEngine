@@ -17,14 +17,17 @@ protected:
 	UMesh* mesh;
 	FTexture* texture;
 	
+	// TODO : textInfo 없애기
 	FTextInfo* textInfo;
 	UCamera* camera;
 	FVector4 Color = { 1, 1, 1, 1 };
 	
-	//임시
+	// TODO : 제발제발제발 임시
 	UInputManager* inputManager;
 	UTextureManager* textureManager;
-
+	UMeshManager* meshManager;
+	URenderer* renderer;
+	
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr), textInfo(new FTextInfo())
@@ -35,7 +38,7 @@ public:
 	bool bVisible = true;
 	bool bIsSelected = false;
 
-	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
+	virtual bool Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
 	virtual void Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled);
 	virtual void UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture,  bool bIsShaderReflectionEnabled);
 
