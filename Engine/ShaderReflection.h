@@ -230,7 +230,11 @@ private:
 		else if (ShaderTypeDesc.Class == D3D_SVC_VECTOR)
 		{
 			assert(ShaderTypeDesc.Rows == 1 && "HLSL Vectors should have 1 row.");
-			if (ShaderTypeDesc.Columns == 3)
+			if (ShaderTypeDesc.Columns == 2)
+			{
+				OutLayout->Append<HLSL::EType::Float2>(Name);
+			}
+			else if (ShaderTypeDesc.Columns == 3)
 			{
 				OutLayout->Append<HLSL::EType::Float3>(Name);
 			}
@@ -326,7 +330,7 @@ private:
 				if (SignatureParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
 				{
 					InputElementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
-					assert(false && "TODO: Float2 Support.");
+					VertexBufferElementLayout.Append<HLSL::EType::Float2>(ParameterName);
 				}
 				else
 				{

@@ -29,6 +29,7 @@ namespace HLSL
         Bool,
         Int,
         Float,
+        Float2,
         Float3,
         Float4,
         Matrix,
@@ -71,6 +72,13 @@ namespace HLSL
         using InternalType = float;
         static constexpr size_t Size = sizeof(InternalType);
         static constexpr const char* Name = "Float";
+    };
+    template<>
+    struct TypeInfo<EType::Float2>
+    {
+        using InternalType = FVector2;
+        static constexpr size_t Size = sizeof(InternalType);
+        static constexpr const char* Name = "Float2";
     };
     template<>
     struct TypeInfo<EType::Float3>
