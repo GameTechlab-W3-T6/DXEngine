@@ -5,6 +5,14 @@
 #include "USceneManager.h"
 #include "UScene.h"
 #include "UDefaultScene.h"
+#include "UGizmoManager.h"
+#include "URenderer.h"
+
+enum class EDebugView : uint8_t {
+	DefaultLit,     // 일반 라이팅
+	Unlit,          // 라이팅 무시 (베이스/버텍스 컬러)
+	Wireframe,   // TRIANGLE + RS Fill=Wireframe (테셀 그물 포함)
+};
 
 // 활성화(선택) 상태면 버튼색을 Active 계열로 바꿔서 '눌린 버튼'처럼 보이게 하는 헬퍼
 static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVec2(0, 0))
@@ -22,9 +30,10 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 	return pressed;
 }
 
-UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager)
+UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, URenderer* renderer)
 	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager)
 {
+	Renderer = renderer;
 	for (const auto& registeredType : UClass::GetClassList())
 	{
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
@@ -133,6 +142,10 @@ void UControlPanel::SceneManagementSection()
 
 void UControlPanel::CameraManagementSection()
 {
+	if (ImGui::Checkbox("Wireframe", &isSolid)) {
+		Renderer->SetRasterizerMode(/*bSolid=*/isSolid); // false면 Wireframe
+	}
+
 	UCamera* camera = SceneManager->GetScene()->GetCamera();
 	// 카메라 정보
 	FVector pos = camera->GetLocation();

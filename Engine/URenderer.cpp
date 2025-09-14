@@ -617,8 +617,8 @@ void URenderer::SetTexture(ID3D11ShaderResourceView* srv, UINT slot)
 void URenderer::SetRasterizerMode(bool isSolid)
 {
 	auto& rss = isSolid ? rasterizerState_solid : rasterizerState_wireframe;
-	if (!rss)
-		return;
+	//if (!rss)
+	//	return;
 	deviceContext->RSSetState(rss);
 }
 
