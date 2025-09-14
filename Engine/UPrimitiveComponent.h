@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "USceneComponent.h"
@@ -38,7 +38,6 @@ public:
 	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
 	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
 	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
-	virtual ~UPrimitiveComponent() {}
 
 	bool CountOnInspector() override { return true; }
 

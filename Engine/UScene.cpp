@@ -1,4 +1,4 @@
-// UScene.cpp
+﻿// UScene.cpp
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
@@ -173,7 +173,7 @@ void UScene::Render(bool bIsShaderReflectionEnabled)
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
 			if(primitive->bVisible)
-				primitive->Draw(*renderer);
+				primitive->Draw(*renderer, bIsShaderReflectionEnabled);
 		}
 	}
 }

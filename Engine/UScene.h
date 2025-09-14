@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ISerializable.h"
 #include "TArray.h"
 #include "UMeshManager.h"
@@ -38,7 +38,7 @@ public:
 	virtual ~UScene();
 	//virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr); 
 	virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr, UTextureManager* tm= nullptr); 
-	virtual void Render();
+	virtual void Render(bool bIsShaderReflectionEnabled);
 	virtual void Update(float deltaTime);
 	virtual bool OnInitialize();
 

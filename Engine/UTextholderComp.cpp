@@ -61,7 +61,7 @@ void UTextholderComp::CaptureTypedChars()
 
 }
 
-void UTextholderComp::RenderTextLine(URenderer& renderer)
+void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	if (!mesh || !mesh->VertexBuffer) return;
 
@@ -83,14 +83,14 @@ void UTextholderComp::RenderTextLine(URenderer& renderer)
 
 		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0);
 		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-		renderer.SetModel(M, Color, bIsSelected);
+		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
 		renderer.DrawMesh(mesh);
 
 		penX += textInfo->cellWidth * 0.01f;
 	}
 }
 
-void UTextholderComp::Draw(URenderer& renderer)
+void UTextholderComp::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
@@ -99,5 +99,5 @@ void UTextholderComp::Draw(URenderer& renderer)
 
 	//UpdateConstantBuffer(renderer);
 
- 	RenderTextLine(renderer);
+ 	RenderTextLine(renderer, bIsShaderReflectionEnabled);
 }
