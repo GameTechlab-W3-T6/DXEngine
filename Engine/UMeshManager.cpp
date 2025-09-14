@@ -37,41 +37,47 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	return mesh;
 }
 
+static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
+{
+	if (a > b) std::swap(a, b);                 // 무방향 키(작은,큰)
+	return (uint64_t(a) << 32) | uint64_t(b);
+}
+
 UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
-	//const int32 verCnt = vertices.size();
-	//if (verCnt % 3 != 0)
-	//{
-	//	OutputDebugStringA("Wrong Vertex to Turn to Wireframe!");
-	//}
+	const size_t v = vertices.size();
+	if (v % 3 != 0) {
+		// 로깅/예외 처리
+	}
+	const size_t triCount = v / 3;
 
-	//TArray<uint32> wireframeIndices;
-	//wireframeIndices.reserve(verCnt*2);
+	TSet<uint64_t> unique;
+	unique.reserve(triCount * 3);
 
-	//auto AddEdge = [&](uint32 a, uint32 b) {
-	//	const uint64 k = MakeEdgeKey(a, b);
-	//	if (!Unique.Contains(k)) {
-	//		Unique.Add(k);
-	//		lineIdx.Add(a);
-	//		lineIdx.Add(b);
-	//	}
-	//};
+	TArray<uint32> lineIdx;
+	lineIdx.reserve(triCount * 6);              // 라인 인덱스는 엣지당 2개
 
-	//// 각 triangle에 대한 
-	//for (int i = 0;i < verCnt; i+=3)
-	//{
-	//	AddEdge(i, i + 1);
-	//	AddEdge(i + 1, i + 2);
-	//	AddEdge(i + 2, i);
-	//}
+	auto AddEdge = [&](uint32_t a, uint32_t b)
+		{
+			const uint64_t k = MakeEdgeKey(a, b);
+			if (unique.emplace(k).second) {         // 새로 추가된 경우만 push
+				lineIdx.push_back(a);
+				lineIdx.push_back(b);
+			}
+		};
 
-	//// 정점 포맷 변환(필요시)
-	//TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	for (uint32_t i = 0; i < v; i += 3) {
+		AddEdge(i, i + 1);
+		AddEdge(i + 1, i + 2);
+		AddEdge(i + 2, i);
+	}
+	
+	// 정점 포맷 변환(필요시)
+	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
 
-	//// 메시 생성: 토폴로지는 반드시 LINELIST
-	//UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	//mesh->Indices = MoveTemp(lineIdx);     // 인덱스 = 와이어 라인 인덱스
-	//mesh->NumVertices = mesh->Indices.size(); // 있으면
+	// 메시 생성: 토폴로지는 반드시 LINELIST
+	UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	mesh->Indices = lineIdx;
 	return mesh;
 }
 
@@ -88,7 +94,7 @@ UMeshManager::UMeshManager()
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
 
-	meshes["SphereWireframe"] = 
+	// meshes["SphereWireframe"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 
 // 소멸자 (메모리 해제)

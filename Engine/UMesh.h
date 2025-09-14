@@ -19,7 +19,8 @@ public:
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 
-	// TODO : code review - indice buffer 슬쩍 추가
+	// TODO : code review - IndexBuffer 슬쩍 추가
+	ID3D11Buffer* IndexBuffer = nullptr;
 	TArray<uint32> Indices;
 
 	UMesh();
