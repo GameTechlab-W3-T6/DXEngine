@@ -63,10 +63,8 @@ void UTextholderComp::CaptureTypedChars()
 
 void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
-	if (!mesh || !mesh->VertexBuffer) return;
-
-	// atlas  구별 임시
-
+	if (!mesh || !mesh->VertexBuffer) return; 
+	// atlas  구별 임시 
 	if (camera == nullptr) return;
 
 	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
@@ -75,13 +73,13 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 
 	FMatrix view = camera->GetView();
 	FMatrix bill = textInfo->MakeBillboard(view);
+
 	for (int i = 0; i < textInfo->orderOfChar.size(); i++)
 	{
 		//addobject
 		textInfo->keyCode = textInfo->orderOfChar[i];
-		renderer.SetTextUV(*textInfo, bIsShaderReflectionEnabled);
-
-		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0);
+		renderer.SetTextUV(*textInfo, true, bIsShaderReflectionEnabled);
+		 
 		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
 		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
 		renderer.DrawMesh(mesh);
@@ -90,14 +88,23 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 	}
 }
 
-void UTextholderComp::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
+
+	if (!mesh || !mesh->VertexBuffer) return;
+ 
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
 
-	if (!mesh || !mesh->VertexBuffer) return;
+	
+	UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled);
+	////UpdateConstantBuffer(renderer);
 
-	//UpdateConstantBuffer(renderer);
-
- 	RenderTextLine(renderer, bIsShaderReflectionEnabled);
+	RenderTextLine(renderer, bIsShaderReflectionEnabled);
 }
+
+//void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
+//{ 
+//	FMatrix M = GetWorldTransform();
+//	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+//}

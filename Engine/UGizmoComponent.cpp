@@ -1,8 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UGizmoComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
 #include "UClass.h"
+#include "FTextInfo.h" 
 
 IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
 
@@ -25,6 +26,7 @@ void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer, bool bIsShaderRe
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, GetColor(), bIsSelected, bIsShaderReflectionEnabled);
+	renderer.SetTextUV(std::nullopt, false, true);
 }
 
 void UGizmoComponent::Update(float deltaTime)

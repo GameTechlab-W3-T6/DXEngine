@@ -36,12 +36,13 @@ public:
 	bool bIsSelected = false;
 
 	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
-	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
-	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled);
+	virtual void UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture,  bool bIsShaderReflectionEnabled);
 
 	bool CountOnInspector() override { return true; }
 
 	UMesh* GetMesh() { return mesh; }
+	FTexture* GetTextTexture() { return textInfo->textTexture; }
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
 	FVector4 GetColor() const { return Color; }

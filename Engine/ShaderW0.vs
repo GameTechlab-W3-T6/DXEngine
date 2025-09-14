@@ -39,6 +39,7 @@ VS_OUTPUT main(VS_INPUT input)
     // row: v' = v * MVP
     output.Position = mul(wpos, MVP);
     output.UV = input.UV;
+    output.Color = input.Color;
 
     return output;
 }

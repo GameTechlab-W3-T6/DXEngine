@@ -193,7 +193,7 @@ bool URenderer::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;// D3D11_CULL_BACK;       //TODO    // 뒷면 제거
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;       //TODO    // 뒷면 제거
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
@@ -933,54 +933,71 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	}
 }
 
-void URenderer::SetTextUV(FTextInfo& textInfo, bool bIsShaderReflectionEnabled)
+void URenderer::SetTextUV(FTextInfo& textInfo, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
 	//임시  
-	if (textInfo.textTexture == nullptr) return;
-
-	FVector2 cellSize = { (float)textInfo.cellWidth , (float)textInfo.cellHeight };
-	FVector2 texResolution = { (float)textInfo.textTexture->width, (float)textInfo.textTexture->height };
-
-	int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
-
-	int cols = (int)textInfo.cellsPerRow;
-	int column = (int)textInfo.cellsPerColumn;
-
-	int indexH = code / cols; 
-	int indexW = code % cols;
-	
-	FVector2 cellIndex = { (float)indexW, (float)indexH};
-
+	//if (textInfo.textTexture == nullptr) return;
 
 	if (bIsShaderReflectionEnabled)
 	{
-		(*PixelShader_SR)["TextConstantBuffer"]["cellIndex"] = cellIndex;
-		(*PixelShader_SR)["TextConstantBuffer"]["cellSize"] = cellSize;
-		(*PixelShader_SR)["TextConstantBuffer"]["texResolution"] = texResolution;
+		if (bUseTextTexture)
+		{
 
-		//VertexShader_SR->Bind(GetDeviceContext(), "ConstantBuffer");
-		PixelShader_SR->Bind(GetDeviceContext(),"TextConstantBuffer");
+			FVector2 cellSize = { (float)textInfo.cellWidth , (float)textInfo.cellHeight };
+			FVector2 texResolution = { (float)textInfo.textTexture->width, (float)textInfo.textTexture->height };
+
+			int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
+
+			int cols = (int)textInfo.cellsPerRow;
+			int column = (int)textInfo.cellsPerColumn;
+
+			int indexH = code / cols;
+			int indexW = code % cols;
+
+			FVector2 cellIndex = { (float)indexW, (float)indexH };
+			
+			(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
+
+			(*PixelShader_SR)["TextConstantBuffer"]["cellIndex"] = cellIndex;
+			(*PixelShader_SR)["TextConstantBuffer"]["cellSize"] = cellSize;
+			(*PixelShader_SR)["TextConstantBuffer"]["texResolution"] = texResolution;
+
+			PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer"); 
+			PixelShader_SR->Bind(GetDeviceContext(), "TextConstantBuffer"); 
+		}
+		else
+		{
+			(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
+
+			PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
+		}
 	}
 	else
-	{ 
-	int cellIndex = textInfo.keyCode;  
-	//cell 크기/ 텍스처 해상도 업로드
-	//mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
-	//mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
-	//mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
-	//mCBUVData.texResolution[1] = (float)textInfo.textTexture->height;
-	
-	//int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
-	
-	//int cols = (int)textInfo.cellsPerRow;
-	//int column = (int)textInfo.cellsPerColumn;
-	
-	
-	mCBUVData.cellIndex[0] = (float)indexW; // X = col
-	mCBUVData.cellIndex[1] = (float)indexH; // Y = row
-	  
-	
-	UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
+	{  
+		//mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
+		//mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
+		//mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
+		//mCBUVData.texResolution[1] = (float)textInfo.textTexture->height; 
+		//mCBUVData.cellIndex[0] = (float)indexW; // X = col
+		//mCBUVData.cellIndex[1] = (float)indexH; // Y = row
+		//  
+		//
+		//UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
+	}
+}
+
+void URenderer::SetTextUV(std::nullopt_t, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
+{
+	if (bIsShaderReflectionEnabled)
+	{
+		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
+
+		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
+	}
+	else
+	{
+		//TOOD
+
 	}
 }
 

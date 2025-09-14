@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UPrimitiveComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
@@ -41,16 +41,18 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTe
 	return false;
 }
 
-void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled);
+	
 }
 
-void UPrimitiveComponent::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UPrimitiveComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
 	if (!mesh || !mesh->VertexBuffer) return;
 
-	UpdateConstantBuffer(renderer, bIsShaderReflectionEnabled);
+	UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled);
 	renderer.DrawMesh(mesh);
 }

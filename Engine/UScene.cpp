@@ -10,6 +10,7 @@
 #include "UCamera.h" 
 #include "UTextureManager.h"
 #include "UTextholderComp.h"
+#include "FTextInfo.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -161,6 +162,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	return true;
 }
 
+//TODO primitive textInfo 확인
 void UScene::Render(bool bIsShaderReflectionEnabled)
 {
 	// 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
@@ -172,8 +174,14 @@ void UScene::Render(bool bIsShaderReflectionEnabled)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			if(primitive->bVisible)
-				primitive->Draw(*renderer, bIsShaderReflectionEnabled);
+			if (primitive->bVisible)
+			{
+				if (primitive->GetTextTexture() == nullptr)
+					primitive->Draw(*renderer, false, bIsShaderReflectionEnabled);
+				else
+					primitive->Draw(*renderer, true, bIsShaderReflectionEnabled);
+			}
+
 		}
 	}
 }
