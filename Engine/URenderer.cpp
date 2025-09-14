@@ -646,10 +646,10 @@ void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<
 		};
 
 	// 8 corners
-	FVector c000{ mn.X,mn.Y,mn.Z }, c100{ mx.X,mn.Y,mn.Z },
-		c110{ mx.X,mx.Y,mn.Z }, c010{ mn.X,mx.Y,mn.Z },
-		c001{ mn.X,mn.Y,mx.Z }, c101{ mx.X,mn.Y,mx.Z },
-		c111{ mx.X,mx.Y,mx.Z }, c011{ mn.X,mx.Y,mx.Z };
+	FVector c000{ mn.X,mn.Y,mn.Z }, c100{ mx.X,mn.Y,mn.Z }, 
+		c110{ mx.X,mx.Y,mn.Z }, c010{ mn.X,mx.Y,mn.Z },		
+		c001{ mn.X,mn.Y,mx.Z }, c101{ mx.X,mn.Y,mx.Z },		
+		c111{ mx.X,mx.Y,mx.Z }, c011{ mn.X,mx.Y,mx.Z };		
 
 	// bottom face
 	V(c000.X, c000.Y, c000.Z); V(c100.X, c100.Y, c100.Z);
@@ -662,10 +662,17 @@ void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<
 	V(c111.X, c111.Y, c111.Z); V(c011.X, c011.Y, c011.Z);
 	V(c011.X, c011.Y, c011.Z); V(c001.X, c001.Y, c001.Z);
 	// verticals
-	V(c000.X, c000.Y, c000.Z); V(c001.X, c001.Y, c001.Z);
-	V(c100.X, c100.Y, c100.Z); V(c101.X, c101.Y, c101.Z);
-	V(c110.X, c110.Y, c110.Z); V(c111.X, c111.Y, c111.Z);
-	V(c010.X, c010.Y, c010.Z); V(c011.X, c011.Y, c011.Z);
+	V(c000.X, c000.Y, c000.Z); 
+	V(c001.X, c001.Y, c001.Z);
+
+	V(c100.X, c100.Y, c100.Z); 
+	V(c101.X, c101.Y, c101.Z);
+	
+	V(c110.X, c110.Y, c110.Z); 
+	V(c111.X, c111.Y, c111.Z);
+	
+	V(c010.X, c010.Y, c010.Z);
+	V(c011.X, c011.Y, c011.Z);
 }
 
 void URenderer::EnsureAabbLineVB(UINT bytes)
@@ -689,8 +696,9 @@ void URenderer::EnsureAabbLineVB(UINT bytes)
 
 void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
 {
+	//SetModel( )
 	TArray<FVertexPosColor4> verts;
-	BuildAabbLineVerts(mn, mx,verts);
+	BuildAabbLineVerts(mn, mx, verts);
 
 	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosColor4));
 	EnsureAabbLineVB(bytes);
@@ -703,7 +711,11 @@ void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
 	UINT stride = sizeof(FVertexPosColor4), offset = 0;
 	deviceContext->IASetVertexBuffers(0, 1, &aabbLineVB, &stride, &offset);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	  
+
+	FMatrix identity = FMatrix::Identity;
+	FVector4 color(1, 1, 0, 1); // 노란색, 필요하면 파라미터로
+	SetModel(identity, color, false, true);
+	SetTextUV(std::nullopt, false, true);
 	deviceContext->Draw((UINT)verts.size(), 0);
 }
 

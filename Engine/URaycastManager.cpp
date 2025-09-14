@@ -140,6 +140,16 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	if (hit)
 	{
 		hitComponent = closestComponent;
+
+
+		UMesh* mesh = hitComponent->GetMesh();
+		FVector localMin, localMax;
+		MakeAABBInfo(mesh, localMin, localMax);
+
+		ComputeWorldAABB_BruteForce(
+			hitComponent->GetWorldTransform(), localMin, localMax,
+			outMinPos, outMaxPos);
+
 	}
 	return hit;
 }
@@ -306,4 +316,34 @@ void URaycastManager::MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax
 	outMax.X = maxPos[0];
 	outMax.Y = maxPos[1];
 	outMax.Z = maxPos[2];   
+}
+
+
+void URaycastManager::ComputeWorldAABB_BruteForce(const FMatrix& M, const FVector& localMin, const FVector& localMax, FVector& worldMin, FVector& worldMax)
+{
+	FVector corners[8] = {
+		{localMin.X, localMin.Y, localMin.Z},
+		{localMax.X, localMin.Y, localMin.Z},
+		{localMin.X, localMax.Y, localMin.Z},
+		{localMax.X, localMax.Y, localMin.Z},
+		{localMin.X, localMin.Y, localMax.Z},
+		{localMax.X, localMin.Y, localMax.Z},
+		{localMin.X, localMax.Y, localMax.Z},
+		{localMax.X, localMax.Y, localMax.Z}
+	};
+
+	worldMin = { FLT_MAX,  FLT_MAX,  FLT_MAX };
+	worldMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+	for (int i = 0; i < 8; ++i)
+	{ 
+		FVector w = TransformVertexToWorld(corners[i], M); // 반드시 Point 변환(w=1)이어야 함
+		worldMin.X = min(worldMin.X, w.X);
+		worldMin.Y = min(worldMin.Y, w.Y);
+		worldMin.Z = min(worldMin.Z, w.Z);
+		worldMax.X = max(worldMax.X, w.X);
+		worldMax.Y = max(worldMax.Y, w.Y);
+		worldMax.Z = max(worldMax.Z, w.Z);
+	}
+
 }

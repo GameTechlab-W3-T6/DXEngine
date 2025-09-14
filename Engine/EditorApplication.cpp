@@ -241,13 +241,15 @@ void EditorApplication::HandleEmptySpaceClick()
 
 void EditorApplication::Render(bool bIsShaderReflectionEnabled)
 {
-	UApplication::Render(bIsShaderReflectionEnabled);
-	gizmoManager.Draw(GetRenderer(), bIsShaderReflectionEnabled);
-
 	if (AABBFlag)
 	{
 		GetRenderer().DrawAABBLines(minPos, maxPos);
+		UE_LOG("min %.2f, %.2f, %.2f", minPos.X, minPos.Y, minPos.Z);
+		UE_LOG("max %.2f, %.2f, %.2f", maxPos.X, maxPos.Y, maxPos.Z);
 	}
+
+	UApplication::Render(bIsShaderReflectionEnabled);
+	gizmoManager.Draw(GetRenderer(), bIsShaderReflectionEnabled);
 
 }
 
