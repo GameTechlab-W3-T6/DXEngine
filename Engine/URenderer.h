@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
-#include "Matrix.h"
+#include "Shader.h"
+
 #include "UEngineSubsystem.h"
 
 struct FTextInfo;
@@ -42,6 +43,9 @@ private:
 	ID3D11PixelShader* pixelShader;
 	ID3D11InputLayout* inputLayout;
 
+	TUniquePtr<UShader> VertexShader_SR;
+	TUniquePtr<UShader> PixelShader_SR;
+
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
 	ID3D11Buffer* textConstantBuffer;
@@ -70,6 +74,7 @@ public:
 	// Initialization and cleanup
 	bool Initialize(HWND windowHandle);
 	bool CreateShader();
+	bool CreateShader_SR();
 	bool CreateRasterizerState();
 	bool CreateConstantBuffer(); 
 
@@ -92,7 +97,7 @@ public:
 
 	// Rendering operations
 	void Prepare();
-	void PrepareShader();
+	void PrepareShader(bool bIsShaderReflectionEnabled);
 	void SwapBuffer();
 	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
 
@@ -152,7 +157,7 @@ private:
 	}
 public:
 	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
-	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
+	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected, bool bIsShaderReflectionEnabled);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
 	void SetTextUV(FTextInfo& textInfo);
 

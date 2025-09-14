@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ISerializable.h"
 #include "TArray.h"
 #include "UMeshManager.h"

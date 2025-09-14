@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UApplication.h"
 #include "EditorApplication.h"
 #include "UMeshManager.h"
@@ -239,7 +239,7 @@ void EditorApplication::HandleEmptySpaceClick()
 }
  
 
-void EditorApplication::Render()
+void EditorApplication::Render(bool bIsShaderReflectionEnabled)
 {
 	UApplication::Render();
 	gizmoManager.Draw(GetRenderer());

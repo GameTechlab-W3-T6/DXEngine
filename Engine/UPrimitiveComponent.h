@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "USceneComponent.h"
@@ -35,10 +35,10 @@ public:
 	bool bVisible = true;
 	bool bIsSelected = false;
 
-	// 별도의 초기화 메서드
 	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
-	virtual void Draw(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer); 
+	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual ~UPrimitiveComponent() {}
 
 	bool CountOnInspector() override { return true; }
 

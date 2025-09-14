@@ -181,6 +181,14 @@ bool URenderer::CreateShader()
 	return CheckResult(hr, "CreatePixelShader");
 }
 
+bool URenderer::CreateShader_SR()
+{
+	VertexShader_SR = MakeUnique<UShader>(GetDevice(), EShaderType::VertexShader, "ShaderW0.vs", "main");
+	PixelShader_SR = MakeUnique<UShader>(GetDevice(), EShaderType::PixelShader, "ShaderW0.ps", "main");
+
+	return true;
+}
+
 bool URenderer::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
@@ -477,10 +485,17 @@ void URenderer::Prepare()
 	Clear();
 }
 
-void URenderer::PrepareShader()
+void URenderer::PrepareShader(bool bIsShaderReflectionEnabled)
 {
 	if (!deviceContext)
+	{
 		return;
+	}
+
+	if (bIsShaderReflectionEnabled)
+	{
+		return;
+	}
 
 	// Set shaders
 	deviceContext->VSSetShader(vertexShader, nullptr, 0);
@@ -895,14 +910,27 @@ void URenderer::SetViewProj(const FMatrix& V, const FMatrix& P)
 	// 여기서는 상수버퍼 업로드 안 함 (오브젝트에서 M과 합쳐서 업로드)
 }
 
-void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelected)
+void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelected, bool bIsShaderReflectionEnabled)
 {
 	// per-object: MVP = M * VP
 	FMatrix MVP = M * mVP;
-	CopyRowMajor(mCBData.MVP, MVP);
-	memcpy(mCBData.MeshColor, &color, sizeof(float) * 4);
-	mCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
-	UpdateConstantBuffer(&mCBData, sizeof(mCBData));
+	if (bIsShaderReflectionEnabled)
+	{
+		(*VertexShader_SR)["ConstantBuffer"]["MVP"] = MVP;
+		(*VertexShader_SR)["ConstantBuffer"]["MeshColor"] = color;
+		(*VertexShader_SR)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+
+		/** @brief: For now, binding should be done here. */
+		VertexShader_SR->Bind(GetDeviceContext(), "ConstantBuffer");
+		PixelShader_SR->Bind(GetDeviceContext());
+	}
+	else
+	{
+		CopyRowMajor(mCBData.MVP, MVP);
+		memcpy(mCBData.MeshColor, &color, sizeof(float) * 4);
+		mCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
+		UpdateConstantBuffer(&mCBData, sizeof(mCBData));
+	}
 }
 
 void URenderer::SetTextUV(FTextInfo& textInfo)
