@@ -14,6 +14,11 @@ public:
 	using MeshID = UMesh::MeshID;
 
 private:
+	MeshID GetNextID() const
+	{
+		return meshes.size();
+	}
+
 	TMap<FString, TUniquePtr<UMesh>> meshes;
 
 	TUniquePtr<UMesh> CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
@@ -27,5 +32,15 @@ public:
 	~UMeshManager();
 
 	bool Initialize(URenderer* renderer);
-	UMesh* GetMesh(FString meshName);
+	UMesh* GetMesh(FString meshName)
+	{
+		auto it = meshes.find(meshName);
+
+		if (it != meshes.end())
+		{
+			return it->second.get();
+		}
+
+		return nullptr;
+	}
 };

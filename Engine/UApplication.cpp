@@ -43,6 +43,10 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	windowWidth = width;
 	windowHeight = height;
 
+	// Create Renderer
+	//renderer = MakeUnique<URenderer>();
+	renderer = MakeUnique<UBatchRenderer>();
+
 	// Create main window
 	if (!CreateMainWindow(hInstance))
 	{
@@ -56,49 +60,50 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
-	if (!renderer.Initialize(hWnd))
+	// Initialize Renderer
+	if (!GetRenderer().Initialize(hWnd))
 	{
 		MessageBox(hWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.CreateShader())
+	if (!GetRenderer().CreateShader())
 	{
 		MessageBox(hWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.CreateShader_SR())
+	if (!GetRenderer().CreateShader_SR())
 	{
 		MessageBox(hWnd, L"Failed to create SR shaders", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.CreateConstantBuffer())
+	if (!GetRenderer().CreateConstantBuffer())
 	{
 		MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!meshManager.Initialize(&renderer))
+	if (!meshManager.Initialize(renderer.get()))
 	{
 		MessageBox(hWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	batchShaderManager.Initialize(renderer.GetDevice());
+	batchShaderManager.Initialize(GetRenderer().GetDevice());
 
 	if (!sceneManager.Initialize(g_pApplication))
 	{
 		MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	if (!raycastManager.Initialize(&renderer, &inputManager))
+	if (!raycastManager.Initialize(renderer.get(), &inputManager))
 	{
 		MessageBox(hWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	if (!gui.Initialize(hWnd, renderer.GetDevice(), renderer.GetDeviceContext()))
+	if (!gui.Initialize(hWnd, GetRenderer().GetDevice(), GetRenderer().GetDeviceContext()))
 	{
 		return false;
 	}
@@ -151,9 +156,9 @@ void UApplication::Shutdown()
 	// Shutdown core systems in reverse order
 	inputManager.Shutdown();  // 먼저 입력 시스템 안전 종료
 	gui.Shutdown();
-	renderer.ReleaseConstantBuffer();
-	renderer.ReleaseShader();
-	renderer.Release();
+	GetRenderer().ReleaseConstantBuffer();
+	GetRenderer().ReleaseShader();
+	GetRenderer().Release();
 
 	bIsInitialized = false;
 }
@@ -246,8 +251,8 @@ void UApplication::InternalUpdate()
 void UApplication::InternalRender()
 {
 	// Prepare rendering
-	renderer.Prepare();
-	renderer.PrepareShader();
+	GetRenderer().Prepare();
+	GetRenderer().PrepareShader();
 
 	// Call derived class render
 	Render();
@@ -259,7 +264,7 @@ void UApplication::InternalRender()
 	gui.EndFrame();
 
 	// Present the frame
-	renderer.SwapBuffer();
+	GetRenderer().SwapBuffer();
 }
 
 LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

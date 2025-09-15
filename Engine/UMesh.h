@@ -33,14 +33,30 @@ public:
 		if (VertexBuffer) VertexBuffer->Release();
 	}
 
-	TOptional<MeshID> GetID() const
+	void Bind(ID3D11DeviceContext* DeviceContext)
 	{
-		return ID;
+		UINT Offset = 0;
+
+		DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &Offset);
+
+		DeviceContext->IASetPrimitiveTopology(PrimitiveType);
+
+		if (IndexBuffer)
+		{
+			DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		}
 	}
 
 	void Init(ID3D11Device* device);
 
 	bool IsInitialized() const { return isInitialized; }
+
+	bool IsIndexBufferEnabled() const { return IndexBuffer;  }
+
+	TOptional<MeshID> GetID() const
+	{
+		return ID;
+	}
 
 private:
 	bool isInitialized = false;

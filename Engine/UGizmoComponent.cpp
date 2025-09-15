@@ -37,14 +37,37 @@ FMatrix UGizmoComponent::GetWorldTransform()
 	return FMatrix::SRTRowQuaternion(RelativeLocation, (OriginQuaternion * RelativeQuaternion).ToMatrixRow(), RelativeScale3D);
 }
 
-void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
-{
-	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, GetColor(), bIsSelected);
-}
-
 void UGizmoComponent::Update(float deltaTime)
 {
+}
+
+void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
+{
+	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
+	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
+	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
+	(*vertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+}
+
+void UGizmoComponent::BindVertexShader(URenderer& renderer)
+{
+	vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
+}
+
+void UGizmoComponent::BindPixelShader(URenderer& renderer)
+{
+	pixelShader->Bind(renderer.GetDeviceContext());
+}
+
+void UGizmoComponent::BindShader(URenderer& renderer)
+{
+	BindVertexShader(renderer);
+	BindPixelShader(renderer);
+}
+
+void UGizmoComponent::BindMesh(URenderer& renderer)
+{
+	mesh->Bind(renderer.GetDeviceContext());
 }
 
 void UGizmoComponent::Draw(URenderer& renderer)
@@ -54,7 +77,6 @@ void UGizmoComponent::Draw(URenderer& renderer)
 		return;
 	}
 
-	UpdateConstantBuffer(renderer);
 	renderer.DrawGizmoComponent(this);
 }
 
@@ -65,7 +87,5 @@ void UGizmoComponent::DrawOnTop(URenderer& renderer)
 		return;
 	}
 
-	renderer.SetShader(vertexShader, pixelShader);
-	UpdateConstantBuffer(renderer);
 	renderer.DrawGizmoComponent(this, true);
 }

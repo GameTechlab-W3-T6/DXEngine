@@ -29,9 +29,21 @@ public:
 	FMatrix GetWorldTransform() override;
 
 	virtual void Update(float deltaTime);
-	virtual void Draw(URenderer& renderer);
-	virtual void DrawOnTop(URenderer& renderer);
+
 	virtual void UpdateConstantBuffer(URenderer& renderer);
+
+	virtual void BindVertexShader(URenderer& renderer);
+
+	virtual void BindPixelShader(URenderer& renderer);
+
+	void BindShader(URenderer& renderer);
+
+	void BindMesh(URenderer& renderer);
+
+	virtual void Draw(URenderer& renderer);
+
+	virtual void DrawOnTop(URenderer& renderer);
+	
 
 	UMesh* GetMesh() { return mesh; }
 

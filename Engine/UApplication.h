@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "URenderer.h"
+#include "UBatchRenderer.h"
 #include "UInputManager.h"
 #include "UGUI.h"
 #include "UTimeManager.h"
@@ -18,7 +19,8 @@ class UApplication
 private:
 	// Core systems
 	HWND hWnd;
-	URenderer renderer;
+	/** @note: Renderer is changed into pointer to support polymorphism. */
+	TUniquePtr<URenderer> renderer;
 	UInputManager inputManager;
 	UGUI gui;
 	UTimeManager timeManager;
@@ -58,7 +60,7 @@ public:
 	virtual void Render();
 
 	// System access
-	URenderer& GetRenderer() { return renderer; }
+	URenderer& GetRenderer() { return *renderer; }
 	UMeshManager& GetMeshManager() { return meshManager; }
 	USceneManager& GetSceneManager() { return sceneManager; }
 	UInputManager& GetInputManager() { return inputManager; }

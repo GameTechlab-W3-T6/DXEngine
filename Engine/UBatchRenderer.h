@@ -4,7 +4,7 @@
 
 class UPrimitiveComponent;
 
-class UBatchRenderer : URenderer
+class UBatchRenderer : public URenderer
 {
 	DECLARE_UCLASS(UBatchRenderer, URenderer)
 public:
@@ -18,7 +18,7 @@ public:
 	UBatchRenderer& operator=(const UBatchRenderer&) = delete;
 	UBatchRenderer& operator=(UBatchRenderer&&) = delete;
 
-	virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent) override;
+	virtual void DrawPrimitiveComponent(UPrimitiveComponent* PrimitiveComponent) override;
 
 	virtual void SwapBuffer() override;
 
@@ -125,4 +125,4 @@ private:
 	TArray<RenderKeyType> KeyArray;
 
 	TMap<RenderKeyType, UPrimitiveComponent*> PrimitiveComponentMap;
-}
+};

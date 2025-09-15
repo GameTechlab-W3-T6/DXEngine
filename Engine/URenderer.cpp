@@ -30,7 +30,7 @@ URenderer::URenderer()
 	else
 		bIsShaderReflectionEnabled = false;
 
-	ZeroMemory(&viewport, sizeof(viewport));
+	ZeroMemory(&Viewport, sizeof(Viewport));
 }
 
 URenderer::~URenderer()
@@ -537,33 +537,31 @@ void URenderer::DrawLine(UMesh* Mesh)
 
 void URenderer::DrawPrimitiveComponent(UPrimitiveComponent* component)
 {
-	UMesh* mesh = component->GetMesh();
+	auto Mesh = component->GetMesh();
+	Mesh->Bind(DeviceContext);
 
-	if (!mesh || !mesh->IsInitialized())
-		return;
+	component->UpdateConstantBuffer(*this);
 
-	UINT offset = 0;
+	component->BindShader(*this);
 
-	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
-	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
-
-	if (mesh->IndexBuffer)
+	if (Mesh->IsIndexBufferEnabled())
 	{
-		deviceContext->IASetIndexBuffer(mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		deviceContext->DrawIndexed(mesh->NumIndices, 0, 0);
+		DeviceContext->DrawIndexed(Mesh->NumIndices, 0, 0);
 	}
 	else
 	{
-		deviceContext->Draw(mesh->NumVertices, 0);
+		DeviceContext->Draw(Mesh->NumVertices, 0);
 	}
 }
 
 void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 {
-	UMesh* mesh = component->GetMesh();
+	auto Mesh = component->GetMesh();
+	Mesh->Bind(DeviceContext);
 
-	if (!mesh || !mesh->IsInitialized())
-		return;
+	component->UpdateConstantBuffer(*this);
+
+	component->BindShader(*this);
 
 	// Create appropriate depth-stencil state based on drawOnTop parameter
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -586,35 +584,29 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 	HRESULT hr = Device->CreateDepthStencilState(&dsDesc, &pDSState);
 	if (FAILED(hr))
 	{
-		LogError("CreateDepthStencilState (DrawGizmoComponent)", hr);
+		LogError(hr, "CreateDepthStencilState (DrawGizmoComponent)");
 		return;
 	}
 
 	// Backup current depth-stencil state
 	ID3D11DepthStencilState* pOldState = nullptr;
 	UINT stencilRef = 0;
-	deviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
+	DeviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
 
 	// Set new depth state
-	deviceContext->OMSetDepthStencilState(pDSState, 0);
+	DeviceContext->OMSetDepthStencilState(pDSState, 0);
 
-	UINT offset = 0;
-
-	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
-	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
-
-	if (mesh->IndexBuffer)
+	if (Mesh->IsIndexBufferEnabled())
 	{
-		deviceContext->IASetIndexBuffer(mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		deviceContext->DrawIndexed(mesh->NumIndices, 0, 0);
+		DeviceContext->DrawIndexed(Mesh->NumIndices, 0, 0);
 	}
 	else
 	{
-		deviceContext->Draw(mesh->NumVertices, 0);
+		DeviceContext->Draw(Mesh->NumVertices, 0);
 	}
 
 	// Restore previous depth state
-	deviceContext->OMSetDepthStencilState(pOldState, stencilRef);
+	DeviceContext->OMSetDepthStencilState(pOldState, stencilRef);
 
 	// Release local COM objects
 	SAFE_RELEASE(pOldState);
@@ -712,29 +704,6 @@ void URenderer::SetViewProj(const FMatrix& View, const FMatrix& Projection)
 	// 프레임 캐시엔 VP = V * P 저장
 	VP = View * Projection;
 	// 여기서는 상수버퍼 업로드 안 함 (오브젝트에서 M과 합쳐서 업로드)
-}
-
-void URenderer::SetModel(const FMatrix& Model, const FVector4& Color, bool bIsSelected, bool bIsShaderReflectionEnabled)
-{
-	// per-object: MVP = M * VP
-	FMatrix MVP = Model * VP;
-	if (bIsShaderReflectionEnabled)
-	{
-		(*VertexShader_SR)["ConstantBuffer"]["MVP"] = MVP;
-		(*VertexShader_SR)["ConstantBuffer"]["MeshColor"] = Color;
-		(*VertexShader_SR)["ConstantBuffer"]["IsSelected"] = bIsSelected;
-
-		/** @brief: For now, binding should be done here. You should designate cbuffer name here.*/
-		VertexShader_SR->Bind(GetDeviceContext(), "ConstantBuffer");
-		PixelShader_SR->Bind(GetDeviceContext());
-	}
-	else
-	{
-		CopyRowMajor(MCBData.MVP, MVP);
-		memcpy(MCBData.MeshColor, &Color, sizeof(float) * 4);
-		MCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
-		UpdateConstantBuffer(&MCBData, sizeof(MCBData));
-	}
 }
 
 bool URenderer::UpdateConstantBuffer(const void* Data, size_t Size)
@@ -956,14 +925,13 @@ void URenderer::SetShader(UShader* vertexShader, UShader* pixelShader)
 void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelected)
 {
 	// per-object: MVP = M * VP
-	FMatrix MVP = M * mVP;
+	FMatrix MVP = M * VP;
 	if (!bIsShaderReflectionEnabled)
 	{
-		D3D11_TEXTURE2D_DESC desc;
-		backBuffer->GetDesc(&desc);
-		Width = static_cast<int32>(desc.Width);
-		Height = static_cast<int32>(desc.Height);
-		backBuffer->Release();
+		CopyRowMajor(MCBData.MVP, MVP);
+		memcpy(MCBData.MeshColor, &color, sizeof(float) * 4);
+		MCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
+		UpdateConstantBuffer(&MCBData, sizeof(MCBData));
 	}
 	else
 	{

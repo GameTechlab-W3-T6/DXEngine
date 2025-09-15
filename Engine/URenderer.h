@@ -53,34 +53,6 @@ public:
 	bool ReleaseTexture(ID3D11Texture2D* Texture);
 	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* ShaderResourceView);
 
-	// Rendering operations
-	void Prepare();
-	void PrepareShader();
-	void SwapBuffer();
-	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
-
-	// Drawing operations
-	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
-	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
-	void DrawMesh(UMesh* mesh);
-	void DrawLine(UMesh* mesh);
-	void DrawPrimitiveComponent(UPrimitiveComponent* component);
-	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
-	void DrawMeshOnTop(UMesh* mesh);
-
-	// Resource binding
-	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
-	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
-	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
-	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
-	void SetRasterizerMode(bool isSolid);
-
-	// Constant buffer updates
-	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
-
-	// Window resize handling
-	bool ResizeBuffers(int32 width, int32 height);
-
 	// Getters
 	ID3D11Device* GetDevice() const { return Device; }
 	ID3D11DeviceContext* GetDeviceContext() const { return DeviceContext; }
@@ -123,7 +95,7 @@ private:
 public:
 	/** Rendering operations */
 	void Prepare();
-	void PrepareShader(bool bIsShaderReflectionEnabled);
+	void PrepareShader();
 	virtual void SwapBuffer();
 	void Clear(float Red = 0.0f, float Green = 0.0f, float Blue = 0.0f, float Alpha = 1.0f);
 
@@ -134,10 +106,13 @@ public:
 	void DrawMesh(UMesh* Mesh);
 
 	/** @todo */
-	virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent)
-	{
-		return;
-	}
+	//virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent)
+	//{
+	//	return;
+	//}
+
+	virtual void DrawPrimitiveComponent(UPrimitiveComponent* component);
+	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
 
 	/** @note: These helper functions use Draw() or DrawMesh() Internally. */
 	void DrawLine(UMesh* Mesh);
@@ -147,13 +122,19 @@ public:
 	void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
 	void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
 	void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
+	void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
 	void SetRasterizerMode(bool bIsSolid);
 
 	/** Constant buffer updates */
 	void SetViewProj(const FMatrix& View, const FMatrix& Projection); // 내부에 VP 캐시
-	void SetModel(const FMatrix& Model, const FVector4& Color, bool IsSelected, bool bIsShaderReflectionEnabled);                      // M*VP → b0 업로드
+	void SetModel(const FMatrix& Model, const FVector4& Color, bool IsSelected);
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
+
+	FMatrix GetViewProj() const
+	{
+		return VP;
+	}
 
 	/** Window resize handling */
 	bool ResizeBuffers(int32 width, int32 height);
@@ -229,4 +210,5 @@ private:
 
 private:
 	uint32 DrawCallCount;
+	bool bIsShaderReflectionEnabled;
 };

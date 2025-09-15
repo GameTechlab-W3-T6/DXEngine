@@ -32,8 +32,18 @@ public:
 
 	bool bIsSelected = false;
 
-	virtual void Draw(URenderer& renderer);
 	virtual void UpdateConstantBuffer(URenderer& renderer);
+
+	virtual void BindVertexShader(URenderer& renderer);
+
+	virtual void BindPixelShader(URenderer& renderer);
+
+	void BindShader(URenderer& renderer);
+
+	void BindMesh(URenderer& renderer);
+
+	virtual void Draw(URenderer& renderer);
+
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드

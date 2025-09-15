@@ -27,6 +27,7 @@ private:
 		return itr->second.get();
 	}
 public:
+	/** @todo: Change instance into local static variable. */
 	static ConfigManager* GetInstance()
 	{
 		if (instance == nullptr)
