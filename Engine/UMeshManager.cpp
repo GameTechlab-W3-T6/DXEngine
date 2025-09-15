@@ -92,6 +92,9 @@ UMeshManager::UMeshManager()
 	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 
+	ConfigData* config = ConfigManager::GetConfig("editor");
+	float gridSize = config->getFloat("Gizmo", "GridSize");
+	int gridCount = config->getInt("Gizmo", "GridCount");
 	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), gizmo_arrow_vertices);
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateRotationHandleVertices());

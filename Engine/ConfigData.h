@@ -55,6 +55,12 @@ public:
         return std::stoi(val);
     }
 
+    float getFloat(const std::string& section, const std::string& key, float defaultValue = 0.0f) const {
+        std::string val = getString(section, key);
+        if (val.empty()) return defaultValue;
+        return std::stof(val);
+    }
+
     bool getBool(const std::string& section, const std::string& key, bool defaultValue = false) const {
         std::string val = getString(section, key);
         toLower(val);
