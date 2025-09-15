@@ -80,6 +80,11 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
+	if (!renderer.CreateTextInstanceVB(4096))
+	{
+		MessageBox(hWnd, L"Failed to create Text Instance Vbuffer", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	if (!meshManager.Initialize(&renderer))
 	{

@@ -25,6 +25,18 @@ struct CBTextUV
 	float padding[2];
 };
 
+struct FTextInstance
+{
+	float M0[4];
+	float M1[4];
+	float M2[4];
+	
+	float uvOffset[2];
+	float uvScale[2];
+
+	float color[4];
+};
+
 class URenderer : UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
@@ -43,6 +55,7 @@ private:
 	ID3D11PixelShader* pixelShader;
 	ID3D11InputLayout* inputLayout;
 
+
 	TUniquePtr<UShader> VertexShader_SR;
 	TUniquePtr<UShader> PixelShader_SR;
 
@@ -50,6 +63,11 @@ private:
 	ID3D11Buffer* constantBuffer;
 	ID3D11Buffer* textConstantBuffer;
 	ID3D11Buffer* aabbLineVB; 
+
+	//Text
+	ID3D11VertexShader* textVertexShaderInst;
+	ID3D11InputLayout* InputLayoutTextInst;
+	ID3D11Buffer* textInstanceVB;
 
 	// Viewport
 	D3D11_VIEWPORT viewport;
@@ -77,6 +95,10 @@ public:
 	bool CreateShader_SR();
 	bool CreateRasterizerState();
 	bool CreateConstantBuffer(); 
+
+	// instanced 
+	bool CreateTextInstanceVB(UINT maxInstances);
+	void UpdateTextInstanceVB(const TArray<FTextInstance>& instances);
 
 	void Release();
 	void ReleaseShader();
@@ -107,6 +129,7 @@ public:
 	void DrawMesh(UMesh* mesh);
 	void DrawLine(UMesh* mesh);
 	void DrawMeshOnTop(UMesh* mesh);
+	void DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances);
 
 	// Drawing AABB 
 	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out);
@@ -137,6 +160,8 @@ public:
 	bool CheckDeviceState();
 	void GetBackBufferSize(int32& width, int32& height);
 
+	// Write Dump File
+	void DumpVSInputSignature(ID3DBlob* vsBlob);
 private:
 	// Internal helper functions
 	bool CreateDeviceAndSwapChain(HWND windowHandle);

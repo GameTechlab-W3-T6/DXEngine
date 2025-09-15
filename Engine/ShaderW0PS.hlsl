@@ -5,7 +5,6 @@ struct PS_INPUT
     float4 Color : COLOR;
     float2 UV : TEXCOORD0;
 };
-
 cbuffer TextConstantBuffer : register(b0)
 {
     float2 cellIndex; 
@@ -20,6 +19,7 @@ cbuffer TextTestBuffer: register(b1)
 };
 
 
+
 Texture2D testText : register(t0);
 SamplerState testSampler : register(s0);
 
@@ -27,15 +27,15 @@ SamplerState testSampler : register(s0);
 float4 main(PS_INPUT input) : SV_Target
 {   
     //UV
-    float2 cellScale     = cellSize / texResolution;              
-    float2 cellOffsetUV  = cellIndex * cellScale;             
-    float2 uv = input.UV * cellScale + cellOffsetUV; 
+    //float2 cellScale     = cellSize / texResolution;              
+    //float2 cellOffsetUV  = cellIndex * cellScale;             
+    //float2 uv = input.UV * cellScale + cellOffsetUV; 
 
    float4 color; 
 
    if(bUseTextTexture)
    {    
-        float4 textColor = testText.Sample(testSampler, uv); 
+        float4 textColor = testText.Sample(testSampler, input.UV); 
         if(textColor.a < 0.1f) discard;
         color = textColor; 
    }

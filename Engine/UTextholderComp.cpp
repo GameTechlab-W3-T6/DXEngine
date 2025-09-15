@@ -12,6 +12,7 @@ UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
 UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 
+
 bool UTextholderComp::Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm, UCamera* cam)
 {
 	inputManager = im;
@@ -61,12 +62,43 @@ void UTextholderComp::CaptureTypedChars()
 
 }
 
+//void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
+//{
+//	if (!mesh || !mesh->VertexBuffer) return; 
+//	// atlas  구별 임시 
+//	if (camera == nullptr) return;
+//
+//	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
+//	float penX = -totalWidth * 0.5f;
+//	textInfo->center = totalWidth * 0.5f;
+//
+//	FMatrix view = camera->GetView();
+//	FMatrix bill = textInfo->MakeBillboard(view);
+//
+//	for (int i = 0; i < textInfo->orderOfChar.size(); i++)
+//	{
+//		//addobject		
+//		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+//		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+//		textInfo->keyCode = textInfo->orderOfChar[i];
+//		renderer.SetTextUV(*textInfo, true, bIsShaderReflectionEnabled);
+//
+//		renderer.DrawMesh(mesh);
+//
+//		penX += textInfo->cellWidth * 0.01f;
+//	}
+//} 
+ 
+
 void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
 	if (!mesh || !mesh->VertexBuffer) return; 
 	// atlas  구별 임시 
 	if (camera == nullptr) return;
 
+	TArray<FTextInstance> instances; 
+	instances.reserve(textInfo->orderOfChar.size());
+	 
 	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
 	float penX = -totalWidth * 0.5f;
 	textInfo->center = totalWidth * 0.5f;
@@ -76,16 +108,37 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 
 	for (int i = 0; i < textInfo->orderOfChar.size(); i++)
 	{
-		//addobject
-		textInfo->keyCode = textInfo->orderOfChar[i];
-		renderer.SetTextUV(*textInfo, true, bIsShaderReflectionEnabled);
-		 
-		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-		renderer.DrawMesh(mesh);
 
-		penX += textInfo->cellWidth * 0.01f;
+		const int code = (int)textInfo->orderOfChar[i];
+
+		// (a) 인스턴스 월드행렬: translation(penX,0,0) * billboard
+		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+
+		FTextInstance inst{}; 
+		Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
+
+		// (b) UV 사각형: 아틀라스에서 code로 계산
+		const int texW = textInfo->textTexture->width;
+		const int texH = textInfo->textTexture->height;
+		ComputeGlyphUVRect(
+			code,
+			(int)textInfo->cellsPerRow,
+			(int)textInfo->cellsPerColumn,
+			(int)textInfo->cellWidth,
+			(int)textInfo->cellHeight,
+			texW, texH,
+			inst.uvOffset, inst.uvScale
+		);
+
+		// (c) 색상
+		inst.color[0] = Color.X; inst.color[1] = Color.Y;
+		inst.color[2] = Color.Z; inst.color[3] = Color.W; 
+		instances.push_back(inst);
+
+		// (d) 커서 전진
+		penX += textInfo->cellWidth * 0.01f;  
 	}
+	renderer.DrawInstanced(mesh, instances);
 }
 
 void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
@@ -96,8 +149,12 @@ void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsSh
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
 
-	
-	UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled);
+	renderer.SetViewProj(
+		camera->GetView(), camera->GetProj()); 
+	renderer.SetModel(FMatrix::Identity, Color, /*selected=*/false, /*shaderReflection=*/false);
+	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled); 
+
+	//UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled); 
 	////UpdateConstantBuffer(renderer);
 
 	RenderTextLine(renderer, bIsShaderReflectionEnabled);
