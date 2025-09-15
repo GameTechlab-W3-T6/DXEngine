@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UPrimitiveComponent.h"
 
@@ -48,8 +48,6 @@ private:
 		outUVOffset[0] = u0; outUVOffset[1] = v0;
 		outUVScale[0] = du; outUVScale[1] = dv;
 	}
-	virtual bool Init(UMeshManager* meshManager, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr) override;
-
 	virtual void UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled) override;
 	virtual void Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled) override;
 };
