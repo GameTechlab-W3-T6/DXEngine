@@ -26,8 +26,8 @@ public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr)
 	{
-		ConfigData* editorConfig = ConfigManager::GetConfig("editor");
-		cachedIsShaderReflectionEnabled = editorConfig->getBool("Graphics", "ShaderReflection");
+		ConfigData* config = ConfigManager::GetConfig("editor");
+		cachedIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");
 	}
 
 	bool bIsSelected = false;

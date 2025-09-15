@@ -43,6 +43,9 @@
     <Filter Include="Engine\UI">
       <UniqueIdentifier>{3a65dfd5-299b-4436-96c7-b669986cfa16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{6bf3b178-5122-458b-9c83-22ff0ce0d3a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -183,6 +186,8 @@
     <ClCompile Include="ImguiConsole.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="UBatchShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -353,6 +358,13 @@
     <ClInclude Include="UObjectMacros.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="DynamicBuffer.h" />
+    <ClInclude Include="FName.h" />
+    <ClInclude Include="ConfigData.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderReflection.h" />
+    <ClInclude Include="UBatchShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
@@ -360,6 +372,9 @@
     </None>
     <None Include="ShaderW0.vs">
       <Filter>Shader</Filter>
+    </None>
+    <None Include="editor.default.ini">
+      <Filter>Resources</Filter>
     </None>
   </ItemGroup>
 </Project>
