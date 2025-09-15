@@ -18,7 +18,7 @@ public:
 	~UShader() = default;
 
 	UShader(ID3D11Device* Device, ShaderID ID, EShaderType InShaderType, const std::filesystem::path& FilePath, const FString& EntryPoint)
-		: ShaderType(InShaderType)
+		: ShaderType(InShaderType), ID(ID)
 	{
 		if (!std::filesystem::exists(FilePath))
 		{
@@ -104,7 +104,8 @@ public:
 
 	ShaderID GetID() const
 	{
-		return ID;
+		assert(ID && "ID is not initialized");
+		return *ID;
 	}
 
 	void BindConstantBuffer(ID3D11DeviceContext* DeviceContext, const FString& BufferName)
@@ -140,7 +141,7 @@ public:
 	}
 
 private:
-	ShaderID ID;
+	TOptional<ShaderID> ID;
 
 	EShaderType ShaderType;
 

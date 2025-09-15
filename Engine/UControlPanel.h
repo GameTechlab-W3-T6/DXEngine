@@ -36,5 +36,9 @@ public:
 	void GridManagementSection();
 
 	USceneComponent* CreateSceneComponentFromChoice(int index);
+
+	// ================================================================= //
+	// Newly added feature
+	void PerformanceSection();
 };
 

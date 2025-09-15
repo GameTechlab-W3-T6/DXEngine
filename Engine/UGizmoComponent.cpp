@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UGizmoComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
@@ -6,7 +6,7 @@
 #include "UBatchShaderManager.h"
 #include "FTextInfo.h" 
 
-IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
+IMPLEMENT_UCLASS(UGizmoComponent, UPrimitiveComponent)
 
 bool UGizmoComponent::Init()
 {
@@ -38,37 +38,33 @@ FMatrix UGizmoComponent::GetWorldTransform()
 	return FMatrix::SRTRowQuaternion(RelativeLocation, (OriginQuaternion * RelativeQuaternion).ToMatrixRow(), RelativeScale3D);
 }
 
-void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
-{
-	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, GetColor(), bIsSelected);
-}
-
 void UGizmoComponent::Update(float deltaTime)
 {
 }
 
-void UGizmoComponent::Draw(URenderer& renderer)
+void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	if (!mesh || !mesh->VertexBuffer)
-	{
-		return;
-	}
+	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
+	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
+	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
+	(*vertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
+}
 
+void UGizmoComponent::BindVertexShader(URenderer& renderer)
+{
+	UPrimitiveComponent::BindVertexShader(renderer);
+}
 
-	renderer.SetShader(vertexShader, pixelShader);
-	UpdateConstantBuffer(renderer);
-	renderer.DrawGizmoComponent(this);
+void UGizmoComponent::BindPixelShader(URenderer& renderer)
+{
+	UPrimitiveComponent::BindVertexShader(renderer);
 }
 
 void UGizmoComponent::DrawOnTop(URenderer& renderer)
 {
-	if (!mesh || !mesh->VertexBuffer)
-	{
-		return;
-	}
-
-	renderer.SetShader(vertexShader, pixelShader);
-	UpdateConstantBuffer(renderer);
+	// TODO : delete this
+	// renderer.SetShader(vertexShader, pixelShader);
+	// UpdateConstantBuffer(renderer);
 	renderer.DrawGizmoComponent(this, true);
 }

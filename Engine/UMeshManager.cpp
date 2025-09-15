@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UMeshManager.h"
 #include "GizmoVertices.h"
 #include "Sphere.h"
@@ -27,13 +27,15 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 	
 	return flipped;
 }
-
+// TODO : manual fix
+IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
+TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVertexPosUV>& vertices,
 TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	// FVertexPosUV를 FVertexPosUV4로 변환
 	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(ID, convertedVertices, primitiveType);
 	return mesh;
 }
 
@@ -53,23 +55,62 @@ static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 	return (uint64_t(a) << 32) | uint64_t(b);
 }
 
+TUniquePtr<UMesh> UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+{
+	const size_t v = vertices.size();
+	if (v % 3 != 0) {
+		// 로깅/예외 처리
+	}
+	const size_t triCount = v / 3;
+
+	TSet<uint64_t> unique;
+	unique.reserve(triCount * 3);
+
+	TArray<uint32> lineIdx;
+	lineIdx.reserve(triCount * 6);              // 라인 인덱스는 엣지당 2개
+
+	auto AddEdge = [&](uint32_t a, uint32_t b)
+		{
+			const uint64_t k = MakeEdgeKey(a, b);
+			if (unique.emplace(k).second) {         // 새로 추가된 경우만 push
+				lineIdx.push_back(a);
+				lineIdx.push_back(b);
+			}
+		};
+
+	for (uint32_t i = 0; i < v; i += 3) {
+		AddEdge(i, i + 1);
+		AddEdge(i + 1, i + 2);
+		AddEdge(i + 2, i);
+	}
+	
+	// 정점 포맷 변환(필요시)
+	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+
+	// 메시 생성: 토폴로지는 반드시 LINELIST
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	mesh->Indices = lineIdx;
+	mesh->NumIndices = lineIdx.size();
+	
+	return mesh;
+}
 
 // 생성자
 UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Plane"] = CreateMeshInternal(plane_vertices);
-	meshes["Cube"] = CreateMeshInternal(cube_vertices);
+	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
+	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 
 	ConfigData* config = ConfigManager::GetConfig("editor");
 	//float gridSize = config->getFloat("Gizmo", "GridSize");
 	int gridCount = config->getInt("Gizmo", "GridCount");
-	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1.0f, gridCount), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
-	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
-	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
+	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateGridVertices(1.0f, gridCount), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), gizmo_arrow_vertices);
+	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateRotationHandleVertices());
+	meshes["GizmoScaleHandle"] = CreateMeshInternal(GetNextID(), gizmo_scale_handle_vertices);
 
 	// meshes["SphereWireframe"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
@@ -104,11 +145,4 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	}
 
 	return true;
-}
-
-UMesh* UMeshManager::GetMesh(FString meshName)
-{
-	auto itr = meshes.find(meshName);
-	if (itr == meshes.end()) return nullptr;
-	return itr->second.get();
 }

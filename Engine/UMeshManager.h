@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "UMesh.h"
 #include "URenderer.h"
@@ -10,18 +10,37 @@
 class UMeshManager : public UEngineSubsystem
 {
 	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)
+public:
+	using MeshID = UMesh::MeshID;
+
 private:
+	MeshID GetNextID() const
+	{
+		return meshes.size();
+	}
+
 	TMap<FString, TUniquePtr<UMesh>> meshes;
-
-	TUniquePtr<UMesh> CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
+    // TODO : manual fix
+	TUniquePtr<UMesh> CreateMeshInternal(MeshID ID, const TArray<FVertexPosUV>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	TUniquePtr<UMesh> CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
+	TUniquePtr<UMesh> CreateWireframeMeshInternal(MeshID ID, const TArray<FVertexPosUV>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 public:
 	UMeshManager();
 	~UMeshManager();
 
 	bool Initialize(URenderer* renderer);
-	UMesh* GetMesh(FString meshName);
+	UMesh* GetMesh(FString meshName)
+	{
+		auto it = meshes.find(meshName);
+
+		if (it != meshes.end())
+		{
+			return it->second.get();
+		}
+
+		return nullptr;
+	}
 };

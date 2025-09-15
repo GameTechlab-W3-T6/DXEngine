@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UMesh.h"
 #include "FVertexPosColor.h"
 #include "UObject.h"
@@ -10,8 +10,8 @@ UMesh::UMesh()
 {
 }
 
-UMesh::UMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size())
+UMesh::UMesh(MeshID ID, const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
 {
 }
 

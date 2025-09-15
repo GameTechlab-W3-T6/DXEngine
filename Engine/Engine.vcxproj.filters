@@ -183,6 +183,9 @@
     <ClCompile Include="ImguiConsole.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
+    <ClCompile Include="UBatchRenderer.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="UBatchShaderManager.cpp" />
     <ClCompile Include="UTextureManager.cpp">
@@ -397,6 +400,9 @@
     <ClInclude Include="ConfigData.h" />
     <ClInclude Include="UBatchShaderManager.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="UBatchRenderer.h">
+      <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TexTestPS.hlsl">
@@ -416,11 +422,6 @@
     <None Include="ShaderW0PS.hlsl">
       <Filter>Shader</Filter>
     </None>
-    <None Include="ShaderW0VS.hlsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="editor.ini">
-      <Filter>Resources</Filter>
-    </None>
+    <None Include="editor.ini" />
   </ItemGroup>
 </Project>

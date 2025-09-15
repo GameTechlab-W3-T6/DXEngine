@@ -14,13 +14,14 @@ class UTextureManager;
 class UCamera;
 struct FTexture;
 
-
 /**
  * @brief Renderable component with mesh and material properties
  */
 class UPrimitiveComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
+public:
+	using LayerID = uint32;
 protected:
 	UMesh* mesh;
 	FTexture* texture;
@@ -40,8 +41,20 @@ public:
 	bool bVisible = true;
 	bool bIsSelected = false;
 
-	virtual void Draw(URenderer& renderer);
 	virtual void UpdateConstantBuffer(URenderer& renderer);
+
+	virtual void BindVertexShader(URenderer& renderer);
+
+	virtual void BindPixelShader(URenderer& renderer);
+
+	void BindShader(URenderer& renderer);
+
+	void BindMesh(URenderer& renderer);
+
+	virtual void Draw(URenderer& renderer);
+
+	virtual LayerID GetLayer() const { return 5;  }
+
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드
@@ -50,6 +63,10 @@ public:
 	bool CountOnInspector() override { return true; }
 
 	UMesh* GetMesh() { return mesh; }
+
+	UShader* GetVertexShader() { return vertexShader;  }
+
+	UShader* GetPixelShader() { return pixelShader;  }
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
 	FVector4 GetColor() const { return Color; }

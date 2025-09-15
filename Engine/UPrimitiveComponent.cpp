@@ -43,8 +43,32 @@ bool UPrimitiveComponent::Init()
 
 void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, Color, bIsSelected);
+	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
+	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
+	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
+	(*vertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
+}
+
+void UPrimitiveComponent::BindVertexShader(URenderer& renderer)
+{
+	vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
+}
+
+void UPrimitiveComponent::BindPixelShader(URenderer& renderer)
+{
+	pixelShader->Bind(renderer.GetDeviceContext());
+}
+
+void UPrimitiveComponent::BindShader(URenderer& renderer)
+{
+	BindVertexShader(renderer);
+	BindPixelShader(renderer);
+}
+
+void UPrimitiveComponent::BindMesh(URenderer& renderer)
+{
+	mesh->Bind(renderer.GetDeviceContext());
 }
 
 void UPrimitiveComponent::Draw(URenderer& renderer)
@@ -54,8 +78,5 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 		return;
 	}
 
-	renderer.SetShader(vertexShader, pixelShader);
-	UpdateConstantBuffer(renderer);
 	renderer.DrawPrimitiveComponent(this);
-	//renderer.DrawMesh(mesh);
 }

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UControlPanel.h"
 #include "USceneComponent.h"
 #include "UCamera.h"
@@ -68,6 +68,9 @@ void UControlPanel::RenderContent()
 	GridManagementSection();
 	ImGui::Separator();
 	HeirachyManagementSection();
+	// ====================== //
+	ImGui::Separator();
+	PerformanceSection();
 }
 
 void UControlPanel::PrimaryInformationSection()
@@ -372,4 +375,70 @@ void UControlPanel::HeirachyManagementSection()
 	}
 
 	ImGui::End();
+}
+
+// ===================================================================== //
+void UControlPanel::PerformanceSection()
+{
+	static double PreviousTime = 0.0;
+	static uint32 PrevDrawCallCount = 0;
+	static uint32 PrevVertexShaderSwitchCount = 0;
+	static uint32 PrevPixelShaderSwitchCount = 0;
+	static uint32 PrevDepthStencilClearCount = 0;
+	static uint32 PrevMeshSwitchCount = 0;
+
+	double CurrentTime = std::chrono::duration_cast<std::chrono::duration<double>>(
+		std::chrono::high_resolution_clock::now().time_since_epoch()
+	).count();
+
+	double DeltaTime = CurrentTime - PreviousTime;
+	if (PreviousTime == 0.0) DeltaTime = 0.0; // 첫 프레임 처리
+
+	// 현재 누적 카운트
+	uint32 DrawCallCount = SceneManager->GetScene()->GetRenderer()->GetDrawCallCount();
+	uint32 VertexShaderSwitchCount = SceneManager->GetScene()->GetRenderer()->GetVertexShaderSwitchCount();
+	uint32 PixelShaderSwitchCount = SceneManager->GetScene()->GetRenderer()->GetPixelShaderSwitchCount();
+	uint32 DepthStencilClearCount = SceneManager->GetScene()->GetRenderer()->GetDepthStencilViewClearCount();
+	uint32 MeshSwitchCount = SceneManager->GetScene()->GetRenderer()->GetMeshSwitchCount();
+
+	// 프레임 단위 계산 (delta count / delta time)
+	double DrawCallsPerSec = (DeltaTime > 0.0) ? (DrawCallCount - PrevDrawCallCount) / DeltaTime : 0.0;
+	double VertexShaderSwitchesPerSec = (DeltaTime > 0.0) ? (VertexShaderSwitchCount - PrevVertexShaderSwitchCount) / DeltaTime : 0.0;
+	double PixelShaderSwitchesPerSec = (DeltaTime > 0.0) ? (PixelShaderSwitchCount - PrevPixelShaderSwitchCount) / DeltaTime : 0.0;
+	double DepthStencilClearsPerSec = (DeltaTime > 0.0) ? (DepthStencilClearCount - PrevDepthStencilClearCount) / DeltaTime : 0.0;
+	double MeshSwitchesPerSec = (DeltaTime > 0.0) ? (MeshSwitchCount - PrevMeshSwitchCount) / DeltaTime : 0.0;
+
+	// ---- Header ----
+	ImGui::TextColored(ImVec4(0.4f, 0.7f, 1.0f, 1.0f), "Performance Statistics");
+	ImGui::Separator();
+
+	// ---- Layout with columns ----
+	ImGui::Columns(2, "perf_columns");
+	ImGui::SetColumnWidth(0, 180.0f);
+
+	// Column 1: Labels
+	ImGui::Text("Draw Calls:");
+	ImGui::Text("Draw Calls/Sec:");
+	ImGui::Text("Vertex Shader Switches/Sec:");
+	ImGui::Text("Pixel Shader Switches/Sec:");
+	ImGui::Text("Depth Stencil Clears/Sec:");
+	ImGui::Text("Mesh Switches/Sec:");
+
+	ImGui::NextColumn();
+
+	// Column 2: Values
+	ImGui::Text("%d", DrawCallCount);
+	ImGui::Text("%.2f", DrawCallsPerSec);
+	ImGui::Text("%.2f", VertexShaderSwitchesPerSec);
+	ImGui::Text("%.2f", PixelShaderSwitchesPerSec);
+	ImGui::Text("%.2f", DepthStencilClearsPerSec);
+	ImGui::Text("%.2f", MeshSwitchesPerSec);
+
+	// 이전 프레임 값 업데이트
+	PreviousTime = CurrentTime;
+	PrevDrawCallCount = DrawCallCount;
+	PrevVertexShaderSwitchCount = VertexShaderSwitchCount;
+	PrevPixelShaderSwitchCount = PixelShaderSwitchCount;
+	PrevDepthStencilClearCount = DepthStencilClearCount;
+	PrevMeshSwitchCount = MeshSwitchCount;
 }

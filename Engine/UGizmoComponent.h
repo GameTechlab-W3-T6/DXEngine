@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"
-#include "USceneComponent.h"
+#include "UPrimitiveComponent.h"
 #include "Vector.h"
 
 class UMeshManager; // 전방 선언
@@ -10,14 +10,14 @@ class UMeshManager; // 전방 선언
 /**
  * @brief Interactive gizmo component for editor manipulation
  */
-class UGizmoComponent : public USceneComponent
+class UGizmoComponent : public UPrimitiveComponent
 {
-	DECLARE_UCLASS(UGizmoComponent, USceneComponent)
+	DECLARE_UCLASS(UGizmoComponent, UPrimitiveComponent)
 public:
 	FQuaternion OriginQuaternion;
 
 	UGizmoComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(loc, rot, scl), mesh(nullptr)
+		: UPrimitiveComponent(loc, rot, scl)
 	{
 	}
 
@@ -29,11 +29,18 @@ public:
 	FMatrix GetWorldTransform() override;
 
 	virtual void Update(float deltaTime);
-	virtual void Draw(URenderer& renderer);
-	virtual void DrawOnTop(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer);
 
-	UMesh* GetMesh() { return mesh; }
+	virtual void UpdateConstantBuffer(URenderer& renderer) override;
+
+	virtual void BindVertexShader(URenderer& renderer) override;
+
+	virtual void BindPixelShader(URenderer& renderer) override;
+
+	virtual void Draw(URenderer& renderer) override;
+
+	virtual LayerID GetLayer() const override { return 0; } 
+
+	void DrawOnTop(URenderer& renderer);
 
 	void SetOriginRotation(FVector originRotation)
 	{
@@ -48,7 +55,5 @@ public:
 	}
 
 protected:
-	UMesh* mesh;
-	UShader* vertexShader, * pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 };
