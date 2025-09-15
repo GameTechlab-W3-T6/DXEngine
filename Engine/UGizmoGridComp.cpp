@@ -9,3 +9,12 @@ UCLASS_META(UGizmoGridComp, MeshName, "GizmoGrid")
 UGizmoGridComp::UGizmoGridComp()
 {
 }
+
+void UGizmoGridComp::Update(float deltaTime)
+{
+	// TODO : fix those temporary set size feature
+	ConfigData* config = ConfigManager::GetConfig("editor");
+	float gridSize = config->getFloat("Gizmo", "GridSize");
+
+	SetScale({ gridSize, gridSize, gridSize });
+}

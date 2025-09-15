@@ -29,6 +29,8 @@ public:
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	void GridManagementSection();
+
 	USceneComponent* CreateSceneComponentFromChoice(int index);
 
 	// ================================================================= //

@@ -31,7 +31,7 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 }
 
 UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, URenderer* renderer)
-	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager)
+	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 450)), SceneManager(sceneManager), GizmoManager(gizmoManager)
 {
 	Renderer = renderer;
 	for (const auto& registeredType : UClass::GetClassList())
@@ -62,6 +62,8 @@ void UControlPanel::RenderContent()
 	SceneManagementSection();
 	ImGui::Separator();
 	CameraManagementSection();
+	ImGui::Separator();
+	GridManagementSection();
 	// ====================== //
 	ImGui::Separator();
 	PerformanceSection();
@@ -291,6 +293,20 @@ void UControlPanel::CameraManagementSection()
 	if (rotCommitted)
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+	}
+}
+
+void UControlPanel::GridManagementSection()
+{
+	ConfigData* config = ConfigManager::GetConfig("editor");
+	float gridSize = config->getFloat("Gizmo", "GridSize");
+
+	ImGui::Text("Grid Size");
+
+	// DragFloat로 교체
+	if (ImGui::DragFloat("Grid Size", &gridSize, 0.01f, 0.0f, 1000.0f, "%.3f"))
+	{
+		config->setFloat("Gizmo", "GridSize", gridSize);
 	}
 }
 
