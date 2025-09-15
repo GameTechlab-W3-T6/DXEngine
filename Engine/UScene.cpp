@@ -84,13 +84,9 @@ void UScene::AddObject(USceneComponent* obj, bool hasText)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		if (hasText)
+		// if (hasText)
 		{
 			primitive->Init(renderer, meshManager, inputManager, textureManager, camera);
-		}
-		else
-		{
-			primitive->Init(renderer, meshManager, inputManager, textureManager);
 		}
 		if (obj->CountOnInspector())
 			++primitiveCount;

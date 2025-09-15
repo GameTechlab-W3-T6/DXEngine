@@ -14,26 +14,21 @@
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 UCLASS_META(UPrimitiveComponent, TextInfo, "TextInfo");
 
-void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
-{
-	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled);
-	
-}
-
+// TODO : 초기화에 이렇게 많이 들어가는 건 애매하다. 
 bool UPrimitiveComponent::Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm, UCamera* cam)
 {
 	renderer = rd;
 	inputManager = im;
 	textureManager = tm;
 	meshManager = mM;
+	camera = cam;
 
 	if (!meshManager)
 		return false;
 
 	mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 
+	// TODO : textholder로 이전
 	if (textureManager)
 	{
 		texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextureType"));
@@ -47,6 +42,13 @@ bool UPrimitiveComponent::Init(URenderer* rd, UMeshManager* mM, UInputManager* i
 	}
 
 	return mesh != nullptr;
+}
+
+void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
+{
+	FMatrix M = GetWorldTransform();
+	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled);
 }
 
 void UPrimitiveComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)

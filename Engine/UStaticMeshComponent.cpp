@@ -5,6 +5,12 @@
 IMPLEMENT_UCLASS(UStaticMeshComponent, UPrimitiveComponent)
 void UStaticMeshComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
+	if (!initialized)
+	{
+		InitializeUUID();
+		initialized = true;
+	}
+
 	// draw quad too!
 	if (!mesh || !mesh->VertexBuffer) return;
 

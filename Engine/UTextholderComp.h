@@ -3,16 +3,19 @@
 #include "UPrimitiveComponent.h"
 
 class USceneManager;
+class UTextureManager;
 class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
+	// void Initialize(UTextureManager* tm, UMeshManager* mm);
 	void SetText(const FString& textContent);
 	void SetText(int32 InNumber);
 	void Draw(FVector location);
 
 private:
-	FTextInfo* TextInfo;
+	//  TODO : pointer로 들고 있기
+	FTextInfo TextInfo;
 	bool isEditable = true;
 
 

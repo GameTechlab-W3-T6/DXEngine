@@ -38,7 +38,7 @@ public:
 	bool bVisible = true;
 	bool bIsSelected = false;
 
-	virtual bool Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm = nullptr, UCamera* cam = nullptr);
+	virtual bool Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm, UCamera* cam);
 	virtual void Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled);
 	virtual void UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture,  bool bIsShaderReflectionEnabled);
 
