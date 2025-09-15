@@ -1,6 +1,7 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UApplication.h"
 #include "UScene.h"
+#include "FTexture.h"
 
 // Static member definitions
 WCHAR UApplication::WindowClass[] = L"EngineWindowClass";
@@ -79,6 +80,11 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
+	if (!renderer.CreateTextInstanceVB(4096))
+	{
+		MessageBox(hWnd, L"Failed to create Text Instance Vbuffer", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	if (!meshManager.Initialize(&renderer))
 	{
@@ -87,6 +93,13 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	}
 
 	batchShaderManager.Initialize(renderer.GetDevice());
+
+
+	if (!textureManager.Initialize(&renderer))
+	{
+		MessageBoxW(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	if (!sceneManager.Initialize(g_pApplication))
 	{
@@ -102,7 +115,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	{
 		return false;
 	}
-
+	 
 	// Allow derived classes to initialize
 	if (!OnInitialize())
 	{

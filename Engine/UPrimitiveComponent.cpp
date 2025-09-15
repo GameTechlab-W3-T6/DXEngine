@@ -4,12 +4,21 @@
 #include "URenderer.h"
 #include "ConfigManager.h"
 #include "UBatchShaderManager.h"
+#include "FTexture.h"
+#include "FTextInfo.h"
+#include "UInputManager.h"
+#include "UCamera.h"
+#include "UTextureManager.h"
+
+//#include <fstream>
+//#include <sstream>
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 bool UPrimitiveComponent::Init()
 {
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
+	UTextureManager* textureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	if (meshManager)
 	{
 		mesh = meshManager->GetMesh(GetClass()->GetMeta("MeshName"));
@@ -28,6 +37,7 @@ bool UPrimitiveComponent::Init()
 		pixelShader = batchShaderManager->GetShaderByName(pixelShaderName);
 	}
 
+	texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 	return mesh && vertexShader && pixelShader;
 }
 

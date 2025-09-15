@@ -6,6 +6,8 @@
 #include "UGizmoComponent.h"
 #include "UEngineSubsystem.h"
 
+struct FTextInfo;
+
 // URenderer.h or cpp 상단
 struct CBTransform
 {
@@ -16,10 +18,22 @@ struct CBTransform
 	float padding[3];
 };
 
+struct FTextInstance
+{
+	float M0[4];
+	float M1[4];
+	float M2[4];
+	
+	float uvOffset[2];
+	float uvScale[2];
+
+	float color[4];
+};
+
 /**
  * @brief Direct3D 11 rendering subsystem managing graphics pipeline and resources
  */
-class URenderer : public UEngineSubsystem
+class URenderer : UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
 private:
@@ -38,14 +52,27 @@ private:
 	ID3D11PixelShader* pixelShader;
 	ID3D11InputLayout* inputLayout;
 
+
 	TUniquePtr<UShader> VertexShader_SR;
 	TUniquePtr<UShader> PixelShader_SR;
+
+	// Gizmo shaders
+	TUniquePtr<UShader> GizmoVertexShader;
+	TUniquePtr<UShader> GizmoPixelShader;
 
 	UShader* currentVertexShader;
 	UShader* currentPixelShader;
 
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
+	ID3D11Buffer* textConstantBuffer;
+	ID3D11Buffer* aabbLineVB; 
+
+	//Text (Instantced Draw) 
+	ID3D11VertexShader* textVertexShaderInst;
+	ID3D11PixelShader* textPixelShaderInst;
+	ID3D11InputLayout* InputLayoutTextInst;
+	ID3D11Buffer* textInstanceVB;
 
 	// Viewport
 	D3D11_VIEWPORT viewport;
@@ -60,9 +87,7 @@ private:
 	bool bIsShaderReflectionEnabled;
 
 	FMatrix mVP;                 // 프레임 캐시
-	CBTransform   mCBData;
-
-
+	CBTransform   mCBData; 
 
 public:
 	URenderer();
@@ -73,10 +98,15 @@ public:
 	bool CreateShader();
 	bool CreateShader_SR();
 	bool CreateRasterizerState();
-	bool CreateConstantBuffer();
+	bool CreateConstantBuffer(); 
+
+	// instanced 
+	bool CreateTextInstanceVB(UINT maxInstances);
+	void UpdateTextInstanceVB(const TArray<FTextInstance>& instances);
+
 	void Release();
 	void ReleaseShader();
-	void ReleaseConstantBuffer();
+	void ReleaseConstantBuffer(); 
 
 	// Buffer creation
 	ID3D11Buffer* CreateVertexBuffer(const void* data, size_t sizeInBytes);
@@ -105,16 +135,26 @@ public:
 	void DrawPrimitiveComponent(UPrimitiveComponent* component);
 	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
 	void DrawMeshOnTop(UMesh* mesh);
+	void DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances);
+
+	// Drawing AABB 
+	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosUV4>& out);
+ 	void EnsureAabbLineVB(UINT bytes);
+	void DrawAABBLines(const FVector& mn, const FVector& mx);
 
 	// Resource binding
 	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
 	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
 	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
 	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
-	void SetRasterizerMode(bool isSolid);
+	void SetRasterizerMode(bool isSolid); 
+	 
+	void SetSampler(ID3D11SamplerState* sampler, UINT slot);
 
 	// Constant buffer updates
+
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
+	bool UpdateConstantBufferUV(const void* data, size_t sizeInBytes);
 
 	// Window resize handling
 	bool ResizeBuffers(int32 width, int32 height);
@@ -129,6 +169,8 @@ public:
 	bool CheckDeviceState();
 	void GetBackBufferSize(int32& width, int32& height);
 
+	// Write Dump File
+	void DumpVSInputSignature(ID3DBlob* vsBlob);
 private:
 	// Internal helper functions
 	bool CreateDeviceAndSwapChain(HWND windowHandle);
@@ -152,6 +194,7 @@ public:
 	void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
+
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
 	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;
 	// 드래그 중 호출: currentViewport만 갈아끼움

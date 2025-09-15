@@ -44,6 +44,7 @@ public:
     bool IsKeyDown(int32 keyCode) const;
     bool IsKeyPressed(int32 keyCode) const;  // True only on the frame key was pressed
     bool IsKeyReleased(int32 keyCode) const; // True only on the frame key was released
+     
 
     // Mouse input
     bool IsMouseButtonDown(int32 button) const; // 0=Left, 1=Right, 2=Middle

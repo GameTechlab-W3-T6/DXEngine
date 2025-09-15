@@ -13,10 +13,10 @@ class UMeshManager : public UEngineSubsystem
 private:
 	TMap<FString, TUniquePtr<UMesh>> meshes;
 
-	TUniquePtr<UMesh> CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
+	TUniquePtr<UMesh> CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	TUniquePtr<UMesh> CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices,
+	TUniquePtr<UMesh> CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 public:
 	UMeshManager();

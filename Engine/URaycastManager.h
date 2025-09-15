@@ -42,6 +42,9 @@ public:
 
 	FRay CreateRayFromScreenPosition(UCamera* camera);
 
+	bool MakeAABBInfo(UMesh* mesh, FVector& outMin, FVector& outMax);
+	void ComputeWorldAABB_BruteForce(const FMatrix& M, const FVector& localMin, const FVector& localMax, FVector& worldMin, FVector& worldMax);
+
 private:
 	URenderer* Renderer;
 	UInputManager* InputManager;
@@ -52,5 +55,6 @@ private:
 	FVector GetRaycastOrigin(UCamera* camera);
 	FVector GetRaycastDirection(UCamera* camera);
 
-	FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
+	FVector TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world);
+	FVector TransformVertexToWorld(const FVector& vertex, const FMatrix& world);
 };

@@ -70,6 +70,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libs\x64\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -140,6 +147,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="FTextInfo.cpp" />
+    <ClCompile Include="FTexture.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
     <ClCompile Include="ImguiConsole.cpp" />
@@ -225,13 +234,15 @@
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="UBatchShaderManager.cpp" />
+    <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
+    <ClCompile Include="UTextholderComp.cpp" />
+    <ClCompile Include="UTextureManager.cpp" />
     <ClCompile Include="UTimeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
-    <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigManager.h" />
@@ -239,9 +250,12 @@
     <ClInclude Include="DynamicBuffer.h" />
     <ClInclude Include="FDynamicBitset.h" />
     <ClInclude Include="FName.h" />
+    <ClInclude Include="FTextInfo.h" />
+    <ClInclude Include="FTexture.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="ConfigData.h" />
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="RenderTypes.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
     <ClInclude Include="UCamera.h" />
@@ -288,7 +302,10 @@
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="UBatchShaderManager.h" />
+    <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="USphereComp.h" />
+    <ClInclude Include="UTextholderComp.h" />
+    <ClInclude Include="UTextureManager.h" />
     <ClInclude Include="UTimeManager.h" />
     <ClInclude Include="UGUI.h" />
     <ClInclude Include="UInputManager.h" />
@@ -296,18 +313,30 @@
     <ClInclude Include="URenderer.h" />
     <ClInclude Include="UPlaneComp.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="editor.default.ini" />
+    <None Include="editor.ini" />
     <None Include="ShaderW0.ps">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <FxCompile Include="TexTestPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="TexTestVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderW0VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="ShaderW0.vs">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    <None Include="ShaderW0PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

@@ -1,0 +1,67 @@
+문제 요약
+- 셰이더를 다중화한 뒤 텍스트 렌더링 시 픽셀 셰이더에서 Texture2D·SamplerState가 바인딩되지 않아 샘플링이 실패함.
+- 현재 코드에서 셰이더 변경(PS 교체)과 상수버퍼 바인딩은 되어 있으나, PS 리소스(SRV/Sampler)를 확실히 재바인딩하는 경로가 없음.
+
+원인
+- D3D11 상태는 컨텍스트에 유지되지만, 다른 드로우 패스가 동일 슬롯(t0/s0)을 덮어쓰면 텍스트 패스 진입 시 원하는 텍스처/샘플러가 보장되지 않음.
+- ShaderReflection 경로(currentPixelShader->Bind)는 상수버퍼만 다루고 텍스처/샘플러 리소스 바인딩은 처리하지 않음.
+
+해결 전략(권장)
+1) 텍스트를 그리기 직전에 PS 리소스를 명시적으로 바인딩
+   - 텍스트 인스턴스 드로우 직전(또는 텍스트 PS로 전환 직후)에 SRV/샘플러를 슬롯에 재설정합니다.
+   - 프로젝트에 이미 있는 UTextureManager::BindPS()를 활용하면 됩니다.
+
+적용 위치(둘 중 한 곳에 적용)
+- 위치 A: URenderer::DrawInstanced()에서 텍스트 VS/PS·InputLayout 설정 후, Draw 호출 전
+  파일: URenderer.cpp
+  함수: void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances)
+  추가 코드 예시:
+
+    // 텍스트 PS/VS, IL 설정 직후에 추가
+    // textVertexShaderInst / textPixelShaderInst / InputLayoutTextInst 설정 다음 줄 근처
+    if (auto* texMgr = UEngineStatics::GetSubsystem<UTextureManager>()) {
+        // TextInfo는 UTextholderComp 쪽에서 관리. 여기서는 텍스처 이름을 직접 쓰거나, 호출측에서 전달하도록 구조화 가능
+        if (auto* textTex = texMgr->RetrieveTexture("TextInfo")) {
+            texMgr->BindPS(deviceContext, textTex, /*textureSlot=*/0, /*samplerSlot=*/0);
+        }
+    }
+
+- 위치 B: UTextholderComp::RenderTextLine()에서 renderer.DrawInstanced() 호출 직전
+  파일: UTextholderComp.cpp
+  함수: void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
+  추가 코드 예시:
+
+    if (cachedTextureManager && TextInfo.textTexture) {
+        cachedTextureManager->BindPS(renderer.GetDeviceContext(), TextInfo.textTexture, 0, 0);
+    }
+
+HLSL 슬롯 확인
+- 텍스트 PS(HLSL)에서 선언:
+  Texture2D testText : register(t0);
+  SamplerState testSampler : register(s0);
+- C++ 바인딩도 동일 슬롯(0)으로 맞춰야 합니다. 슬롯이 바뀌면 HLSL의 register(tN/sN)도 일치시켜야 합니다.
+
+중요 포인트
+- "PSSetShader"를 호출해 픽셀 셰이더를 바꾼 뒤에도 SRV/Sampler는 자동으로 맞춰지지 않습니다. 각 드로우 패스에서 자신이 필요한 리소스를 책임지고 바인딩하세요.
+- 다른 드로우 경로가 같은 슬롯을 사용한다면, 텍스트 드로우 직전에 항상 재바인딩하세요.
+- 필요 시, 드로우 종료 후 UnBindPS()로 정리해 상태 누수를 방지할 수 있습니다.
+
+확장(선택 사항)
+- ShaderReflection에 리소스 바인딩(텍스처/샘플러) 리플렉션을 추가해 이름 기반 바인딩을 제공할 수 있습니다.
+  예) UShader::BindTexture("testText", srv), UShader::BindSampler("testSampler", samp)
+  구현 방법: D3DReflect 결과에서 D3D11_SHADER_INPUT_BIND_DESC를 순회하며 Type이 D3D_SIT_TEXTURE / D3D_SIT_SAMPLER인 항목의 BindPoint를 맵으로 저장한 뒤, 해당 슬롯으로 PSSetShaderResources/PSSetSamplers 호출.
+
+체크리스트
+- 텍스트 PS 진입 직전에 t0/s0에 올바른 리소스가 바인딩되는가?
+- 텍스처의 SRV가 유효하고, 샘플러가 올바른 필터/어드레싱 모드를 가지는가?
+- 다른 패스가 동일 슬롯을 덮어쓴 뒤 텍스트 드로우에서 재바인딩을 하고 있는가?
+- HLSL의 register(t0/s0)와 C++ 바인딩 슬롯이 일치하는가?
+
+참고 코드 위치
+- HLSL: DefaultPS.hlsl, ShaderW0PS.hlsl, TexTestPS.hlsl (t0/s0 사용)
+- 텍스처 로드/바인딩: UTextureManager.cpp (BindPS/UnBindPS 제공)
+- 텍스트 드로우: UTextholderComp.cpp(RenderTextLine), URenderer.cpp(DrawInstanced)
+
+요약
+- 해결의 핵심은 "텍스트 드로우 직전에 텍스처/샘플러를 픽셀 셰이더 슬롯에 확실히 바인딩"하는 것입니다. 위의 두 위치(A 또는 B) 중 한 곳에 BindPS 호출을 추가하면 문제가 해결됩니다.
+

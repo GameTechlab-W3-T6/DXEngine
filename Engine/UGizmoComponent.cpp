@@ -4,6 +4,7 @@
 #include "URenderer.h"
 #include "UClass.h"
 #include "UBatchShaderManager.h"
+#include "FTextInfo.h" 
 
 IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
 
@@ -54,6 +55,8 @@ void UGizmoComponent::Draw(URenderer& renderer)
 		return;
 	}
 
+
+	renderer.SetShader(vertexShader, pixelShader);
 	UpdateConstantBuffer(renderer);
 	renderer.DrawGizmoComponent(this);
 }

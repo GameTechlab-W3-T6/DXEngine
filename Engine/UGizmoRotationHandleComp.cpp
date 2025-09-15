@@ -5,6 +5,8 @@
 
 IMPLEMENT_UCLASS(UGizmoRotationHandleComp, UGizmoComponent)
 UCLASS_META(UGizmoRotationHandleComp, MeshName, "GizmoRotationHandle")
+UCLASS_META(UGizmoRotationHandleComp, VertexShaderName, "GizmoVertex")
+UCLASS_META(UGizmoRotationHandleComp, PixelShaderName, "GizmoPixel")
 
 UGizmoRotationHandleComp::UGizmoRotationHandleComp()
 {

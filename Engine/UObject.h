@@ -19,7 +19,7 @@ private:
     static inline uint32 NextFreshIndex = 0;
 public:
     static inline TArray<UObject*> GUObjectArray;
-    uint32 UUID;
+    uint32 UUID; // TODO : uuid는 private으로 ㅜㅜ
     uint32 InternalIndex;
 
     static void AddTrackedObject(UObject* obj)

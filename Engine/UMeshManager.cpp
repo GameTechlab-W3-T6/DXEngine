@@ -6,6 +6,7 @@
 #include "CubeVertices.h"
 #include "UClass.h"
 
+IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
 // Triangle winding order flip utility function
 TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& vertices)
 {
@@ -27,13 +28,22 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 	return flipped;
 }
 
-IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
+TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
+	D3D_PRIMITIVE_TOPOLOGY primitiveType)
+{
+	// FVertexPosUV를 FVertexPosUV4로 변환
+	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
+	return mesh;
+}
+
 TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
-	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
-	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
+	// FVertexPosColor를 FVertexPosColor4로 변환한 후 FVertexPosUV4로 변환
+	auto color4Vertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	auto uvVertices = FVertexPosColor4::ConvertToUV4(color4Vertices.data(), color4Vertices.size());
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(uvVertices, primitiveType);
 	return mesh;
 }
 
@@ -43,45 +53,6 @@ static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 	return (uint64_t(a) << 32) | uint64_t(b);
 }
 
-TUniquePtr<UMesh> UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-{
-	const size_t v = vertices.size();
-	if (v % 3 != 0) {
-		// 로깅/예외 처리
-	}
-	const size_t triCount = v / 3;
-
-	TSet<uint64_t> unique;
-	unique.reserve(triCount * 3);
-
-	TArray<uint32> lineIdx;
-	lineIdx.reserve(triCount * 6);              // 라인 인덱스는 엣지당 2개
-
-	auto AddEdge = [&](uint32_t a, uint32_t b)
-		{
-			const uint64_t k = MakeEdgeKey(a, b);
-			if (unique.emplace(k).second) {         // 새로 추가된 경우만 push
-				lineIdx.push_back(a);
-				lineIdx.push_back(b);
-			}
-		};
-
-	for (uint32_t i = 0; i < v; i += 3) {
-		AddEdge(i, i + 1);
-		AddEdge(i + 1, i + 2);
-		AddEdge(i + 2, i);
-	}
-	
-	// 정점 포맷 변환(필요시)
-	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-
-	// 메시 생성: 토폴로지는 반드시 LINELIST
-	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	mesh->Indices = lineIdx;
-	mesh->NumIndices = lineIdx.size();
-	
-	return mesh;
-}
 
 // 생성자
 UMeshManager::UMeshManager()
@@ -117,6 +88,7 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	{
 		for (const auto& var : meshes)
 		{
+			// 모든 메시는 이제 FVertexPosUV4 포맷으로 통일됨
 			var.second->Init(renderer->GetDevice());
 		}
 	}

@@ -1,2 +1,6 @@
 [**/*.{cpp,h}]
 charset = utf-8-bom
+
+[*.{hlsl, ps, vs}]
+charset = utf-8
+.editorconfig에 필요하심 쓰세이

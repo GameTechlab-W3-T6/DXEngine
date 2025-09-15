@@ -179,7 +179,7 @@ void UCamera::UpdateProj(bool leftHanded)
 	}
 }
 
-// 뷰 행렬 갱신
+// 뷰 행렬 갱신 : 회전 행렬의 역행렬은 회전 행렬의 전치행렬임 + 이동 행렬의 반대방향과 합성한 행렬
 void UCamera::UpdateView()
 {
 	// f = (eye - target) = -forward → forward = -f

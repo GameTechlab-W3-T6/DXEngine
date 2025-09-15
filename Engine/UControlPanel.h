@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ImGuiWindowWrapper.h"
 #include "ConfigData.h"
 
@@ -32,6 +32,7 @@ public:
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	void HeirachyManagementSection();
 	void GridManagementSection();
 
 	USceneComponent* CreateSceneComponentFromChoice(int index);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="IMGUI">
@@ -138,9 +138,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Vector4.h">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="UEngineSubsystem.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
@@ -188,6 +185,21 @@
     </ClCompile>
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="UBatchShaderManager.cpp" />
+    <ClCompile Include="UTextureManager.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FTexture.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="FTextInfo.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="UTextholderComp.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UStaticMeshComponent.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -358,22 +370,56 @@
     <ClInclude Include="UObjectMacros.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="FTexture.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UTextureManager.h">
+      <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FTexture.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FTextInfo.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
     <ClInclude Include="DynamicBuffer.h" />
-    <ClInclude Include="FName.h" />
-    <ClInclude Include="ConfigData.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
+    <ClInclude Include="UTextholderComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTypes.h" />
+    <ClInclude Include="UStaticMeshComponent.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="FName.h" />
+    <ClInclude Include="ConfigData.h" />
     <ClInclude Include="UBatchShaderManager.h" />
+    <ClInclude Include="Vector4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="TexTestPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexTestVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
       <Filter>Shader</Filter>
     </None>
-    <None Include="ShaderW0.vs">
+    <None Include="editor.default.ini">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="ShaderW0PS.hlsl">
       <Filter>Shader</Filter>
     </None>
-    <None Include="editor.default.ini">
+    <None Include="ShaderW0VS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="editor.ini">
       <Filter>Resources</Filter>
     </None>
   </ItemGroup>

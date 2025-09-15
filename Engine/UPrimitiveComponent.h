@@ -8,7 +8,11 @@
 #include "ConfigData.h"
 #include "ConfigManager.h"
 
+#include "FTextInfo.h"
 class UMeshManager; // 전방 선언
+class UTextureManager;
+class UCamera;
+struct FTexture;
 
 
 /**
@@ -19,9 +23,11 @@ class UPrimitiveComponent : public USceneComponent
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
 protected:
 	UMesh* mesh;
+	FTexture* texture;
 	UShader* vertexShader, *pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 	bool cachedIsShaderReflectionEnabled;
+	UCamera* camera;
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr)
@@ -30,6 +36,8 @@ public:
 		cachedIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");
 	}
 
+	// 해당 primitive 활성화 여부
+	bool bVisible = true;
 	bool bIsSelected = false;
 
 	virtual void Draw(URenderer& renderer);

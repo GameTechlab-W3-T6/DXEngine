@@ -28,6 +28,58 @@ struct FVertexPosColor
 	}
 };
 
+struct FVertexPosUV
+{
+	float x, y, z; 
+	float r, g, b, a;
+	float u, v;
+
+	// 정적 함수 ChangeAxis 구현
+	static void ChangeAxis(FVertexPosUV vertices[], int32 count, int32 axis1, int32 axis2)
+	{
+		// 유효성 검사
+		if (axis1 < 0 || 2 < axis1 || axis2 < 0 || 2 < axis2 || axis1 == axis2)
+		{
+			// 유효하지 않은 축 인덱스인 경우 함수 종료
+			return;
+		}
+
+		// 모든 버텍스를 순회하며 축 교환
+		for (int32 i = 0; i < count; ++i)
+		{
+			//std::swap(vertices[i].y, vertices[i].z);
+			float* pCoords = &vertices[i].x; // 첫 번째 좌표의 포인터
+			std::swap(pCoords[axis1], pCoords[axis2]);
+		}
+	}
+};
+
+struct FVertexPosUV4
+{
+	float x, y, z, w;
+	float r, g, b, a;
+	float u, v;
+
+	// 정적 함수 ChangeAxis 구현
+	static void ChangeAxis(FVertexPosUV vertices[], int32 count, int32 axis1, int32 axis2)
+	{
+		// 유효성 검사
+		if (axis1 < 0 || 2 < axis1 || axis2 < 0 || 2 < axis2 || axis1 == axis2)
+		{
+			// 유효하지 않은 축 인덱스인 경우 함수 종료
+			return;
+		}
+
+		// 모든 버텍스를 순회하며 축 교환
+		for (int32 i = 0; i < count; ++i)
+		{
+			//std::swap(vertices[i].y, vertices[i].z);
+			float* pCoords = &vertices[i].x; // 첫 번째 좌표의 포인터
+			std::swap(pCoords[axis1], pCoords[axis2]);
+		}
+	}
+};
+
 //정점 구조체 선언, 삼각형 배열 정의
 // 1. Define the triangle vertices
 struct FVertexPosColor4
@@ -61,6 +113,68 @@ struct FVertexPosColor4
 		}
 
 		return newVertices;
+	}
+
+	static TArray<FVertexPosUV4> ConvertVertexData(const FVertexPosUV* oldVertices, int32 count)
+	{
+		TArray<FVertexPosUV4> newVertices;
+		newVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosUV4 newVertex;
+
+			// Position: w = 1.0f 추가
+			newVertex.x = oldVertices[i].x;
+			newVertex.y = oldVertices[i].y;
+			newVertex.z = oldVertices[i].z;
+			newVertex.w = 1.0f;  // 동차좌표 w 컴포넌트
+
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
+
+			// Color: 그대로 복사
+			newVertex.u = oldVertices[i].u;
+			newVertex.v = oldVertices[i].v;
+
+			newVertices.push_back(newVertex);
+		}
+
+		return newVertices;
+	}
+
+	// FVertexPosColor4에서 FVertexPosUV4로 변환 (색상만 있는 정점을 UV 정점으로)
+	static TArray<FVertexPosUV4> ConvertToUV4(const FVertexPosColor4* colorVertices, int32 count, float defaultU = 0.0f, float defaultV = 0.0f)
+	{
+		TArray<FVertexPosUV4> uvVertices;
+		uvVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosUV4 newVertex;
+
+			// Position 복사
+			newVertex.x = colorVertices[i].x;
+			newVertex.y = colorVertices[i].y;
+			newVertex.z = colorVertices[i].z;
+			newVertex.w = colorVertices[i].w;
+
+			// Color 복사
+			newVertex.r = colorVertices[i].r;
+			newVertex.g = colorVertices[i].g;
+			newVertex.b = colorVertices[i].b;
+			newVertex.a = colorVertices[i].a;
+
+			// UV 기본값 설정
+			newVertex.u = defaultU;
+			newVertex.v = defaultV;
+
+			uvVertices.push_back(newVertex);
+		}
+
+		return uvVertices;
 	}
 
 	FVector GetPosition()

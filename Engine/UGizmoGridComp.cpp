@@ -5,6 +5,8 @@
 
 IMPLEMENT_UCLASS(UGizmoGridComp, UGizmoComponent)
 UCLASS_META(UGizmoGridComp, MeshName, "GizmoGrid")
+UCLASS_META(UGizmoGridComp, VertexShaderName, "GizmoVertex")
+UCLASS_META(UGizmoGridComp, PixelShaderName, "GizmoPixel")
 
 UGizmoGridComp::UGizmoGridComp()
 {
