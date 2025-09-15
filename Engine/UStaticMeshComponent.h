@@ -20,7 +20,7 @@ public:
 		// uuidQuad.Initialize(textureManager, meshManager);
 		uuidQuad.SetText(UUID);
 	}
-	virtual void Draw(URenderer& renderer) override;
+	/*virtual void Draw(URenderer& renderer) override;*/
 
 private:
 	bool initialized = false;

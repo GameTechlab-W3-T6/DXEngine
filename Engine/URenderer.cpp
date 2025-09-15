@@ -724,6 +724,7 @@ void URenderer::DrawLine(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
 		return;
+
 	deviceContext->IASetInputLayout(inputLayout);
 
 	UINT offset = 0;
@@ -903,15 +904,16 @@ void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instance
 	if (prevIL) prevIL->Release(); 
 }
 
-void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out)
+void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosUV4>& out)
 {
-	out.clear(); 
+	out.clear();
 	out.reserve(24);
 
 	auto V = [&](float x, float y, float z) {
-		FVertexPosColor4 v{};
+		FVertexPosUV4 v{};
 		v.x = x; v.y = y; v.z = z; v.w = 1.0f;
 		v.r = 1.0f; v.g = 1.0f; v.b = 1.0f; v.a = 1.0f;
+		v.u = 0.0f; v.v = 0.0f; // UV 기본값 설정
 		out.push_back(v);
 		};
 
@@ -967,10 +969,10 @@ void URenderer::EnsureAabbLineVB(UINT bytes)
 void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
 {
 	//SetModel( )
-	TArray<FVertexPosColor4> verts;
+	TArray<FVertexPosUV4> verts;
 	BuildAabbLineVerts(mn, mx, verts);
 
-	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosColor4));
+	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosUV4));
 	EnsureAabbLineVB(bytes);
 
 	D3D11_MAPPED_SUBRESOURCE mapped{};
@@ -978,7 +980,7 @@ void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
 	memcpy(mapped.pData, verts.data(), bytes);
 	deviceContext->Unmap(aabbLineVB, 0);
 
-	UINT stride = sizeof(FVertexPosColor4), offset = 0;
+	UINT stride = sizeof(FVertexPosUV4), offset = 0;
 	deviceContext->IASetVertexBuffers(0, 1, &aabbLineVB, &stride, &offset);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 

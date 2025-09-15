@@ -138,7 +138,7 @@ public:
 	void DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances);
 
 	// Drawing AABB 
-	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out);
+	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosUV4>& out);
  	void EnsureAabbLineVB(UINT bytes);
 	void DrawAABBLines(const FVector& mn, const FVector& mx);
 

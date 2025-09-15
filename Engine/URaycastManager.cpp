@@ -96,18 +96,9 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 		for (int32 i = 0; i + 2 < mesh->NumVertices; i += 3)
 		{ 
 			FVector triangleVertices[3];
-			if (mesh->Vertices.size() > 0)
-			{
-				triangleVertices[0] = TransformVertexToWorld(mesh->Vertices[i], worldTransform);
-				triangleVertices[1] = TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform);
-				triangleVertices[2] = TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform);  
-			}
-			else
-			{
-				triangleVertices[0] = TransformVertexToWorld(mesh->Vertices2[i], worldTransform);
-				triangleVertices[1] = TransformVertexToWorld(mesh->Vertices2[i + 1], worldTransform);
-				triangleVertices[2] = TransformVertexToWorld(mesh->Vertices2[i + 2], worldTransform);
-			}
+			triangleVertices[0] = TransformVertexToWorld(mesh->Vertices[i], worldTransform);
+			triangleVertices[1] = TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform);
+			triangleVertices[2] = TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform);  
 			
 			// std::cout << "Triangle: V0(" 
 		 //  << triangleVertices[0].X << ", " << triangleVertices[0].Y << ", " << triangleVertices[0].Z 
@@ -186,12 +177,6 @@ TOptional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertic
 		return {};
 }
 
-FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world)
-{
-	FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
-	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
-	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
-}
 
 FVector URaycastManager::TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world)
 {

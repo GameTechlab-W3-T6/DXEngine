@@ -31,7 +31,7 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosUV>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
-	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
+	// FVertexPosUV를 FVertexPosUV4로 변환
 	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
 	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
 	return mesh;
@@ -40,9 +40,10 @@ TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosUV>& v
 TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
-	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
-	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
+	// FVertexPosColor를 FVertexPosColor4로 변환한 후 FVertexPosUV4로 변환
+	auto color4Vertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	auto uvVertices = FVertexPosColor4::ConvertToUV4(color4Vertices.data(), color4Vertices.size());
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(uvVertices, primitiveType);
 	return mesh;
 }
 
@@ -87,17 +88,8 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	{
 		for (const auto& var : meshes)
 		{
-			// Vertices(FVertexPosColor4) 데이터가 있으면 isFVertexPosColor를 true로 전달
-			if (var.second->Vertices.size() > 0)
-			{
-				var.second->Init(renderer->GetDevice(), true);
-
-			}
-			// Vertices2(FVertexPosUV) 데이터만 있으면 isFVertexPosColor를 false로 전달
-			else
-			{
-				var.second->Init(renderer->GetDevice(), false);
-			}
+			// 모든 메시는 이제 FVertexPosUV4 포맷으로 통일됨
+			var.second->Init(renderer->GetDevice());
 		}
 	}
 	catch (const std::exception& e)

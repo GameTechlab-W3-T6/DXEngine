@@ -55,7 +55,6 @@ private:
 	FVector GetRaycastOrigin(UCamera* camera);
 	FVector GetRaycastDirection(UCamera* camera);
 
-	FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
 	FVector TransformVertexToWorld(const FVertexPosUV4& vertex, const FMatrix& world);
 	FVector TransformVertexToWorld(const FVector& vertex, const FMatrix& world);
 };

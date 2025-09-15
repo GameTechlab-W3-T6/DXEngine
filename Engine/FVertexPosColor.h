@@ -137,12 +137,44 @@ struct FVertexPosColor4
 
 			// Color: 그대로 복사
 			newVertex.u = oldVertices[i].u;
-			newVertex.v = oldVertices[i].v; 
+			newVertex.v = oldVertices[i].v;
 
 			newVertices.push_back(newVertex);
 		}
 
 		return newVertices;
+	}
+
+	// FVertexPosColor4에서 FVertexPosUV4로 변환 (색상만 있는 정점을 UV 정점으로)
+	static TArray<FVertexPosUV4> ConvertToUV4(const FVertexPosColor4* colorVertices, int32 count, float defaultU = 0.0f, float defaultV = 0.0f)
+	{
+		TArray<FVertexPosUV4> uvVertices;
+		uvVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosUV4 newVertex;
+
+			// Position 복사
+			newVertex.x = colorVertices[i].x;
+			newVertex.y = colorVertices[i].y;
+			newVertex.z = colorVertices[i].z;
+			newVertex.w = colorVertices[i].w;
+
+			// Color 복사
+			newVertex.r = colorVertices[i].r;
+			newVertex.g = colorVertices[i].g;
+			newVertex.b = colorVertices[i].b;
+			newVertex.a = colorVertices[i].a;
+
+			// UV 기본값 설정
+			newVertex.u = defaultU;
+			newVertex.v = defaultV;
+
+			uvVertices.push_back(newVertex);
+		}
+
+		return uvVertices;
 	}
 
 	FVector GetPosition()
