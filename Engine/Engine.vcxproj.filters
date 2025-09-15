@@ -187,6 +187,8 @@
     <ClCompile Include="UBatchRenderer.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
+    <ClCompile Include="UBatchShaderManager.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -366,6 +368,8 @@
     <ClInclude Include="UBatchRenderer.h">
       <Filter>Engine\Subsystem</Filter>
     </ClInclude>
+    <ClInclude Include="UBatchShaderManager.h" />
+    <ClInclude Include="MeshLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
