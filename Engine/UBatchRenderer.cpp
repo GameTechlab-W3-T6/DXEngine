@@ -17,7 +17,7 @@ void UBatchRenderer::DrawPrimitiveComponent(UPrimitiveComponent* Component)
 	ShaderID VertexShader = Component->GetVertexShader()->GetID();
 	ShaderID PixelShader = Component->GetPixelShader()->GetID();
 
-	RenderKeyType RenderKey = RenderKeyManager::CreateKey(Mesh, VertexShader, PixelShader, Layer);
+	RenderKeyType RenderKey = RenderKeyManager::CreateKey(Mesh, PixelShader, VertexShader, Layer);
 
 	PrimitiveComponentArray.emplace_back(RenderKey, Component);
 }

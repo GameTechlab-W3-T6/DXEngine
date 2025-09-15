@@ -57,7 +57,7 @@ void UGizmoComponent::BindVertexShader(URenderer& renderer)
 
 void UGizmoComponent::BindPixelShader(URenderer& renderer)
 {
-	UPrimitiveComponent::BindVertexShader(renderer);
+	UPrimitiveComponent::BindPixelShader(renderer);
 }
 
 void UGizmoComponent::Draw(URenderer& renderer)

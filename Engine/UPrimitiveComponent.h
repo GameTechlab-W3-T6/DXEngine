@@ -45,7 +45,7 @@ public:
 
 	virtual void Draw(URenderer& renderer);
 
-	virtual LayerID GetLayer() const { return 5;  }
+	virtual LayerID GetLayer() const { return 2;  }
 
 	virtual ~UPrimitiveComponent() {}
 
