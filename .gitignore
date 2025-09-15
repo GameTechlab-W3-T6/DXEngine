@@ -441,6 +441,16 @@ FodyWeavers.xsd
 Engine/data
 Engine/imgui.ini
 
+# 폴더 무시 해제
+!Libs/
+!Libs/x64/
+!Libs/x64/Debug/
+!Libs/x64/Release/
+
+# 특정 파일 해제
+!Libs/x64/Debug/DirectXTK.lib
+!Libs/x64/Release/DirectXTK.lib
+
 # INI files - include default files, exclude others
 Engine/*.ini
 !Engine/*.default.ini

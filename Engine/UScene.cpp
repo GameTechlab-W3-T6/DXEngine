@@ -1,13 +1,17 @@
-﻿// UScene.cpp
+// UScene.cpp
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
 #include "UObject.h"
 #include "USceneComponent.h"
 #include "UPrimitiveComponent.h"
+#include "UStaticMeshComponent.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
-#include "UCamera.h"
+#include "UCamera.h" 
+#include "UTextureManager.h"
+#include "FTextInfo.h"
+#include "UTextholderComp.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -25,12 +29,12 @@ UScene::~UScene()
 	}
 	delete camera;
 }
-
-bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
+bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UTextureManager* tm)
 {
 	renderer = r;
 	meshManager = mm;
 	inputManager = im;
+	textureManager = tm;
 
 	backBufferWidth = 0.0f;
 	backBufferHeight = 0.0f;
@@ -51,6 +55,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	return OnInitialize();
 }
 
+ 
 UScene* UScene::Create(json::JSON data)
 {
 	UScene* scene = new UScene();
@@ -58,11 +63,17 @@ UScene* UScene::Create(json::JSON data)
 	return scene;
 }
 
-void UScene::AddObject(USceneComponent* obj)
+void UScene::AddObject(USceneComponent* obj, bool hasText)
 {
 	// 런타임에서만 사용 - Scene이 Initialize된 후에 호출할 것
 	assert(meshManager != nullptr && "AddObject should only be called after Scene initialization");
 
+	if (!meshManager)
+	{
+		// 릴리즈 빌드에서 안전성 확보
+		return;
+	}
+	
 	if (!meshManager)
 	{
 		// 릴리즈 빌드에서 안전성 확보
@@ -169,6 +180,32 @@ void UScene::Update(float deltaTime)
 	{
 		camera->SetAspect((float)backBufferWidth / (float)backBufferHeight);
 	}
+
+	float dx = 0, dy = 0, dz = 0;
+	bool boost = inputManager->IsKeyDown(VK_SHIFT); // Shift로 가속
+
+	// --- 마우스룩: RMB 누른 동안 회전 ---
+	if (inputManager->IsMouseLooking())
+	{
+		// 마우스룩 모드는 WndProc에서 Begin/End로 관리
+		float mdx = 0.f, mdy = 0.f;
+		inputManager->ConsumeMouseDelta(mdx, mdy);
+
+		const float sens = 0.005f; // 일단 크게 해서 동작 확인
+		camera->AddYawPitch(mdx * sens, mdy * sens);
+	}
+
+	// TODO : delete/move after test
+	if (inputManager->IsKeyPressed(VK_CONTROL))
+	{
+		AddObject(new UTextholderComp, true); 
+	}
+
+	static float t = 0.0f; t += deltaTime;
+	// 대각선 이동 속도 보정(선택): 벡터 정규화
+	float len = sqrtf(dx * dx + dy * dy + dz * dz);
+	if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
+	camera->MoveLocal(dx, dy, dz, deltaTime, boost);
 }
 
 bool UScene::OnInitialize()

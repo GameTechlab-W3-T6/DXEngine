@@ -3,6 +3,7 @@
 #include "UClass.h"
 #include "ConfigManager.h"
 #include "UPrimitiveComponent.h"
+#include "FTextInfo.h"
 
 IMPLEMENT_UCLASS(URenderer, UEngineSubsystem)
 
@@ -15,7 +16,10 @@ URenderer::URenderer()
 	, vertexShader(nullptr)
 	, pixelShader(nullptr)
 	, inputLayout(nullptr)
+	, InputLayoutTextInst(nullptr)
 	, constantBuffer(nullptr)
+	, textConstantBuffer(nullptr)
+	, aabbLineVB(nullptr)
 	, rasterizerState_solid(nullptr)
 	, hWnd(nullptr)
 	, bIsInitialized(false)
@@ -78,7 +82,7 @@ bool URenderer::Initialize(HWND windowHandle)
 	{
 		LogError("CreateRasterizerState", E_FAIL);
 		return false;
-	}
+	} 
 
 	bIsInitialized = true;
 	return true;
@@ -93,7 +97,7 @@ bool URenderer::CreateShader()
 	ID3DBlob* errorBlob = nullptr;
 
 	HRESULT hr = D3DCompileFromFile(
-		L"ShaderW0.vs",           // 파일 경로
+		L"ShaderW0VS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
@@ -107,7 +111,7 @@ bool URenderer::CreateShader()
 	if (FAILED(hr))
 	{
 		if (errorBlob)
-		{
+		{ 
 			OutputDebugStringA("Vertex Shader Compile Error:\n");
 			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 			SAFE_RELEASE(errorBlob);
@@ -129,15 +133,21 @@ bool URenderer::CreateShader()
 	}
 
 	// Create input layout
+	//D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	//};
+
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0 ,16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-
 
 	hr = device->CreateInputLayout(inputElements, ARRAYSIZE(inputElements),
 		vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
 		&inputLayout);
+
 	SAFE_RELEASE(vsBlob);
 
 	if (!CheckResult(hr, "CreateInputLayout"))
@@ -145,10 +155,77 @@ bool URenderer::CreateShader()
 		return false;
 	}
 
+	ID3DBlob* vsBlobInst = nullptr; 
+	ID3DBlob* errorBlobInst = nullptr;
+	 hr = D3DCompileFromFile(
+		L"ShaderW0VS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main_instanced",                   // 진입점 함수명
+		"vs_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&vsBlobInst,                // 컴파일된 셰이더
+		&errorBlobInst                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlobInst)
+		{
+			OutputDebugStringA("Instanced Vertex Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlobInst->GetBufferPointer());
+			SAFE_RELEASE(errorBlobInst);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load Instanced vertex shader file: ShaderW0.vs\n");
+		}
+		return false;
+	}
+
+	// Create vertex shader
+	hr = device->CreateVertexShader(vsBlobInst->GetBufferPointer(), vsBlobInst->GetBufferSize(),
+		nullptr, &textVertexShaderInst);
+	if (!CheckResult(hr, "CreateInstancedVertexShader"))
+	{
+		SAFE_RELEASE(vsBlobInst);
+		return false;
+	}
+
+
+	D3D11_INPUT_ELEMENT_DESC textInput[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0 ,16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }, 
+
+
+		// instanced
+		{ "INST_M", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INST_M", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INST_M", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_UV_OFFSET", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_UV_SCALE",  0, DXGI_FORMAT_R32G32_FLOAT, 1, 56, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+				
+	}; 
+
+	hr = device->CreateInputLayout(textInput, ARRAYSIZE(textInput),
+		vsBlobInst->GetBufferPointer(), vsBlobInst->GetBufferSize(),
+		&InputLayoutTextInst);
+	if (!CheckResult(hr, "CreateInstanced InpuyLayout"))
+	{
+		DumpVSInputSignature(vsBlobInst);
+		SAFE_RELEASE(vsBlobInst);
+		return false;
+	}
 	// Load pixel shader from file
 	ID3DBlob* psBlob = nullptr;
 	hr = D3DCompileFromFile(
-		L"ShaderW0.ps",           // 파일 경로
+		L"ShaderW0PS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
@@ -184,8 +261,8 @@ bool URenderer::CreateShader()
 
 bool URenderer::CreateShader_SR()
 {
-	VertexShader_SR = MakeUnique<UShader>(GetDevice(), 0, EShaderType::VertexShader, std::filesystem::path("ShaderW0.vs"), "main");
-	PixelShader_SR = MakeUnique<UShader>(GetDevice(), 1, EShaderType::PixelShader, std::filesystem::path("ShaderW0.ps"), "main");
+	VertexShader_SR = MakeUnique<UShader>(GetDevice(), 0, EShaderType::VertexShader, std::filesystem::path("DefaultVS.hlsl"), "main");
+	PixelShader_SR = MakeUnique<UShader>(GetDevice(), 1, EShaderType::PixelShader, std::filesystem::path("DefaultPS.hlsl"), "main");
 
 	return true;
 }
@@ -194,7 +271,7 @@ bool URenderer::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;           // 뒷면 제거
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;       //TODO    // 뒷면 제거
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
@@ -223,7 +300,30 @@ bool URenderer::CreateConstantBuffer()
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	HRESULT hr = device->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
-	return CheckResult(hr, "CreateConstantBuffer");
+	return CheckResult(hr, "CreateConstantBuffer"); 
+}
+
+bool URenderer::CreateTextInstanceVB(UINT maxInstances)
+{
+	D3D11_BUFFER_DESC bd{};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = maxInstances * sizeof(FTextInstance);
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd.MiscFlags = 0;
+	bd.StructureByteStride = 0;
+	HRESULT hr = device->CreateBuffer(&bd, 0, &textInstanceVB);
+
+	return CheckResult(hr, "Create Text Instance");
+}
+
+void URenderer::UpdateTextInstanceVB(const TArray<FTextInstance>& instances)
+{
+	D3D11_MAPPED_SUBRESOURCE m{};
+
+	deviceContext->Map(textInstanceVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
+	deviceContext->Unmap(textInstanceVB, 0);
 }
 
 ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes)
@@ -246,7 +346,7 @@ ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes
 	{
 		LogError("CreateVertexBuffer", hr);
 		return nullptr;
-	}
+	} 
 
 	return buffer;
 }
@@ -267,6 +367,26 @@ bool URenderer::UpdateConstantBuffer(const void* data, size_t sizeInBytes)
 
 	memcpy(mappedResource.pData, data, sizeInBytes);
 	deviceContext->Unmap(constantBuffer, 0);
+
+	return true;
+}
+
+bool URenderer::UpdateConstantBufferUV(const void* data, size_t sizeInBytes)
+{
+	if (!textConstantBuffer || !data)
+		return false;
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(textConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	if (FAILED(hr))
+	{
+		LogError("UV textConstantBuffer", hr);
+		return false;
+	}
+
+	memcpy(mappedResource.pData, data, sizeInBytes);
+	deviceContext->Unmap(textConstantBuffer, 0);
 
 	return true;
 }
@@ -320,6 +440,7 @@ void URenderer::ReleaseShader()
 void URenderer::ReleaseConstantBuffer()
 {
 	SAFE_RELEASE(constantBuffer);
+	SAFE_RELEASE(textConstantBuffer);
 }
 
 bool URenderer::ReleaseVertexBuffer(ID3D11Buffer* buffer)
@@ -488,6 +609,11 @@ void URenderer::PrepareShader()
 	{
 		deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
 	}
+
+	if (textConstantBuffer) 
+	{
+		deviceContext->PSSetConstantBuffers(0, 1, &textConstantBuffer);
+	}
 }
 
 void URenderer::SwapBuffer()
@@ -518,6 +644,8 @@ void URenderer::Clear(float r, float g, float b, float a)
 
 void URenderer::DrawIndexed(UINT indexCount, UINT startIndexLocation, INT baseVertexLocation)
 {
+	deviceContext->IASetInputLayout(inputLayout);
+
 	if (deviceContext)
 	{
 		deviceContext->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
@@ -526,6 +654,8 @@ void URenderer::DrawIndexed(UINT indexCount, UINT startIndexLocation, INT baseVe
 
 void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 {
+	deviceContext->IASetInputLayout(inputLayout);
+
 	if (deviceContext)
 	{
 		deviceContext->Draw(vertexCount, startVertexLocation);
@@ -535,7 +665,8 @@ void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 void URenderer::DrawMesh(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
-		return;
+		return;  
+	deviceContext->IASetInputLayout(inputLayout);
 
 	UINT offset = 0;
 
@@ -557,6 +688,7 @@ void URenderer::DrawLine(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
 		return;
+	deviceContext->IASetInputLayout(inputLayout);
 
 	UINT offset = 0;
 
@@ -656,7 +788,8 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
 		return;
-	
+	deviceContext->IASetInputLayout(inputLayout);
+
 	// Create a depth-stencil state with depth testing disabled
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = FALSE;  // disable depth testing
@@ -691,6 +824,132 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
 	// Release local COM objects
 	SAFE_RELEASE(pOldState);
 	SAFE_RELEASE(pDSState);
+}
+
+/**
+ * @brief 텍스트 메시(사각형 등)를 인스턴싱으로 그린다.
+ * @details
+ *  - 슬롯 0: 기본 버텍스 버퍼(텍스트 메쉬)
+ *  - 슬롯 1: 인스턴스 버퍼(FTextInstance 배열)
+ *  - 그리기 전 기존 VS/InputLayout 상태를 백업하고, 인스턴싱용 VS/IL로 교체한 뒤 DrawInstanced 호출 후 복원한다.
+ */
+void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances)
+{
+	if (!text || instances.empty()) return;
+	 
+	// UPDATE CONSTABUFFER 
+	UpdateTextInstanceVB(instances);
+
+	 // 이전 상태 백업하고
+	 // vertexshader inputlayout을 intaced draw 용으로 교체
+	ID3D11VertexShader* prevVS = nullptr; 
+	ID3D11InputLayout* prevIL = nullptr;
+	deviceContext->VSGetShader(&prevVS, nullptr, nullptr);
+	deviceContext->IAGetInputLayout(&prevIL);
+
+	deviceContext->VSSetShader(textVertexShaderInst, nullptr, 0);   
+	deviceContext->IASetInputLayout(InputLayoutTextInst);
+
+	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };
+	UINT strides[2] = { text->Stride, (UINT)sizeof(FTextInstance) };
+	UINT offsets[2] = { 0, 0 };
+
+	deviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
+	deviceContext->IASetPrimitiveTopology(text->PrimitiveType);
+
+	deviceContext->DrawInstanced(text->NumVertices, (UINT)instances.size(), 0, 0); 
+	
+	// 이전 상태 복원 
+	deviceContext->VSSetShader(prevVS, nullptr, 0);
+	deviceContext->IASetInputLayout(prevIL);
+	if (prevVS) prevVS->Release();
+	if (prevIL) prevIL->Release(); 
+}
+
+void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColor4>& out)
+{
+	out.clear(); 
+	out.reserve(24);
+
+	auto V = [&](float x, float y, float z) {
+		FVertexPosColor4 v{};
+		v.x = x; v.y = y; v.z = z; v.w = 1.0f;
+		v.r = 1.0f; v.g = 1.0f; v.b = 1.0f; v.a = 1.0f;
+		out.push_back(v);
+		};
+
+	// 8 corners
+	FVector c000{ mn.X,mn.Y,mn.Z }, c100{ mx.X,mn.Y,mn.Z }, 
+		c110{ mx.X,mx.Y,mn.Z }, c010{ mn.X,mx.Y,mn.Z },		
+		c001{ mn.X,mn.Y,mx.Z }, c101{ mx.X,mn.Y,mx.Z },		
+		c111{ mx.X,mx.Y,mx.Z }, c011{ mn.X,mx.Y,mx.Z };		
+
+	// bottom face
+	V(c000.X, c000.Y, c000.Z); V(c100.X, c100.Y, c100.Z);
+	V(c100.X, c100.Y, c100.Z); V(c110.X, c110.Y, c110.Z);
+	V(c110.X, c110.Y, c110.Z); V(c010.X, c010.Y, c010.Z);
+	V(c010.X, c010.Y, c010.Z); V(c000.X, c000.Y, c000.Z);
+	// top face
+	V(c001.X, c001.Y, c001.Z); V(c101.X, c101.Y, c101.Z);
+	V(c101.X, c101.Y, c101.Z); V(c111.X, c111.Y, c111.Z);
+	V(c111.X, c111.Y, c111.Z); V(c011.X, c011.Y, c011.Z);
+	V(c011.X, c011.Y, c011.Z); V(c001.X, c001.Y, c001.Z);
+	// verticals
+	V(c000.X, c000.Y, c000.Z); 
+	V(c001.X, c001.Y, c001.Z);
+
+	V(c100.X, c100.Y, c100.Z); 
+	V(c101.X, c101.Y, c101.Z);
+	
+	V(c110.X, c110.Y, c110.Z); 
+	V(c111.X, c111.Y, c111.Z);
+	
+	V(c010.X, c010.Y, c010.Z);
+	V(c011.X, c011.Y, c011.Z);
+}
+
+void URenderer::EnsureAabbLineVB(UINT bytes)
+{  
+	if (aabbLineVB != nullptr) return;
+
+	D3D11_BUFFER_DESC bd{};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = bytes;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	HRESULT hr = device->CreateBuffer(&bd, nullptr, &aabbLineVB);
+
+	if (FAILED(hr))
+	{
+		LogError("AABB BUFFER ERROR", hr);
+		return;
+	}
+}
+
+void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
+{
+	//SetModel( )
+	TArray<FVertexPosColor4> verts;
+	BuildAabbLineVerts(mn, mx, verts);
+
+	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosColor4));
+	EnsureAabbLineVB(bytes);
+
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+	deviceContext->Map(aabbLineVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	memcpy(mapped.pData, verts.data(), bytes);
+	deviceContext->Unmap(aabbLineVB, 0);
+
+	UINT stride = sizeof(FVertexPosColor4), offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &aabbLineVB, &stride, &offset);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	FMatrix identity = FMatrix::Identity;
+	FVector4 color(1, 1, 0, 1); // 노란색, 필요하면 파라미터로
+	SetModel(identity, color, true);
+	SetTextUV(std::nullopt, false, true);
+	deviceContext->Draw((UINT)verts.size(), 0);
 }
 
 void URenderer::SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset)
@@ -936,6 +1195,36 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	}
 }
 
+void URenderer::SetTextUV(FTextInfo& textInfo, bool bUseTextTexture)
+{
+	if (bUseTextTexture)
+	{ 
+		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture; 
+		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");  
+	}
+	else
+	{
+		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
+
+		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
+	}
+}
+
+void URenderer::SetTextUV(std::nullopt_t, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
+{
+	if (bIsShaderReflectionEnabled)
+	{
+		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
+
+		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
+	}
+	else
+	{
+		//TOOD
+
+	}
+}
+
 D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const
 {
 	D3D11_VIEWPORT vp{};
@@ -957,4 +1246,26 @@ D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const
 		vp.TopLeftY = 0.5f * (winH - vp.Height);
 	}
 	return vp;
+}
+
+void URenderer::DumpVSInputSignature(ID3DBlob* vsBlob)
+{
+	ID3D11ShaderReflection* refl;
+	D3DReflect(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+		IID_ID3D11ShaderReflection, (void**)&refl);
+
+	D3D11_SHADER_DESC sd = {};
+	refl->GetDesc(&sd);
+
+	OutputDebugStringA("== VS INPUT PARAMETERS ==\n");
+	for (UINT i = 0; i < sd.InputParameters; ++i) {
+		D3D11_SIGNATURE_PARAMETER_DESC spd{};
+		refl->GetInputParameterDesc(i, &spd);
+
+		char buf[256];
+		sprintf_s(buf, "  %s%d  mask=0x%x  reg=%u\n",
+			spd.SemanticName, spd.SemanticIndex, spd.Mask, spd.Register);
+		OutputDebugStringA(buf);
+	}
+	OutputDebugStringA("=========================\n");
 }

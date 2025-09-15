@@ -1,16 +1,18 @@
 ﻿#include "stdafx.h"
 #include "UClass.h"
-#include "UPrimitiveComponent.h"
+#include "UStaticMeshComponent.h"
 #include "UPlaneComp.h"
 #include "UObject.h"
 #include "UInputManager.h"
 
-IMPLEMENT_UCLASS(UPlaneComp, UPrimitiveComponent)
+IMPLEMENT_UCLASS(UPlaneComp, UStaticMeshComponent)
 UCLASS_META(UPlaneComp, DisplayName, "Plane")
 UCLASS_META(UPlaneComp, MeshName, "Plane")
+UCLASS_META(UPlaneComp, TextureType, "PlaneBaseColor")
+UCLASS_META(UPlaneComp, TextInfo, "TextInfo");
 
 UPlaneComp::UPlaneComp(FVector pos, FVector rot, FVector scl)
-	:UPrimitiveComponent(pos, rot, scl)
+	:UStaticMeshComponent(pos, rot, scl)
 {
 
 	UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();

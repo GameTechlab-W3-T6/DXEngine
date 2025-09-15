@@ -56,4 +56,9 @@ private:
 	void HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint);
 	void HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive);
 	void HandleEmptySpaceClick();
+	  
+	bool AABBFlag = false;
+	UPrimitiveComponent* SelectedPrimitive = nullptr;
+	FVector MinWSPos, MaxWSPos;
+
 };

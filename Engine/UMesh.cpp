@@ -10,12 +10,16 @@ UMesh::UMesh()
 {
 }
 
-UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+UMesh::UMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosUV4))
 {
 }
+UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: Vertices2(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+{
+} 
 
-void UMesh::Init(ID3D11Device* device) {
+void UMesh::Init(ID3D11Device* device, bool isFVertexPosUV) {
 	D3D11_BUFFER_DESC vertexBufferDesc = {};
 	vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	vertexBufferDesc.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
@@ -24,10 +28,16 @@ void UMesh::Init(ID3D11Device* device) {
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA vertexBufferSRD = {};
-	vertexBufferSRD.pSysMem = Vertices.data();
-
-	HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferSRD, &VertexBuffer);
+	D3D11_SUBRESOURCE_DATA vertexData = {}; 
+	if (isFVertexPosUV)
+	{
+		vertexData.pSysMem = Vertices.data();
+	}
+	else
+	{
+		vertexData.pSysMem = Vertices2.data();
+    }
+	HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexData, &VertexBuffer);
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create vertex buffer for mesh");

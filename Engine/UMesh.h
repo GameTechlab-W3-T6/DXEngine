@@ -14,7 +14,9 @@ private:
 	bool isInitialized = false;
 public:
 	ID3D11Buffer* VertexBuffer = nullptr;
-	TArray<FVertexPosColor4> Vertices;
+	TArray<FVertexPosColor4> Vertices2;
+	TArray<FVertexPosUV4> Vertices; 
+
 	int32 NumVertices = 0;
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
@@ -27,13 +29,16 @@ public:
 	UMesh();
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
 	UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+	//texture 용도 
+	UMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	~UMesh()
 	{
 		if (VertexBuffer) VertexBuffer->Release();
 	}
 
-	void Init(ID3D11Device* device);
+	void Init(ID3D11Device* device, bool isFVertexPosUV = true);
 
 	bool IsInitialized() const { return isInitialized; }
 

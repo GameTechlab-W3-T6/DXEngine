@@ -4,6 +4,7 @@
 #include "URenderer.h"
 #include "UClass.h"
 #include "UBatchShaderManager.h"
+#include "FTextInfo.h" 
 
 IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
 
@@ -41,6 +42,7 @@ void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, GetColor(), bIsSelected);
+	renderer.SetTextUV(std::nullopt, false, true);
 }
 
 void UGizmoComponent::Update(float deltaTime)
@@ -54,6 +56,8 @@ void UGizmoComponent::Draw(URenderer& renderer)
 		return;
 	}
 
+
+	renderer.SetShader(vertexShader, pixelShader);
 	UpdateConstantBuffer(renderer);
 	renderer.DrawGizmoComponent(this);
 }

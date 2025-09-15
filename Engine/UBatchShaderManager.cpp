@@ -14,8 +14,10 @@ IMPLEMENT_UCLASS(UBatchShaderManager, UEngineSubsystem)
 void UBatchShaderManager::Initialize(ID3D11Device* Device)
 {
 	/** @todo: Remove this. */
-	LoadShaderFromFile(Device, EShaderType::VertexShader, "ShaderW0.vs", "main", "Vertex");
-	LoadShaderFromFile(Device, EShaderType::PixelShader, "ShaderW0.ps", "main", "Pixel");
+	LoadShaderFromFile(Device, EShaderType::VertexShader, "DefaultVS.hlsl", "main", "Vertex");
+	LoadShaderFromFile(Device, EShaderType::PixelShader, "DefaultPS.hlsl", "main", "Pixel");
+	LoadShaderFromFile(Device, EShaderType::VertexShader, "ShaderW0VS.hlsl", "main", "Text_VS");
+	LoadShaderFromFile(Device, EShaderType::PixelShader, "ShaderW0PS.hlsl", "main", "Text_PS");
 }
 
 void UBatchShaderManager::LoadShaderFromFile(ID3D11Device* Device, EShaderType ShaderType, const std::filesystem::path& FilePath, const FString& EntryPoint, const FString& Name)

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UControlPanel.h"
 #include "USceneComponent.h"
 #include "UCamera.h"
@@ -66,6 +66,8 @@ void UControlPanel::RenderContent()
 	CameraManagementSection();
 	ImGui::Separator();
 	GridManagementSection();
+	ImGui::Separator();
+	HeirachyManagementSection();
 }
 
 void UControlPanel::PrimaryInformationSection()
@@ -91,7 +93,7 @@ void UControlPanel::SpawnPrimitiveSection()
 	{
 		USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
 		if (sceneComponent != nullptr)
-		{
+		{		
 			sceneComponent->SetPosition(FVector(
 				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
 				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
@@ -315,4 +317,58 @@ void UControlPanel::GridManagementSection()
 	{
 		config->setFloat("Gizmo", "GridSize", gridSize);
 	}
+}
+
+// imgui 창에 heirachy 창, sceneojects의 class 이름과 그 옆에 check box : visible 여부
+void UControlPanel::HeirachyManagementSection()
+{
+	if (!SceneManager || !SceneManager->GetScene())
+		return;
+
+	const TArray<USceneComponent*>& Objects = SceneManager->GetScene()->GetObjects();
+
+	if (!ImGui::Begin("Hierarchy"))
+	{
+		ImGui::End(); return;
+	}
+
+	// 표로 깔끔하게: [Visible][Class(Name)]
+	ImGuiTableFlags TableFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp;
+	if (ImGui::BeginTable("HierarchyTable", 2, TableFlags))
+	{
+		ImGui::TableSetupColumn("Visible", ImGuiTableColumnFlags_WidthFixed, 70.0f);
+		ImGui::TableSetupColumn("Class / Name"); // 가변 너비
+		ImGui::TableHeadersRow();
+
+		for (int32 Index = 0; Index < Objects.size(); ++Index)
+		{
+			if (UPrimitiveComponent* Comp = Objects[Index]->Cast<UPrimitiveComponent>())
+			{
+				ImGui::PushID(Comp); // 라벨 충돌 방지용 고유 ID
+
+				bool bVisible = Comp->bVisible;
+
+				ImGui::TableNextRow();
+
+				// Col0: 체크박스
+				ImGui::TableSetColumnIndex(0);
+				if (ImGui::Checkbox("##Visible", &bVisible))
+				{
+					Comp->bVisible = bVisible;
+					// 필요하면: SceneManager->MarkVisibilityDirty(Comp);
+				}
+
+				// Col1: 클래스/이름, TODO : FName으로 교체
+				ImGui::TableSetColumnIndex(1);
+				const char* ClassName = Comp->GetClass()->GetDisplayName().c_str();        
+				ImGui::Text("%s", ClassName ? ClassName : "USceneComponent");
+
+				ImGui::PopID();
+			}
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::End();
 }
