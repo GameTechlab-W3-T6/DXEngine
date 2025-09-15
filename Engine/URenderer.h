@@ -103,7 +103,7 @@ public:
 	void DrawMesh(UMesh* mesh);
 	void DrawLine(UMesh* mesh);
 	void DrawPrimitiveComponent(UPrimitiveComponent* component);
-	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = true);
+	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
 	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding
