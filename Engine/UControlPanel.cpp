@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UControlPanel.h"
 #include "USceneComponent.h"
 #include "UCamera.h"
@@ -94,11 +94,12 @@ void UControlPanel::SpawnPrimitiveSection()
 		USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
 		if (sceneComponent != nullptr)
 		{		
-			sceneComponent->SetPosition(FVector(
+			sceneComponent->SetPosition(FVector(0, 0, 0));
+			/*sceneComponent->SetPosition(FVector(
 				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
 				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
 				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-			));
+			));*/
 			sceneComponent->SetScale(FVector(
 				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
 				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,

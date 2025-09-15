@@ -18,7 +18,7 @@ UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 UCLASS_META(UTextholderComp, VertexShaderName, "Text_VS")
 UCLASS_META(UTextholderComp, PixelShaderName, "Text_PS");
 
-void UTextholderComp::Initialize()
+void UTextholderComp::ResourcesInitialize()
 {
 	if (isInitailized) return;
 
@@ -35,8 +35,7 @@ void UTextholderComp::Initialize()
 			TextInfo.SetParam(textTex, 16, 16);
 		}
 	}
-
-	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
+	// UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
 }
 
 void UTextholderComp::SetText(const FString& textContent)
@@ -45,7 +44,7 @@ void UTextholderComp::SetText(const FString& textContent)
 	if (isEditable)
 	{
 		isEditable = false;
-		Initialize();
+		ResourcesInitialize();
 	}
 
 	TextInfo.orderOfChar.clear();
@@ -68,24 +67,24 @@ void UTextholderComp::DrawAboveParent(URenderer& renderer, FVector location)
 	Draw(renderer);
 }
 
-void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
-{
-	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, Color, bIsSelected);
-}
-
 // 동적 타이핑 draw용 : scene에서 draw할 때
 void UTextholderComp::Draw(URenderer& renderer)
 {
-	Initialize();
+	ResourcesInitialize();
 
 	// TODO : delegate로 고치기 -> editable을 on off
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
-	
+
 	renderer.SetShader(vertexShader, pixelShader);
 	UpdateConstantBuffer(renderer);
 	RenderTextLine(renderer, true);
+}
+
+void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
+{
+	FMatrix M = GetWorldTransform();
+	renderer.SetModel(M, Color, bIsSelected);
 }
 
 /**
@@ -145,8 +144,6 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 
 	// 카메라 View의 역행렬에서 Rotation 성분만 추출한 행렬을 사용해서 빌보드 행렬 생성
 	FMatrix view = camera->GetView();
-	FMatrix bill = TextInfo.MakeBillboard(view);
-
 	for (int i = 0; i < TextInfo.orderOfChar.size(); i++)
 	{
 		//addobject
@@ -155,6 +152,7 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 		FTextInstance inst{};
 		if (isEditable)
 		{
+			FMatrix bill = TextInfo.MakeBillboard(view);
 			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
 			//renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
 
@@ -163,16 +161,22 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 		}
 		else
 		{
+			FMatrix bill = TextInfo.MakeBillboard(view);
 			FVector p = RelativeLocation;
-			FMatrix M = FMatrix::TranslationRow(p.X + penX, p.Y, p.Z) * bill;
-			//renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+			//SetPosition(p);
+			UE_LOG("%.2f, %.2f, %.2f", p.X+ penX, p.Y, p.Z) ;
+			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+			// FMatrix bill = TextInfo.MakeBillboard(RelativeLocation, camera->GetLocation());
+			// FMatrix M = FMatrix::Identity  * bill;// GetWorldTransform();
+			// FMatrix M = FMatrix::TranslationRow(p.X, p.Y, p.Z);//*bill;
+			// FMatrix M = FMatrix::TranslationRow(p.X + penX, p.Y, p.Z);//*bill;
+			// renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
 		  
 			// 행렬을 float4 로 분리해 인스턴스 구조체에 저장
 			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 		}
 		 
 		// 인스턴스 월드 행렬: X축으로 penX 만큼 이동 후 빌보드 적용
-		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
 
 
 		// 아틀라스에서 현재 글자의 UV 사각형 계산

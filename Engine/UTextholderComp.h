@@ -9,7 +9,7 @@ class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
-	void Initialize();
+	void ResourcesInitialize();
 	void SetText(const FString& textContent);
 	void SetText(int32 InNumber);
 	void DrawAboveParent(URenderer& renderer, FVector location);

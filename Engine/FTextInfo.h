@@ -3,6 +3,7 @@
 #include "UEngineStatics.h"
  
 struct FMatrix;
+struct FVector;
 struct FTextInfo
 { 
 	std::vector<int> orderOfChar;
@@ -18,4 +19,5 @@ struct FTextInfo
 
 	void SetParam(FTexture* textTex, int32 PerRow, int32 PerCol);
 	FMatrix MakeBillboard(FMatrix view);
+	FMatrix MakeBillboard(FVector objPos, FVector camPos);
 };
