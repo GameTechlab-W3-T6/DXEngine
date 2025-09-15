@@ -20,6 +20,8 @@ private:
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
 
+	ConfigData* config;
+
 public:
 	EditorApplication() = default;
 	~EditorApplication()

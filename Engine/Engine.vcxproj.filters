@@ -43,6 +43,9 @@
     <Filter Include="Engine\UI">
       <UniqueIdentifier>{3a65dfd5-299b-4436-96c7-b669986cfa16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{6bf3b178-5122-458b-9c83-22ff0ce0d3a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -420,5 +423,8 @@
     <FxCompile Include="DefaultPS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <None Include="editor.default.ini">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

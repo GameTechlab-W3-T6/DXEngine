@@ -2,6 +2,7 @@
 #include "ConfigData.h"
 #include "TArray.h"
 #include "UEngineStatics.h"
+#include <stdexcept>
 
 class ConfigManager
 {
@@ -40,6 +41,39 @@ public:
 	static ConfigData* GetConfig(const FString& configName)
 	{
 		return GetInstance()->GetConfigInternal(configName);
+	}
+
+	static std::map<std::string, std::string>& GetSection(const FString& configName, const std::string& sectionName)
+	{
+		static std::map<std::string, std::string> emptySection;
+
+		ConfigData* config = GetConfig(configName);
+		if (!config)
+		{
+			emptySection.clear();
+			return emptySection;
+		}
+
+		auto it = config->data.find(sectionName);
+		if (it == config->data.end())
+		{
+			// Create new section if it doesn't exist
+			config->data[sectionName] = std::map<std::string, std::string>();
+			return config->data[sectionName];
+		}
+
+		return it->second;
+	}
+
+	static std::string GetValue(const FString& configName, const std::string& sectionName, const std::string& key, const std::string& defaultValue = "")
+	{
+		ConfigData* config = GetConfig(configName);
+		if (!config)
+		{
+			return defaultValue;
+		}
+
+		return config->getString(sectionName, key, defaultValue);
 	}
 };
 

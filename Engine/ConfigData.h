@@ -7,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include <filesystem>
+#include <stdexcept>
 
 class ConfigData {
 public:
@@ -14,8 +15,25 @@ public:
 
     ConfigData(const std::filesystem::path& path) {
         configPath = path;
+
+        // If .ini file doesn't exist, try to copy from .default.ini
+        if (!std::filesystem::exists(configPath)) {
+            std::filesystem::path defaultPath = configPath;
+            defaultPath.replace_extension(".default.ini");
+
+            if (std::filesystem::exists(defaultPath)) {
+                try {
+                    std::filesystem::copy_file(defaultPath, configPath);
+                } catch (const std::filesystem::filesystem_error& e) {
+                    throw std::runtime_error("Failed to copy default config file: " + std::string(e.what()));
+                }
+            }
+        }
+
         std::ifstream file(configPath);
-        assert(file.is_open());
+        if (!file.is_open()) {
+            throw std::runtime_error("Failed to open config file: " + configPath.string());
+        }
 
         std::string line, currentSection;
         while (std::getline(file, line)) {
@@ -38,18 +56,24 @@ public:
         }
     }
 
-    ~ConfigData()
+    ~ConfigData() noexcept
     {
-        std::ofstream file(configPath);
-        assert(file.is_open());
-        for (const auto& section : data)
-        {
-            file << "[" << section.first << "]" << std::endl;
-            for (const auto& field : section.second)
-            {
-                file << field.first << " = " << field.second << std::endl;
+        try {
+            std::ofstream file(configPath);
+            if (!file.is_open()) {
+                return;
             }
-            file << std::endl;
+            for (const auto& section : data)
+            {
+                file << "[" << section.first << "]" << std::endl;
+                for (const auto& field : section.second)
+                {
+                    file << field.first << " = " << field.second << std::endl;
+                }
+                file << std::endl;
+            }
+        }
+        catch (...) {
         }
     }
 

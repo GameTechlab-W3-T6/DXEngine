@@ -53,7 +53,7 @@ void EditorApplication::HandleCameraInput(float deltaTime)
 	UCamera* camera = scene->GetCamera();
 	if (!camera) return;
 
-	const float baseSensitivity = ConfigManager::GetConfig("editor")->getFloat("Camera", "Sensitivity") * deltaTime / 100.0f;
+	const float baseSensitivity = config->getFloat("Camera", "Sensitivity") * deltaTime / 100.0f;
 
 	// Mouse look handling
 	if (inputManager.IsMouseLooking())
@@ -272,6 +272,7 @@ bool EditorApplication::OnInitialize()
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetRenderer());
 	propertyWindow = new USceneComponentPropertyWindow();
+	config = ConfigManager::GetConfig("editor");
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))
 	{
