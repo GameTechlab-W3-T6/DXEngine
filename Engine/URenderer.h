@@ -2,7 +2,8 @@
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"
-
+#include "UPrimitiveComponent.h"
+#include "UGizmoComponent.h"
 #include "UEngineSubsystem.h"
 
 // URenderer.h or cpp 상단
@@ -40,6 +41,9 @@ private:
 	TUniquePtr<UShader> VertexShader_SR;
 	TUniquePtr<UShader> PixelShader_SR;
 
+	UShader* currentVertexShader;
+	UShader* currentPixelShader;
+
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
 
@@ -53,6 +57,7 @@ private:
 
 	// Render state
 	bool bIsInitialized;
+	bool bIsShaderReflectionEnabled;
 
 	FMatrix mVP;                 // 프레임 캐시
 	CBTransform   mCBData;
@@ -88,7 +93,7 @@ public:
 
 	// Rendering operations
 	void Prepare();
-	void PrepareShader(bool bIsShaderReflectionEnabled);
+	void PrepareShader();
 	void SwapBuffer();
 	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
 
@@ -97,6 +102,8 @@ public:
 	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
 	void DrawMesh(UMesh* mesh);
 	void DrawLine(UMesh* mesh);
+	void DrawPrimitiveComponent(UPrimitiveComponent* component);
+	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = true);
 	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding
@@ -142,7 +149,8 @@ private:
 	}
 public:
 	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
-	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected, bool bIsShaderReflectionEnabled);                      // M*VP → b0 업로드
+	void SetShader(UShader* vertexShader, UShader* pixelShader);
+	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
 	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;

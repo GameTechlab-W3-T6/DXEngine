@@ -8,6 +8,7 @@
 #include "URaycastManager.h"
 #include "USceneManager.h"
 #include "UGizmoManager.h"
+#include "UBatchShaderManager.h"
 
 /**
  * @brief Main application class managing the engine's core systems and lifecycle
@@ -24,6 +25,7 @@ private:
 	UMeshManager meshManager;
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
+	UBatchShaderManager batchShaderManager;
 
 	// Application state
 	bool bIsRunning;
@@ -48,12 +50,12 @@ public:
 	// Application lifecycle
 	bool Initialize(HINSTANCE hInstance, const std::wstring& title = L"Engine Application",
 		int32 width = 1024, int32 height = 768);
-	void Run(bool bIsShaderReflectionEnabled);
+	void Run();
 	void Shutdown();
 
 	// Core update loop - can be overridden by derived classes
 	virtual void Update(float deltaTime);
-	virtual void Render(bool bIsShaderReflectionEnabled);
+	virtual void Render();
 
 	// System access
 	URenderer& GetRenderer() { return renderer; }
@@ -63,6 +65,7 @@ public:
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }
 	URaycastManager& GetRaycastManager() { return raycastManager; }
+	UBatchShaderManager& GetBatchShaderManager() { return batchShaderManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return hWnd; }
@@ -78,7 +81,7 @@ protected:
 	bool CreateMainWindow(HINSTANCE hInstance);
 	void ProcessMessages();
 	void InternalUpdate();
-	void InternalRender(bool bIsShaderReflectionEnabled);
+	void InternalRender();
 
 	// Window procedure
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

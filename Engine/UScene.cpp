@@ -40,7 +40,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager);
+			primitive->Init();
 		}
 	}
 
@@ -74,7 +74,7 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager);
+		primitive->Init();
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}
@@ -145,7 +145,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	return true;
 }
 
-void UScene::Render(bool bIsShaderReflectionEnabled)
+void UScene::Render()
 {
 	// 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
 	renderer->SetTargetAspect(camera->GetAspect());
@@ -156,7 +156,7 @@ void UScene::Render(bool bIsShaderReflectionEnabled)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Draw(*renderer, bIsShaderReflectionEnabled);
+			primitive->Draw(*renderer);
 		}
 	}
 }

@@ -39,7 +39,7 @@ public:
 	virtual ~UScene();
 	virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr);
 
-	virtual void Render(bool bIsShaderReflectionEnabled);
+	virtual void Render();
 	virtual void Update(float deltaTime);
 	virtual bool OnInitialize();
 

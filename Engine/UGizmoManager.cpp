@@ -110,9 +110,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 
 	// =================================================
 
-	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
-		|| !rotationX->Init(meshManager) || !rotationY->Init(meshManager) || !rotationZ->Init(meshManager)
-		|| !scaleX->Init(meshManager) || !scaleY->Init(meshManager) || !scaleZ->Init(meshManager))
+	if (!gridPrimitive->Init() || !arrowX->Init() || !arrowY->Init() || !arrowZ->Init()
+		|| !rotationX->Init() || !rotationY->Init() || !rotationZ->Init()
+		|| !scaleX->Init() || !scaleY->Init() || !scaleZ->Init())
 	{
 		delete gridPrimitive;
 
@@ -206,12 +206,12 @@ void UGizmoManager::Update(float deltaTime)
 	}
 }
 
-void UGizmoManager::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UGizmoManager::Draw(URenderer& renderer)
 {
 	// --- 파트 1: 타겟 유무와 상관없이 항상 그리는 요소 ---
 	if (gridPrimitive)
 	{
-		gridPrimitive->Draw(renderer, bIsShaderReflectionEnabled);
+		gridPrimitive->Draw(renderer);
 	}
 
 	// --- 파트 2: 타겟이 있을 때만 그리는 요소 ---
@@ -256,7 +256,7 @@ void UGizmoManager::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
 				float gizmoScale = (targetObject->RelativeLocation - camera->GetLocation()).Length() * 0.15f;
 				gizmoPart->SetScale({ gizmoScale, gizmoScale, gizmoScale });
 
-				gizmoPart->DrawOnTop(renderer, bIsShaderReflectionEnabled);
+				gizmoPart->DrawOnTop(renderer);
 			}
 		}
 	}

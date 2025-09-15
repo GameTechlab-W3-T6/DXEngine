@@ -28,12 +28,12 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 }
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
-UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
+TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
 	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	UMesh* mesh = new UMesh(convertedVertices, primitiveType);
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(convertedVertices, primitiveType);
 	return mesh;
 }
 
@@ -43,7 +43,7 @@ static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 	return (uint64_t(a) << 32) | uint64_t(b);
 }
 
-UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+TUniquePtr<UMesh> UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	const size_t v = vertices.size();
 	if (v % 3 != 0) {
@@ -76,7 +76,7 @@ UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& 
 	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
 
 	// 메시 생성: 토폴로지는 반드시 LINELIST
-	UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	mesh->Indices = lineIdx;
 	mesh->NumIndices = lineIdx.size();
 	
@@ -103,10 +103,6 @@ UMeshManager::UMeshManager()
 // 소멸자 (메모리 해제)
 UMeshManager::~UMeshManager()
 {
-	for (auto& pair : meshes)
-	{
-		delete pair.second;
-	}
 	meshes.clear();
 }
 
@@ -135,9 +131,9 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	return true;
 }
 
-UMesh* UMeshManager::RetrieveMesh(FString meshName)
+UMesh* UMeshManager::GetMesh(FString meshName)
 {
 	auto itr = meshes.find(meshName);
 	if (itr == meshes.end()) return nullptr;
-	return itr->second;
+	return itr->second.get();
 }
