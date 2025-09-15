@@ -53,17 +53,19 @@ void UTextholderComp::SetText(int32 InNumber) // TODO : hex mode 넣어 말아?
 }
 
 // 정적 타이핑 draw용 : primitive가 자신의 textholder를 call 할 때
-void UTextholderComp::Draw(FVector location)
+void UTextholderComp::DrawAboveParent(FVector location)
 {
-	// TODO : Set position도 draw와 분리 필요
-	Initialize();
+	// TODO : test
 	SetPosition(location);
-	SetScale(FVector(3.0f, 3.0f, 3.0f));
+	Draw(*renderer, true, true);
+	// TODO : Set position도 draw와 분리 필요
+	//Initialize();
+	////SetScale(FVector(3.0f, 3.0f, 3.0f));
 
-	CaptureTypedChars();
+	//CaptureTypedChars();
 
-	UpdateConstantBuffer(*renderer, true, false);
-	RenderTextLine(*renderer, false);
+	//UpdateConstantBuffer(*renderer, true, false);
+	//RenderTextLine(*renderer, false);
 }
 
 void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
@@ -82,7 +84,7 @@ void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsSh
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
 
-	UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled);
+	UpdateConstantBuffer(renderer, true, bIsShaderReflectionEnabled);
 	RenderTextLine(renderer, bIsShaderReflectionEnabled);
 }
 
@@ -116,7 +118,7 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 // TODO : delegate... 필요
 void UTextholderComp::CaptureTypedChars()
 {
-	if (!textureManager || !inputManager) return;
+	if (!isEditable ||!textureManager || !inputManager) return;
 
 	// A~Z 키 검사 (이번 프레임 "막 눌린" 키만 받음)
 	for (int vk = 'A'; vk <= 'Z'; ++vk)
