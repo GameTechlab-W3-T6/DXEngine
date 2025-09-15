@@ -59,7 +59,7 @@ public:
 	IDXGISwapChain* GetSwapChain() const { return SwapChain; }
 	bool IsInitialized() const { return bIsInitialized; }
 
-private:
+protected:
 	/** Renderer State */
 	bool bIsInitialized;
 
@@ -105,6 +105,9 @@ public:
 	void Draw(UINT VertexCount, UINT StartVertexLocation = 0);
 	void DrawMesh(UMesh* Mesh);
 
+	/** @note: Does nothing in URenderer.h. Just introduced for derived classes. */
+	virtual void Draw() {}
+
 	/** @todo */
 	//virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent)
 	//{
@@ -112,7 +115,7 @@ public:
 	//}
 
 	virtual void DrawPrimitiveComponent(UPrimitiveComponent* component);
-	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
+	virtual void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
 
 	/** @note: These helper functions use Draw() or DrawMesh() Internally. */
 	void DrawLine(UMesh* Mesh);

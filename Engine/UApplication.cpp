@@ -252,10 +252,11 @@ void UApplication::InternalRender()
 {
 	// Prepare rendering
 	GetRenderer().Prepare();
-	GetRenderer().PrepareShader();
 
 	// Call derived class render
 	Render();
+
+	GetRenderer().Draw();
 
 	// Render GUI
 	gui.BeginFrame();

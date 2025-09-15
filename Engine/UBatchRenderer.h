@@ -3,6 +3,7 @@
 #include "URenderer.h"
 
 class UPrimitiveComponent;
+class UGizmoComponent;
 
 class UBatchRenderer : public URenderer
 {
@@ -10,7 +11,7 @@ class UBatchRenderer : public URenderer
 public:
 	virtual ~UBatchRenderer() = default;
 
-	UBatchRenderer() = default;
+	UBatchRenderer() : MeshSwitchCount(0), VertexShaderSwitchCount(0), PixelShaderSwitchCount(0) {}
 
 	UBatchRenderer(const UBatchRenderer&) = delete;
 	UBatchRenderer(UBatchRenderer&&) = delete;
@@ -19,11 +20,15 @@ public:
 	UBatchRenderer& operator=(UBatchRenderer&&) = delete;
 
 	virtual void DrawPrimitiveComponent(UPrimitiveComponent* PrimitiveComponent) override;
+	virtual void DrawGizmoComponent(UGizmoComponent* GizmoComponent, bool drawOnTop) override;
 
-	virtual void SwapBuffer() override;
+	virtual void Draw() override;
 
 private:
-	void Draw();
+
+	uint64 MeshSwitchCount;
+	uint64 VertexShaderSwitchCount;
+	uint64 PixelShaderSwitchCount;
 
 private:
 	// ===============================================
@@ -122,7 +127,10 @@ private:
 	>;
 
 	/** @todo: Maybe deprecated? */
-	TArray<RenderKeyType> KeyArray;
+	//TArray<RenderKeyType> KeyArray;
 
-	TMap<RenderKeyType, UPrimitiveComponent*> PrimitiveComponentMap;
+	/** @todo: Add support for custom comparison fucntion for TMap */
+	//std::multimap<RenderKeyType, USceneComponent*, std::greater<RenderKeyType>> SceneComponentMap;
+
+	TArray<std::pair<RenderKeyType, UPrimitiveComponent*>> PrimitiveComponentArray;
 };

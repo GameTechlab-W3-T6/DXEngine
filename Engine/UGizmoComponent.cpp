@@ -5,7 +5,7 @@
 #include "UClass.h"
 #include "UBatchShaderManager.h"
 
-IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
+IMPLEMENT_UCLASS(UGizmoComponent, UPrimitiveComponent)
 
 bool UGizmoComponent::Init()
 {
@@ -43,6 +43,7 @@ void UGizmoComponent::Update(float deltaTime)
 
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
+	FMatrix M = GetWorldTransform();
 	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
 	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
 	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
@@ -51,41 +52,24 @@ void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 
 void UGizmoComponent::BindVertexShader(URenderer& renderer)
 {
-	vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
+	UPrimitiveComponent::BindVertexShader(renderer);
+	//vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UGizmoComponent::BindPixelShader(URenderer& renderer)
 {
-	pixelShader->Bind(renderer.GetDeviceContext());
-}
-
-void UGizmoComponent::BindShader(URenderer& renderer)
-{
-	BindVertexShader(renderer);
-	BindPixelShader(renderer);
-}
-
-void UGizmoComponent::BindMesh(URenderer& renderer)
-{
-	mesh->Bind(renderer.GetDeviceContext());
+	UPrimitiveComponent::BindVertexShader(renderer);
+	//pixelShader->Bind(renderer.GetDeviceContext());
 }
 
 void UGizmoComponent::Draw(URenderer& renderer)
 {
-	if (!mesh || !mesh->VertexBuffer)
-	{
-		return;
-	}
-
-	renderer.DrawGizmoComponent(this);
+	//renderer.DrawGizmoComponent(this);
+	UPrimitiveComponent::Draw(renderer);
 }
 
 void UGizmoComponent::DrawOnTop(URenderer& renderer)
 {
-	if (!mesh || !mesh->VertexBuffer)
-	{
-		return;
-	}
-
-	renderer.DrawGizmoComponent(this, true);
+	// renderer.DrawGizmoComponent(this, true);
+	UPrimitiveComponent::Draw(renderer);
 }

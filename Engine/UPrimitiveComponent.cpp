@@ -37,6 +37,7 @@ void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
 	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
 	(*vertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UPrimitiveComponent::BindVertexShader(URenderer& renderer)

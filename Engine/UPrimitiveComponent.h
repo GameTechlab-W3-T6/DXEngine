@@ -17,6 +17,8 @@ class UMeshManager; // 전방 선언
 class UPrimitiveComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
+public:
+	using LayerID = uint32;
 protected:
 	UMesh* mesh;
 	UShader* vertexShader, *pixelShader;
@@ -44,6 +46,8 @@ public:
 
 	virtual void Draw(URenderer& renderer);
 
+	virtual LayerID GetLayer() const { return 10;  }
+
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드
@@ -52,6 +56,10 @@ public:
 	bool CountOnInspector() override { return true; }
 
 	UMesh* GetMesh() { return mesh; }
+
+	UShader* GetVertexShader() { return vertexShader;  }
+
+	UShader* GetPixelShader() { return pixelShader;  }
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
 	FVector4 GetColor() const { return Color; }
