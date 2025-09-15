@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ImGuiWindowWrapper.h"
+#include "ConfigData.h"
 
 class USceneComponent;
 class USceneManager;
@@ -10,6 +11,8 @@ class UControlPanel : public ImGuiWindowWrapper
 	USceneManager* SceneManager;
 	UGizmoManager* GizmoManager;
 	URenderer* Renderer;
+	
+	ConfigData* config;
 
 	// Spawn Primitive Section
 	TArray<UClass*> registeredTypes;
