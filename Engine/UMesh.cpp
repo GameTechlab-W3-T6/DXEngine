@@ -10,8 +10,8 @@ UMesh::UMesh()
 {
 }
 
-UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+UMesh::UMesh(MeshID ID, const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
 {
 }
 
@@ -52,4 +52,8 @@ void UMesh::Init(ID3D11Device* device) {
 	}
 	
 	isInitialized = true;
+
+	// =================================================== //
+	// DEBUG FEATURE
+	UE_LOG("Mesh ID '%d' is initialized.", ID);
 }

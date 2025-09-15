@@ -200,6 +200,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UBatchRenderer.cpp" />
     <ClCompile Include="UCamera.cpp" />
     <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UControlPanel.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
+    <ClInclude Include="UBatchRenderer.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />

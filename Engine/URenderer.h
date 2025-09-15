@@ -5,6 +5,8 @@
 
 #include "UEngineSubsystem.h"
 
+class UPrimitiveComponent;
+
 // URenderer.h or cpp 상단
 struct CBTransform
 {
@@ -99,7 +101,11 @@ public:
 	void Draw(UINT VertexCount, UINT StartVertexLocation = 0);
 	void DrawMesh(UMesh* Mesh);
 
-	// virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent);
+	/** @todo */
+	virtual void DrawPrimitive(UPrimitiveComponent* PrimitiveComponent)
+	{
+		return;
+	}
 
 	/** @note: These helper functions use Draw() or DrawMesh() Internally. */
 	void DrawLine(UMesh* Mesh);

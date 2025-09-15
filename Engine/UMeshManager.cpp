@@ -28,12 +28,12 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 }
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
-UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
+UMesh* UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
 	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	UMesh* mesh = new UMesh(convertedVertices, primitiveType);
+	UMesh* mesh = new UMesh(ID, convertedVertices, primitiveType);
 	return mesh;
 }
 
@@ -43,7 +43,7 @@ static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 	return (uint64_t(a) << 32) | uint64_t(b);
 }
 
-UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+UMesh* UMeshManager::CreateWireframeMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	const size_t v = vertices.size();
 	if (v % 3 != 0) {
@@ -76,7 +76,7 @@ UMesh* UMeshManager::CreateWireframeMeshInternal(const TArray<FVertexPosColor>& 
 	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
 
 	// 메시 생성: 토폴로지는 반드시 LINELIST
-	UMesh* mesh = new UMesh(converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	UMesh* mesh = new UMesh(ID, converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	mesh->Indices = lineIdx;
 	mesh->NumIndices = lineIdx.size();
 	
@@ -88,14 +88,14 @@ UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Plane"] = CreateMeshInternal(plane_vertices);
-	meshes["Cube"] = CreateMeshInternal(cube_vertices);
+	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
+	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 
-	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
-	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
-	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
+	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), gizmo_arrow_vertices);
+	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateRotationHandleVertices());
+	meshes["GizmoScaleHandle"] = CreateMeshInternal(GetNextID(), gizmo_scale_handle_vertices);
 
 	// meshes["SphereWireframe"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
