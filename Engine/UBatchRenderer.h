@@ -9,9 +9,14 @@ class UBatchRenderer : public URenderer
 {
 	DECLARE_UCLASS(UBatchRenderer, URenderer)
 public:
+	// type aliases
+	using LayerID	= UPrimitiveComponent::LayerID;
+	using MeshID	= UMesh::MeshID;
+	using ShaderID	= UShader::ShaderID;
+
 	virtual ~UBatchRenderer() = default;
 
-	UBatchRenderer() : MeshSwitchCount(0), VertexShaderSwitchCount(0), PixelShaderSwitchCount(0) {}
+	UBatchRenderer() = default;
 
 	UBatchRenderer(const UBatchRenderer&) = delete;
 	UBatchRenderer(UBatchRenderer&&) = delete;
@@ -20,15 +25,13 @@ public:
 	UBatchRenderer& operator=(UBatchRenderer&&) = delete;
 
 	virtual void DrawPrimitiveComponent(UPrimitiveComponent* PrimitiveComponent) override;
+	[[deprecated("Use DrawPrimitiveComponent to draw Gizmo.")]]
 	virtual void DrawGizmoComponent(UGizmoComponent* GizmoComponent, bool drawOnTop) override;
 
+	/** @note: You should call Draw() before moving onto other rendering step(e.g., GUI drawing).*/
 	virtual void Draw() override;
 
 private:
-
-	uint64 MeshSwitchCount;
-	uint64 VertexShaderSwitchCount;
-	uint64 PixelShaderSwitchCount;
 
 private:
 	// ===============================================
@@ -108,14 +111,15 @@ private:
 	};
 
 	/** @note: Do not use 'using' keyword. Compiler cannot distinguish template specialization with same paramters. */
-	struct LayerField			: KeyField<int8_t, 8> {};
-	struct VertexShaderField	: KeyField<int8_t, 8> {};
-	struct PixelShaderField		: KeyField<int32, 8> {};
+	struct LayerField			: KeyField<LayerID, 8> {};
+	struct VertexShaderField	: KeyField<ShaderID, 8> {};
+	struct PixelShaderField		: KeyField<ShaderID, 8> {};
 	//struct TextureField		: KeyField<TextureID, 10> {};
-	struct MeshField			: KeyField<int32, 10> {};
+	struct MeshField			: KeyField<MeshID, 10> {};
 
 	/** @brief: Rendering information from UPrimitiveComponent is packed into this type. */
 	using RenderKeyType = uint64;
+
 	/** @brief: The priority of information is handled at here. The lower one has higher priority. */
 	using RenderKeyManager = KeyManager<
 		RenderKeyType,		// #5.
@@ -125,12 +129,6 @@ private:
 		VertexShaderField,	// #2.
 		LayerField			// #1. 
 	>;
-
-	/** @todo: Maybe deprecated? */
-	//TArray<RenderKeyType> KeyArray;
-
-	/** @todo: Add support for custom comparison fucntion for TMap */
-	//std::multimap<RenderKeyType, USceneComponent*, std::greater<RenderKeyType>> SceneComponentMap;
 
 	TArray<std::pair<RenderKeyType, UPrimitiveComponent*>> PrimitiveComponentArray;
 };

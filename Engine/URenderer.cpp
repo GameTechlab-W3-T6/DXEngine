@@ -21,6 +21,9 @@ URenderer::URenderer()
 	, hWnd(nullptr)
 	, bIsInitialized(false)
 	, DrawCallCount(0)
+	, MeshSwitchCount(0)
+	, VertexShaderSwitchCount(0)
+	, PixelShaderSwitchCount(0)
 {
 	ConfigData* config = ConfigManager::GetConfig("editor");
 
@@ -509,7 +512,7 @@ void URenderer::Draw(UINT VertexCount, UINT StartVertexLocation)
 	}
 }
 
-void URenderer::DrawMesh(UMesh* Mesh)
+[[deprecated]] void URenderer::DrawMesh(UMesh* Mesh)
 {
 	if (!Mesh || !Mesh->IsInitialized())
 		return;
@@ -522,7 +525,7 @@ void URenderer::DrawMesh(UMesh* Mesh)
 	Draw(Mesh->NumVertices, 0);
 }
 
-void URenderer::DrawLine(UMesh* Mesh)
+[[deprecated]] void URenderer::DrawLine(UMesh* Mesh)
 {
 	if (!Mesh || !Mesh->IsInitialized())
 		return;
@@ -539,18 +542,21 @@ void URenderer::DrawPrimitiveComponent(UPrimitiveComponent* component)
 {
 	auto Mesh = component->GetMesh();
 	Mesh->Bind(DeviceContext);
+	IncrementMeshSwitchCount();
 
 	component->UpdateConstantBuffer(*this);
 
 	component->BindShader(*this);
+	IncrementVertexShaderSwitchCount();
+	IncrementPixelShaderSwitchCount();
 
 	if (Mesh->IsIndexBufferEnabled())
 	{
-		DeviceContext->DrawIndexed(Mesh->NumIndices, 0, 0);
+		DrawIndexed(Mesh->NumIndices, 0, 0);
 	}
 	else
 	{
-		DeviceContext->Draw(Mesh->NumVertices, 0);
+		Draw(Mesh->NumVertices, 0);
 	}
 }
 
@@ -558,10 +564,13 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 {
 	auto Mesh = component->GetMesh();
 	Mesh->Bind(DeviceContext);
+	IncrementMeshSwitchCount();
 
 	component->UpdateConstantBuffer(*this);
 
 	component->BindShader(*this);
+	IncrementVertexShaderSwitchCount();
+	IncrementPixelShaderSwitchCount();
 
 	// Create appropriate depth-stencil state based on drawOnTop parameter
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -611,9 +620,11 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 	// Release local COM objects
 	SAFE_RELEASE(pOldState);
 	SAFE_RELEASE(pDSState);
+
+	IncrementDepthStencilViewClearCount();
 }
 
-void URenderer::DrawMeshOnTop(UMesh* Mesh)
+[[deprecated]] void URenderer::DrawMeshOnTop(UMesh* Mesh)
 {
 	if (!Mesh || !Mesh->IsInitialized())
 		return;
@@ -652,6 +663,7 @@ void URenderer::DrawMeshOnTop(UMesh* Mesh)
 	// Release local COM objects
 	SAFE_RELEASE(pOldState);
 	SAFE_RELEASE(pDepthStencilState);
+
 }
 
 void URenderer::SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset)

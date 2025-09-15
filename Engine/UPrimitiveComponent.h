@@ -10,7 +10,6 @@
 
 class UMeshManager; // 전방 선언
 
-
 /**
  * @brief Renderable component with mesh and material properties
  */
@@ -46,7 +45,7 @@ public:
 
 	virtual void Draw(URenderer& renderer);
 
-	virtual LayerID GetLayer() const { return 10;  }
+	virtual LayerID GetLayer() const { return 5;  }
 
 	virtual ~UPrimitiveComponent() {}
 

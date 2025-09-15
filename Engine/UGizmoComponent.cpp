@@ -43,33 +43,29 @@ void UGizmoComponent::Update(float deltaTime)
 
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	FMatrix M = GetWorldTransform();
 	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
 	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
 	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
 	(*vertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UGizmoComponent::BindVertexShader(URenderer& renderer)
 {
 	UPrimitiveComponent::BindVertexShader(renderer);
-	//vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UGizmoComponent::BindPixelShader(URenderer& renderer)
 {
 	UPrimitiveComponent::BindVertexShader(renderer);
-	//pixelShader->Bind(renderer.GetDeviceContext());
 }
 
 void UGizmoComponent::Draw(URenderer& renderer)
 {
-	//renderer.DrawGizmoComponent(this);
-	UPrimitiveComponent::Draw(renderer);
+	renderer.DrawGizmoComponent(this);
 }
 
 void UGizmoComponent::DrawOnTop(URenderer& renderer)
 {
-	// renderer.DrawGizmoComponent(this, true);
-	UPrimitiveComponent::Draw(renderer);
+	renderer.DrawGizmoComponent(this, true);
 }

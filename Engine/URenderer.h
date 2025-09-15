@@ -187,14 +187,33 @@ private:
 public:
 	bool CheckDeviceState();
 	void GetBackBufferSize(int32& Width, int32& Height);
-	void IncrementDrawCallCount()
-	{
-		++DrawCallCount;
-	}
-	uint32 GetDrawCallCount() const
+	uint64 GetDrawCallCount() const
 	{
 		return DrawCallCount;
 	}
+	uint64 GetMeshSwitchCount() const
+	{
+		return MeshSwitchCount;
+	}
+	uint64 GetVertexShaderSwitchCount() const
+	{
+		return VertexShaderSwitchCount;
+	}
+	uint64 GetPixelShaderSwitchCount()
+	{
+		return PixelShaderSwitchCount;
+	}
+	uint64 GetDepthStencilViewClearCount()
+	{
+		return DepthStencilViewClearCount;
+	}
+
+protected:
+	void IncrementDrawCallCount() { ++DrawCallCount; }
+	void IncrementMeshSwitchCount() { ++MeshSwitchCount; }
+	void IncrementVertexShaderSwitchCount() { ++VertexShaderSwitchCount; }
+	void IncrementPixelShaderSwitchCount() { ++PixelShaderSwitchCount; }
+	void IncrementDepthStencilViewClearCount() { ++DepthStencilViewClearCount; }
 
 private:
 	/** Error handling */
@@ -212,6 +231,15 @@ private:
 	}
 
 private:
-	uint32 DrawCallCount;
 	bool bIsShaderReflectionEnabled;
+
+	uint64 DrawCallCount;
+	/** @brief: The number of VBO binding. */
+	uint64 MeshSwitchCount;
+	/** @brief: The number of Veretx Shader binding. */
+	uint64 VertexShaderSwitchCount;
+	/** @brief: The number of Pixel Shader binding. */
+	uint64 PixelShaderSwitchCount;
+	/** @brief: The number of Depth Stencil View clearing for layers. */
+	uint64 DepthStencilViewClearCount;
 };

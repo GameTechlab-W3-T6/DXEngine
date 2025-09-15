@@ -52,8 +52,4 @@ void UMesh::Init(ID3D11Device* device) {
 	}
 	
 	isInitialized = true;
-
-	// =================================================== //
-	// DEBUG FEATURE
-	UE_LOG("Mesh ID '%d' is initialized.", ID);
 }

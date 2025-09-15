@@ -10,42 +10,23 @@ IMPLEMENT_UCLASS(UBatchRenderer, URenderer)
 
 void UBatchRenderer::DrawPrimitiveComponent(UPrimitiveComponent* Component)
 {
-	/** @todo: Each component has own layer ID later on. For now, use hard-coded version. */
-	uint32 Layer = Component->GetLayer();
-	auto MeshID = Component->GetMesh()->GetID();
-	auto VertexShaderID = Component->GetVertexShader()->GetID();
-	auto PixelShaderID = Component->GetPixelShader()->GetID();
+	assert(Component && "Component is not valid.");
 
-	RenderKeyType RenderKey = RenderKeyManager::CreateKey(
-		*MeshID,
-		VertexShaderID,
-		PixelShaderID,
-		Layer
-	);
+	LayerID Layer = Component->GetLayer();
+	MeshID Mesh = Component->GetMesh()->GetID();
+	ShaderID VertexShader = Component->GetVertexShader()->GetID();
+	ShaderID PixelShader = Component->GetPixelShader()->GetID();
 
-	//SceneComponentMap.emplace(RenderKey, Component);
+	RenderKeyType RenderKey = RenderKeyManager::CreateKey(Mesh, VertexShader, PixelShader, Layer);
+
 	PrimitiveComponentArray.emplace_back(RenderKey, Component);
-	//URenderer::DrawPrimitiveComponent(Component);
 }
 
-[[deprecated]] void UBatchRenderer::DrawGizmoComponent(UGizmoComponent* Component, bool drawOnTop) 
+/** @note: drawOnTop does nothing with this function. */
+/** @todo: Resolve naming collision with URenderer::Draw. */
+void UBatchRenderer::DrawGizmoComponent(UGizmoComponent* Component, bool drawOnTop) 
 {
-	/** @todo: Each component has own layer ID later on. For now, use hard-coded version. */
-	uint32 Layer = 0;
-	auto MeshID = Component->GetMesh()->GetID();
-	auto VertexShaderID = Component->GetVertexShader()->GetID();
-	auto PixelShaderID = Component->GetPixelShader()->GetID();
-
-	RenderKeyType RenderKey = RenderKeyManager::CreateKey(
-		*MeshID,
-		VertexShaderID,
-		PixelShaderID,
-		Layer
-	);
-
-	//SceneComponentMap.emplace(RenderKey, Component);
-	PrimitiveComponentArray.emplace_back(RenderKey, Component);
-	//URenderer::DrawGizmoComponent(Component, drawOnTop);
+	DrawPrimitiveComponent(Component);
 }
 
 void UBatchRenderer::Draw()
@@ -55,83 +36,66 @@ void UBatchRenderer::Draw()
 		return;
 	}
 
+	/** @todo: Is std::sort enough? */
 	std::sort(PrimitiveComponentArray.begin(), PrimitiveComponentArray.end(),
 		[](const auto& lhs, const auto& rhs) {
 		return lhs.first > rhs.first;
 	});
 
-	uint32 LastLayer = -1;
-	uint32 LastMeshID = -1;
-	uint32 LastVertexShaderID = -1;
-	uint32 LastPixelShaderID = -1;
+	/** @note: Be careful not to use uninitialized values. */
+	TOptional<LayerID> LastLayer;
+	TOptional<MeshID> LastMesh;
+	TOptional<ShaderID> LastVertexShader;
+	TOptional<ShaderID> LastPixelShader;
 
-	UE_LOG("DRAW START ===============");
-
-	for (auto Iter = PrimitiveComponentArray.begin(); Iter != PrimitiveComponentArray.end(); ++Iter)
+	for (const auto& [RenderKey, Component] : PrimitiveComponentArray)
 	{
-		auto [RenderKey, Component] = *Iter;
+		const LayerID Layer = RenderKeyManager::Get<LayerField>(RenderKey);
+		const MeshID Mesh = RenderKeyManager::Get<MeshField>(RenderKey);
+		const ShaderID VertexShader = RenderKeyManager::Get<VertexShaderField>(RenderKey);
+		const ShaderID PixelShader = RenderKeyManager::Get<PixelShaderField>(RenderKey);
 
 		Component->UpdateConstantBuffer(*this);
 
-		auto Layer = RenderKeyManager::Get<LayerField>(RenderKey);
-		auto MeshID = RenderKeyManager::Get<MeshField>(RenderKey);
-		auto VertexShaderID = RenderKeyManager::Get<VertexShaderField>(RenderKey);
-		auto PixelShaderID = RenderKeyManager::Get<PixelShaderField>(RenderKey);
+		/** If first element arrives, state should be initialized. */
+		if (Layer != LastLayer)
+		{
+			GetDeviceContext()->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			LastLayer = Layer;
+			IncrementDepthStencilViewClearCount();
+		}
 
-		if (Iter == PrimitiveComponentArray.begin())
-		//if (true)
+		if (VertexShader != LastVertexShader)
 		{
 			Component->BindVertexShader(*this);
+			LastVertexShader = VertexShader;
+			IncrementVertexShaderSwitchCount();
+		}
 
+		if (PixelShader != LastPixelShader)
+		{
 			Component->BindPixelShader(*this);
+			LastPixelShader = PixelShader;
+			IncrementPixelShaderSwitchCount();
+		}
 
+		if (Mesh != LastMesh)
+		{
 			Component->BindMesh(*this);
+			LastMesh = Mesh;
+			IncrementMeshSwitchCount();
+		}
+
+		auto pMesh = Component->GetMesh();
+		if (pMesh->IsIndexBufferEnabled())
+		{
+			DrawIndexed(pMesh->NumIndices, 0, 0);
 		}
 		else
 		{
-			UE_LOG("Last Layer: %d", LastLayer);
-			UE_LOG("Layer: %d", Layer);
-			if (Layer != LastLayer)
-			{
-				UE_LOG("CLEAR!");
-				GetDeviceContext()->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-			}
-
-			if (VertexShaderID != LastVertexShaderID)
-			{
-				Component->BindVertexShader(*this);
-			}
-
-			//if (PixelShaderID != LastPixelShaderID)
-			if (true)
-			{
-				Component->BindPixelShader(*this);
-			}
-			
-			if (MeshID != LastMeshID)
-			{
-				Component->BindMesh(*this);
-			}
+			URenderer::Draw(pMesh->NumVertices, 0);
 		}
-
-		auto Mesh = Component->GetMesh();
-		if (Mesh->IsIndexBufferEnabled())
-		{
-			DeviceContext->DrawIndexed(Mesh->NumIndices, 0, 0);
-		}
-		else
-		{
-			DeviceContext->Draw(Mesh->NumVertices, 0);
-		}
-
-
-		LastLayer = Layer;
-		LastMeshID = MeshID;
-		LastVertexShaderID = VertexShaderID;
-		LastPixelShaderID = PixelShaderID;
 	}
-
-	UE_LOG("DRAW END ===============");
 
 	PrimitiveComponentArray.clear();
 }

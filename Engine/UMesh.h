@@ -53,9 +53,10 @@ public:
 
 	bool IsIndexBufferEnabled() const { return IndexBuffer;  }
 
-	TOptional<MeshID> GetID() const
+	MeshID GetID() const
 	{
-		return ID;
+		assert(ID && "ID is not initialized");
+		return *ID;
 	}
 
 private:

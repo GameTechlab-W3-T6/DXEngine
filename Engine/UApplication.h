@@ -43,8 +43,6 @@ private:
 	int32 windowWidth;
 	int32 windowHeight;
 
-
-
 public:
 	UApplication();
 	virtual ~UApplication();

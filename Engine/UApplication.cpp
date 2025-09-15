@@ -44,8 +44,8 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	windowHeight = height;
 
 	// Create Renderer
-	//renderer = MakeUnique<URenderer>();
-	renderer = MakeUnique<UBatchRenderer>();
+	renderer = MakeUnique<URenderer>();
+	//renderer = MakeUnique<UBatchRenderer>();
 
 	// Create main window
 	if (!CreateMainWindow(hInstance))
