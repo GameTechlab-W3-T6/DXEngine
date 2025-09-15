@@ -167,7 +167,7 @@ void UControlPanel::CameraManagementSection()
 	if (isOrthogonal)
 	{
 		// 원하는 직교 크기로 (예시: 월드 단위 10x10)
-		camera->SetOrtho(10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/true);
+		camera->SetOrtho(camera->GetAspect() * 10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/true);
 	}
 	else
 	{
