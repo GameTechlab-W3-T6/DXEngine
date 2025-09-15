@@ -75,7 +75,7 @@ VS_OUTPUT main_instanced(VS_INPUT input, VS_INST inst)
     
     output.Position = mul(mul(wpos, M), MVP); 
     output.UV = inst.UVOffset + input.UV * inst.UVScale; 
-    output.Color = input.Color  * inst.Color;
+    output.Color = inst.Color;
 
 	return output;
 }

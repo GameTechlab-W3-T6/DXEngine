@@ -17,13 +17,13 @@ struct CBTransform
 	float padding[3];
 };
 
-struct CBTextUV
-{
-	float cellIndex[2];
-	float cellSize[2];
-	float texResolution[2];
-	float padding[2];
-};
+//struct CBTextUV
+//{
+//	float cellIndex[2];
+//	float cellSize[2];
+//	float texResolution[2];
+//	float padding[2];
+//};
 
 struct FTextInstance
 {
@@ -64,7 +64,7 @@ private:
 	ID3D11Buffer* textConstantBuffer;
 	ID3D11Buffer* aabbLineVB; 
 
-	//Text
+	//Text (Instantced Draw) 
 	ID3D11VertexShader* textVertexShaderInst;
 	ID3D11InputLayout* InputLayoutTextInst;
 	ID3D11Buffer* textInstanceVB;
@@ -81,9 +81,7 @@ private:
 	bool bIsInitialized;
 
 	FMatrix mVP;                 // 프레임 캐시
-	CBTransform   mCBData;
-	CBTextUV	mCBUVData;
-
+	CBTransform   mCBData; 
 
 public:
 	URenderer();

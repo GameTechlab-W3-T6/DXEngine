@@ -61,63 +61,41 @@ void UTextholderComp::CaptureTypedChars()
 	}
 
 }
-
-//void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
-//{
-//	if (!mesh || !mesh->VertexBuffer) return; 
-//	// atlas  구별 임시 
-//	if (camera == nullptr) return;
-//
-//	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
-//	float penX = -totalWidth * 0.5f;
-//	textInfo->center = totalWidth * 0.5f;
-//
-//	FMatrix view = camera->GetView();
-//	FMatrix bill = textInfo->MakeBillboard(view);
-//
-//	for (int i = 0; i < textInfo->orderOfChar.size(); i++)
-//	{
-//		//addobject		
-//		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-//		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-//		textInfo->keyCode = textInfo->orderOfChar[i];
-//		renderer.SetTextUV(*textInfo, true, bIsShaderReflectionEnabled);
-//
-//		renderer.DrawMesh(mesh);
-//
-//		penX += textInfo->cellWidth * 0.01f;
-//	}
-//} 
- 
-
+/**
+* @brief 인스턴싱을 이용해 텍스트를 렌더링합니다.
+*
+* 이 함수는 `textInfo->orderOfChar`에 포함된 각 문자에 대해
+* 인스턴스 데이터(월드 변환 행렬, UV 좌표, 색상)를 생성하고
+* 렌더러를 통해 instanced draw call을 호출합니다.
+*/
 void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
-{
-	if (!mesh || !mesh->VertexBuffer) return; 
-	// atlas  구별 임시 
-	if (camera == nullptr) return;
+{ 
 
+	// 문자 개수만큼 인스턴스 배열 공간 확보
 	TArray<FTextInstance> instances; 
 	instances.reserve(textInfo->orderOfChar.size());
 	 
+	// 텍스트 전체 너비 계산 및 중앙 정렬용 penX 초기화
 	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
 	float penX = -totalWidth * 0.5f;
 	textInfo->center = totalWidth * 0.5f;
 
+	// 카메라 View의 역행렬에서 Rotation 성분만 추출한 행렬을 사용해서 빌보드 행렬 생성
 	FMatrix view = camera->GetView();
 	FMatrix bill = textInfo->MakeBillboard(view);
 
 	for (int i = 0; i < textInfo->orderOfChar.size(); i++)
-	{
-
+	{ 
 		const int code = (int)textInfo->orderOfChar[i];
 
-		// (a) 인스턴스 월드행렬: translation(penX,0,0) * billboard
+		// 인스턴스 월드 행렬: X축으로 penX 만큼 이동 후 빌보드 적용
 		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
 
+		// 행렬을 float4 로 분리해 인스턴스 구조체에 저장
 		FTextInstance inst{}; 
 		Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 
-		// (b) UV 사각형: 아틀라스에서 code로 계산
+		// 아틀라스에서 현재 글자의 UV 사각형 계산
 		const int texW = textInfo->textTexture->width;
 		const int texH = textInfo->textTexture->height;
 		ComputeGlyphUVRect(
@@ -130,14 +108,15 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 			inst.uvOffset, inst.uvScale
 		);
 
-		// (c) 색상
+		// 글자 색상지정
 		inst.color[0] = Color.X; inst.color[1] = Color.Y;
 		inst.color[2] = Color.Z; inst.color[3] = Color.W; 
 		instances.push_back(inst);
-
-		// (d) 커서 전진
+		
+		// text 가운데 정렬
 		penX += textInfo->cellWidth * 0.01f;  
 	}
+		 
 	renderer.DrawInstanced(mesh, instances);
 }
 
@@ -148,20 +127,9 @@ void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsSh
  
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
-
-	renderer.SetViewProj(
-		camera->GetView(), camera->GetProj()); 
-	renderer.SetModel(FMatrix::Identity, Color, /*selected=*/false, /*shaderReflection=*/false);
+	 
 	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled); 
 
-	//UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled); 
-	////UpdateConstantBuffer(renderer);
-
+	// instaced 정보 저장 + instanced용 layout,shader로 교체해서 render
 	RenderTextLine(renderer, bIsShaderReflectionEnabled);
-}
-
-//void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
-//{ 
-//	FMatrix M = GetWorldTransform();
-//	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-//}
+} 

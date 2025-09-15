@@ -45,8 +45,7 @@ void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bUseTex
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled);
-	
+	renderer.SetTextUV(*textInfo, bUseTextTexture, bIsShaderReflectionEnabled); 
 }
 
 void UPrimitiveComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)

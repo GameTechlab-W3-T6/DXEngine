@@ -284,18 +284,7 @@ bool URenderer::CreateConstantBuffer()
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	HRESULT hr = device->CreateBuffer(&bufferDesc, nullptr, &constantBuffer);
-	
-	D3D11_BUFFER_DESC textBufferDesc = {};
-
-	textBufferDesc.ByteWidth = sizeof(CBTextUV);   // ← 변경
-	textBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	textBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	textBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	hr =  device->CreateBuffer(&textBufferDesc, nullptr, &textConstantBuffer);
-
-	return CheckResult(hr, "CreateConstantBuffer");
-	 
+	return CheckResult(hr, "CreateConstantBuffer"); 
 }
 
 bool URenderer::CreateTextInstanceVB(UINT maxInstances)
@@ -731,14 +720,22 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
 	SAFE_RELEASE(pDSState);
 }
 
+/**
+ * @brief 텍스트 메시(사각형 등)를 인스턴싱으로 그린다.
+ * @details
+ *  - 슬롯 0: 기본 버텍스 버퍼(텍스트 메쉬)
+ *  - 슬롯 1: 인스턴스 버퍼(FTextInstance 배열)
+ *  - 그리기 전 기존 VS/InputLayout 상태를 백업하고, 인스턴싱용 VS/IL로 교체한 뒤 DrawInstanced 호출 후 복원한다.
+ */
 void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances)
 {
 	if (!text || instances.empty()) return;
 	 
 	// UPDATE CONSTABUFFER 
 	UpdateTextInstanceVB(instances);
-	 
-	 // 이전 상태 저장하고, vertexshader inputlayout 저장 
+
+	 // 이전 상태 백업하고
+	 // vertexshader inputlayout을 intaced draw 용으로 교체
 	ID3D11VertexShader* prevVS = nullptr; 
 	ID3D11InputLayout* prevIL = nullptr;
 	deviceContext->VSGetShader(&prevVS, nullptr, nullptr);
@@ -750,10 +747,12 @@ void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instance
 	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };
 	UINT strides[2] = { text->Stride, (UINT)sizeof(FTextInstance) };
 	UINT offsets[2] = { 0, 0 };
+
 	deviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
 	deviceContext->IASetPrimitiveTopology(text->PrimitiveType);
 
 	deviceContext->DrawInstanced(text->NumVertices, (UINT)instances.size(), 0, 0); 
+	
 	// 이전 상태 복원 
 	deviceContext->VSSetShader(prevVS, nullptr, 0);
 	deviceContext->IASetInputLayout(prevIL);
@@ -1081,29 +1080,10 @@ void URenderer::SetTextUV(FTextInfo& textInfo, bool bUseTextTexture, bool bIsSha
 	if (bIsShaderReflectionEnabled)
 	{
 		if (bUseTextTexture)
-		{
-
-			FVector2 cellSize = { (float)textInfo.cellWidth , (float)textInfo.cellHeight };
-			FVector2 texResolution = { (float)textInfo.textTexture->width, (float)textInfo.textTexture->height };
-
-			int code = textInfo.keyCode ? textInfo.keyCode : (int)U'a';
-
-			int cols = (int)textInfo.cellsPerRow;
-			int column = (int)textInfo.cellsPerColumn;
-
-			int indexH = code / cols;
-			int indexW = code % cols;
-
-			FVector2 cellIndex = { (float)indexW, (float)indexH };
+		{ 
 			
-			(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
-
-			//(*PixelShader_SR)["TextConstantBuffer"]["cellIndex"] = cellIndex;
-			//(*PixelShader_SR)["TextConstantBuffer"]["cellSize"] = cellSize;
-			//(*PixelShader_SR)["TextConstantBuffer"]["texResolution"] = texResolution;
-
-			PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer"); 
-			//PixelShader_SR->Bind(GetDeviceContext(), "TextConstantBuffer"); 
+			(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture; 
+			PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");  
 		}
 		else
 		{
@@ -1114,15 +1094,7 @@ void URenderer::SetTextUV(FTextInfo& textInfo, bool bUseTextTexture, bool bIsSha
 	}
 	else
 	{  
-		//mCBUVData.cellSize[0] = (float)textInfo.cellWidth;
-		//mCBUVData.cellSize[1] = (float)textInfo.cellHeight; 
-		//mCBUVData.texResolution[0] = (float)textInfo.textTexture->width;	
-		//mCBUVData.texResolution[1] = (float)textInfo.textTexture->height; 
-		//mCBUVData.cellIndex[0] = (float)indexW; // X = col
-		//mCBUVData.cellIndex[1] = (float)indexH; // Y = row
-		//  
-		//
-		//UpdateConstantBufferUV(&mCBUVData, sizeof(mCBUVData));
+		//TODO 
 	}
 }
 

@@ -19,7 +19,7 @@ protected:
 	
 	FTextInfo* textInfo;
 	UCamera* camera;
-	FVector4 Color = { 1, 1, 1, 1 };
+	FVector4 Color = { 1, 1, 0, 1 };
 	
 	//임시
 	UInputManager* inputManager;

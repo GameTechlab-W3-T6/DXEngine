@@ -18,7 +18,6 @@ bool UTextureManager::Initialize(URenderer* renderer)
 	return true;
 }
 
-
 FTexture* UTextureManager::LoadFromFile(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
 	const std::wstring& path, bool isDDS)
 { 
@@ -111,8 +110,7 @@ void UTextureManager::CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl ,
 	textInfo->cellWidth = textTex->width / textInfo->cellsPerRow;
 	textInfo->cellHeight = textTex->height / textInfo->cellsPerColumn;
 	
-	stringList.push_back(textInfo); 
-
+	stringList.push_back(textInfo);  
 }
 
 
