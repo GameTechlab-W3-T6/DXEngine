@@ -158,7 +158,7 @@ bool URenderer::CreateShader()
 	ID3DBlob* vsBlobInst = nullptr; 
 	ID3DBlob* errorBlobInst = nullptr;
 	 hr = D3DCompileFromFile(
-		L"ShaderW0VS.hlsl",           // 파일 경로
+		L"TexTestVS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",						// 진입점 함수명
@@ -255,6 +255,42 @@ bool URenderer::CreateShader()
 	hr = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
 		nullptr, &pixelShader);
 	SAFE_RELEASE(psBlob);
+
+	// Load pixel shader from file
+	ID3DBlob* psBlobIns = nullptr;
+	hr = D3DCompileFromFile(
+		L"ShaderW0PS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main",                   // 진입점 함수명
+		"ps_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&psBlobIns,                  // 컴파일된 셰이더
+		&errorBlob                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA("Pixel Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			SAFE_RELEASE(errorBlob);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load pixel shader file: ShaderW0.ps\n");
+		}
+		return false;
+	}
+
+	// Create pixel shader
+	hr = device->CreatePixelShader(psBlobIns->GetBufferPointer(), psBlobIns->GetBufferSize(),
+		nullptr, &textPixelShaderInst);
+
+	SAFE_RELEASE(psBlobIns);
+
 
 	return CheckResult(hr, "CreatePixelShader");
 }
@@ -848,6 +884,7 @@ void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instance
 	deviceContext->IAGetInputLayout(&prevIL);
 
 	deviceContext->VSSetShader(textVertexShaderInst, nullptr, 0);   
+	deviceContext->PSSetShader(textPixelShaderInst, nullptr, 0);   
 	deviceContext->IASetInputLayout(InputLayoutTextInst);
 
 	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };

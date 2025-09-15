@@ -8,6 +8,8 @@
 #include "UInputManager.h"
 #include "UMeshManager.h"
 #include "UTextureManager.h"
+#include "USceneManager.h"
+#include "UScene.h"
 
 IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
@@ -125,9 +127,13 @@ void UTextholderComp::CaptureTypedChars()
 
 void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
-	if (!mesh || !mesh->VertexBuffer) return;
+	//if (!mesh || !mesh->VertexBuffer) return;
 	// atlas  구별 임시 
-	if (camera == nullptr) return;
+	//if (camera == nullptr) return;
+
+	USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
+	UCamera* camera  = sceneManager->GetScene()->GetCamera();
+
 
 	// 문자 개수만큼 인스턴스 배열 공간 확보
 	TArray<FTextInstance> instances;

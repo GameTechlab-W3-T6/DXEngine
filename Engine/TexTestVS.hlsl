@@ -5,9 +5,7 @@ struct VS_INPUT
     float4 Color : COLOR;
     float2 UV : TEXCOORD;
      
-};
-
-
+}; 
 struct VS_INST
 {
     float4 M0 : INST_M0;
@@ -34,30 +32,30 @@ cbuffer ConstantBuffer : register(b0)
     float4 MeshColor;
 };
 
-VS_OUTPUT main(VS_INPUT input)
-{
-    VS_OUTPUT output;
+//VS_OUTPUT main(VS_INPUT input)
+//{
+//    VS_OUTPUT output;
 
-    //float4 baseColor = input.Color;
-    //
-    //if (0.5f < IsSelected)
-    //{
-    //    baseColor.rgb = baseColor.rgb + 0.25f;
-    //}
-    //
-    //output.Color = baseColor * MeshColor;
+//    //float4 baseColor = input.Color;
+//    //
+//    //if (0.5f < IsSelected)
+//    //{
+//    //    baseColor.rgb = baseColor.rgb + 0.25f;
+//    //}
+//    //
+//    //output.Color = baseColor * MeshColor;
 
-    float4 wpos = float4(input.Position.xyz, 1.0f);
+//    float4 wpos = float4(input.Position.xyz, 1.0f);
 
-    // row: v' = v * MVP
-    output.Position = mul(wpos, MVP);
-    output.UV = input.UV;
-    output.Color = input.Color;
+//    // row: v' = v * MVP
+//    output.Position = mul(wpos, MVP);
+//    output.UV = input.UV;
+//    output.Color = input.Color;
 
-    return output;
-}
+//    return output;
+//}
 
-VS_OUTPUT main_instanced(VS_INPUT input, VS_INST inst)
+VS_OUTPUT main(VS_INPUT input, VS_INST inst)
 {
     VS_OUTPUT output;
     
