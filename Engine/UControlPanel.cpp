@@ -62,6 +62,9 @@ void UControlPanel::RenderContent()
 	SceneManagementSection();
 	ImGui::Separator();
 	CameraManagementSection();
+	// ====================== //
+	ImGui::Separator();
+	PerformanceSection();
 }
 
 void UControlPanel::PrimaryInformationSection()
@@ -289,4 +292,38 @@ void UControlPanel::CameraManagementSection()
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
 	}
+}
+
+// ===================================================================== //
+void UControlPanel::PerformanceSection()
+{
+	/** @todo: This is a simple and temporary implementation, so should be changed later. */
+	static std::chrono::time_point StartTimePoint = std::chrono::high_resolution_clock::now();
+
+	double ElapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(
+		std::chrono::high_resolution_clock::now() - StartTimePoint
+	).count();
+
+	uint32 DrawCallCount = SceneManager->GetScene()->GetRenderer()->GetDrawCallCount();
+	double DrawCallCountPerSeconds = DrawCallCount / ElapsedTime;
+
+	// ---- Header ----
+	ImGui::TextColored(ImVec4(0.4f, 0.7f, 1.0f, 1.0f), "Performance Statistics");
+	ImGui::Separator();
+
+	// ---- Layout with columns ----
+	ImGui::Columns(2, "perf_columns");
+	ImGui::SetColumnWidth(0, 150.0f);
+
+	// Column 1: Labels
+	ImGui::Text("Draw Calls:");
+	ImGui::Text("Calls/Sec:");
+	ImGui::Text("Elapsed Time:");
+
+	ImGui::NextColumn();
+
+	// Column 2: Values
+	ImGui::Text("%d", DrawCallCount);
+	ImGui::Text("%.2f", DrawCallCountPerSeconds);
+	ImGui::Text("%.2f sec", ElapsedTime);
 }

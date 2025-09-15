@@ -30,5 +30,9 @@ public:
 	void SceneManagementSection();
 	void CameraManagementSection();
 	USceneComponent* CreateSceneComponentFromChoice(int index);
+
+	// ================================================================= //
+	// Newly added feature
+	void PerformanceSection();
 };
 
