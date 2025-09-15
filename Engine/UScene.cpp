@@ -5,6 +5,7 @@
 #include "UObject.h"
 #include "USceneComponent.h"
 #include "UPrimitiveComponent.h"
+#include "UStaticMeshComponent.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
 #include "UCamera.h" 
@@ -172,10 +173,17 @@ void UScene::Render(bool bIsShaderReflectionEnabled)
 		{
 			if (primitive->bVisible)
 			{
-				if (primitive->GetTextTexture() == nullptr)
-					primitive->Draw(*renderer, false, bIsShaderReflectionEnabled);
+				if (UStaticMeshComponent* staticMesh = primitive->Cast<UStaticMeshComponent>())
+				{
+					staticMesh->Draw(*renderer, false, bIsShaderReflectionEnabled);
+				}
 				else
-					primitive->Draw(*renderer, true, bIsShaderReflectionEnabled);
+				{
+					if (primitive->GetTextTexture() == nullptr)
+						primitive->Draw(*renderer, false, bIsShaderReflectionEnabled);
+					else
+						primitive->Draw(*renderer, true, bIsShaderReflectionEnabled);
+				}
 			}
 		}
 	}

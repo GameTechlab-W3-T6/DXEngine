@@ -14,12 +14,29 @@ UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
 UCLASS_META(UTextholderComp, TextInfo, "TextInfo"); 
 
+void UTextholderComp::Initialize()
+{
+	if (isInitailized) return;
+
+	isInitailized = true;
+
+	if (textureManager)
+	{
+		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
+		if (textTex)
+		{
+			TextInfo.SetParam(textTex, 16, 16);
+		}
+	}
+}
+
 void UTextholderComp::SetText(const FString& textContent)
 {
 	// TODO : 이딴 식으로 editable 핸들링 하지 말기;;
 	if (isEditable)
 	{
 		isEditable = false;
+		Initialize();
 	}
 
 	TextInfo.orderOfChar.clear();
@@ -39,17 +56,28 @@ void UTextholderComp::SetText(int32 InNumber) // TODO : hex mode 넣어 말아?
 void UTextholderComp::Draw(FVector location)
 {
 	// TODO : Set position도 draw와 분리 필요
+	Initialize();
 	SetPosition(location);
+	SetScale(FVector(3.0f, 3.0f, 3.0f));
+
+	CaptureTypedChars();
 
 	UpdateConstantBuffer(*renderer, true, false);
 	RenderTextLine(*renderer, false);
 }
 
+void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
+{
+	FMatrix M = GetWorldTransform();
+	renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+	renderer.SetTextUV(TextInfo, bUseTextTexture, bIsShaderReflectionEnabled);
+}
+
 // 동적 타이핑 draw용 : scene에서 draw할 때
 void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
-	if (!mesh || !mesh->VertexBuffer) return;
- 
+	Initialize();
+	
 	// TODO : delegate로 고치기 -> editable을 on off
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
@@ -88,28 +116,28 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 // TODO : delegate... 필요
 void UTextholderComp::CaptureTypedChars()
 {
-	if (!isEditable || !textureManager || !inputManager) return;
+	if (!textureManager || !inputManager) return;
 
 	// A~Z 키 검사 (이번 프레임 "막 눌린" 키만 받음)
 	for (int vk = 'A'; vk <= 'Z'; ++vk)
 	{
 		if (inputManager->IsKeyPressed(vk))
 		{
-			if (textInfo == nullptr)
+			if (!TextInfo.textTexture)
 			{
 				OutputDebugStringA("TextInfo Error:\n");
 			}
 			else
 			{
-				textInfo->orderOfChar.push_back(vk);
+				TextInfo.orderOfChar.push_back(vk);
 			}
 		}
 	}
 	if (inputManager->IsKeyPressed('\b'))
 	{
-		if (!textInfo->orderOfChar.empty())
+		if (!TextInfo.orderOfChar.empty())
 		{
-			textInfo->orderOfChar.pop_back();
+			TextInfo.orderOfChar.pop_back();
 		}
 	}
 }

@@ -14,7 +14,6 @@
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 UCLASS_META(UPrimitiveComponent, TextInfo, "TextInfo");
 
-// TODO : 초기화에 이렇게 많이 들어가는 건 애매하다. 
 bool UPrimitiveComponent::Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm, UCamera* cam)
 {
 	renderer = rd;
@@ -27,19 +26,8 @@ bool UPrimitiveComponent::Init(URenderer* rd, UMeshManager* mM, UInputManager* i
 		return false;
 
 	mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
-
-	// TODO : textholder로 이전
-	if (textureManager)
-	{
-		texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextureType"));
-
-		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-		if (textTex)
-		{
-			textInfo->SetParam(textTex, 16, 16);
-			camera = cam;
-		}
-	}
+	// 해당 primitive의 texture
+	texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 
 	return mesh != nullptr;
 }

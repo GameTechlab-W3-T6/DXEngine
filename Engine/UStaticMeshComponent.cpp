@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "UStaticMeshComponent.h"
 #include "UMeshManager.h"
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UStaticMeshComponent, UPrimitiveComponent)
 void UStaticMeshComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
@@ -17,6 +18,8 @@ void UStaticMeshComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool 
 	UpdateConstantBuffer(renderer, bUseTextTexture, bIsShaderReflectionEnabled);
 	renderer.DrawMesh(mesh);
 
-	FVector labelLocation = GetPosition() + (0, 0, 5); // 월드 z축 + 5정도 되는 위치 = 머리 위
+	FVector ParentLocation = GetPosition();
+	FVector Offset = FVector(30.0f, 30.0f, 30.0f); // 월드 z축 + 5정도 되는 위치 = 머리 위
+	FVector labelLocation = ParentLocation + Offset;
 	uuidQuad.Draw(labelLocation);
 }
