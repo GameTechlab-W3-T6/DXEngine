@@ -12,7 +12,7 @@
 IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
-UCLASS_META(UTextholderComp, TextInfo, "TextInfo"); 
+UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 
 void UTextholderComp::Initialize()
 {
@@ -70,7 +70,7 @@ void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTex
 void UTextholderComp::Draw(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
 {
 	Initialize();
-	
+
 	// TODO : delegate로 고치기 -> editable을 on off
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
@@ -124,10 +124,10 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 
 	// 문자 개수만큼 인스턴스 배열 공간 확보
 	TArray<FTextInstance> instances;
-	instances.reserve(textInfo->orderOfChar.size());
+	instances.reserve(TextInfo.orderOfChar.size());
 
 	// 텍스트 전체 너비 계산 및 중앙 정렬용 penX 초기화
-	float totalWidth = textInfo->orderOfChar.size() * textInfo->cellWidth * 0.01f;
+	float totalWidth = TextInfo.orderOfChar.size() * TextInfo.cellWidth * 0.01f;
 	float penX = -totalWidth * 0.5f;
 	TextInfo.center = totalWidth * 0.5f;
 
@@ -141,52 +141,49 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
 		renderer.SetTextUV(TextInfo, true, bIsShaderReflectionEnabled);
 
+		FTextInstance inst{};
 		if (isEditable)
 		{
 			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-			renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+			//renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+
+			// 행렬을 float4 로 분리해 인스턴스 구조체에 저장 
+			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 		}
 		else
 		{
 			FVector p = RelativeLocation;
 			FMatrix M = FMatrix::TranslationRow(p.X + penX, p.Y, p.Z) * bill;
-			// renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-		}
-
-		renderer.DrawMesh(mesh);
-		for (int i = 0; i < textInfo->orderOfChar.size(); i++)
-		{
-			const int code = (int)textInfo->orderOfChar[i];
-
-			// 인스턴스 월드 행렬: X축으로 penX 만큼 이동 후 빌보드 적용
-			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-
+			//renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+		  
 			// 행렬을 float4 로 분리해 인스턴스 구조체에 저장
-			FTextInstance inst{};
 			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
-
-			// 아틀라스에서 현재 글자의 UV 사각형 계산
-			const int texW = textInfo->textTexture->width;
-			const int texH = textInfo->textTexture->height;
-			ComputeGlyphUVRect(
-				code,
-				(int)textInfo->cellsPerRow,
-				(int)textInfo->cellsPerColumn,
-				(int)textInfo->cellWidth,
-				(int)textInfo->cellHeight,
-				texW, texH,
-				inst.uvOffset, inst.uvScale
-			);
-
-			// 글자 색상지정
-			inst.color[0] = Color.X; inst.color[1] = Color.Y;
-			inst.color[2] = Color.Z; inst.color[3] = Color.W;
-			instances.push_back(inst);
-
-			// text 가운데 정렬
-			penX += textInfo->cellWidth * 0.01f;
 		}
+		 
+		// 인스턴스 월드 행렬: X축으로 penX 만큼 이동 후 빌보드 적용
+		//FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
 
-		renderer.DrawInstanced(mesh, instances);
+
+		// 아틀라스에서 현재 글자의 UV 사각형 계산
+		const int texW = TextInfo.textTexture->width;
+		const int texH = TextInfo.textTexture->height;
+		ComputeGlyphUVRect(
+			TextInfo.keyCode,
+			(int)TextInfo.cellsPerRow,
+			(int)TextInfo.cellsPerColumn,
+			(int)TextInfo.cellWidth,
+			(int)TextInfo.cellHeight,
+			texW, texH,
+			inst.uvOffset, inst.uvScale
+		);
+
+		// 글자 색상지정
+		inst.color[0] = Color.X; inst.color[1] = Color.Y;
+		inst.color[2] = Color.Z; inst.color[3] = Color.W;
+		instances.push_back(inst);
+
+		// text 가운데 정렬
+		penX += TextInfo.cellWidth * 0.01f;
 	}
+	renderer.DrawInstanced(mesh, instances);
 }
