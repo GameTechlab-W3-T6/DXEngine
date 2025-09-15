@@ -596,30 +596,38 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 	if (!mesh || !mesh->IsInitialized())
 		return;
 
+	// Create appropriate depth-stencil state based on drawOnTop parameter
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	if (drawOnTop)
 	{
-		// Create a depth-stencil state with depth testing disabled
-		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-		dsDesc.DepthEnable = FALSE;  // disable depth testing
+		// Disable depth testing for on-top rendering
+		dsDesc.DepthEnable = FALSE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-
-		ID3D11DepthStencilState* pDSState = nullptr;
-		HRESULT hr = device->CreateDepthStencilState(&dsDesc, &pDSState);
-		if (FAILED(hr))
-		{
-			LogError("CreateDepthStencilState (DrawMeshOnTop)", hr);
-			return;
-		}
-
-		// Backup current depth-stencil state
-		ID3D11DepthStencilState* pOldState = nullptr;
-		UINT stencilRef = 0;
-		deviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
-
-		// Set new state (no depth test)
-		deviceContext->OMSetDepthStencilState(pDSState, 0);
 	}
+	else
+	{
+		// Enable normal depth testing
+		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	}
+
+	ID3D11DepthStencilState* pDSState = nullptr;
+	HRESULT hr = device->CreateDepthStencilState(&dsDesc, &pDSState);
+	if (FAILED(hr))
+	{
+		LogError("CreateDepthStencilState (DrawGizmoComponent)", hr);
+		return;
+	}
+
+	// Backup current depth-stencil state
+	ID3D11DepthStencilState* pOldState = nullptr;
+	UINT stencilRef = 0;
+	deviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
+
+	// Set new depth state
+	deviceContext->OMSetDepthStencilState(pDSState, 0);
 
 	UINT offset = 0;
 
@@ -635,6 +643,13 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 	{
 		deviceContext->Draw(mesh->NumVertices, 0);
 	}
+
+	// Restore previous depth state
+	deviceContext->OMSetDepthStencilState(pOldState, stencilRef);
+
+	// Release local COM objects
+	SAFE_RELEASE(pOldState);
+	SAFE_RELEASE(pDSState);
 }
 
 void URenderer::DrawMeshOnTop(UMesh* mesh)

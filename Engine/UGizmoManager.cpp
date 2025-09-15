@@ -256,7 +256,12 @@ void UGizmoManager::Draw(URenderer& renderer)
 				float gizmoScale = (targetObject->RelativeLocation - camera->GetLocation()).Length() * 0.15f;
 				gizmoPart->SetScale({ gizmoScale, gizmoScale, gizmoScale });
 
-				gizmoPart->DrawOnTop(renderer);
+
+				// TODO : 굳이 체크하지 않고, draw를 virtual로 만들어 상황에 맞게 처리하도록 변경
+				if (gizmoPart->IsA<UGizmoGridComp>())
+					gizmoPart->Draw(renderer);
+				else
+					gizmoPart->DrawOnTop(renderer);
 			}
 		}
 	}
