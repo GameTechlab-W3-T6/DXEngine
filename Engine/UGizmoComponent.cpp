@@ -3,17 +3,33 @@
 #include "UMeshManager.h"
 #include "URenderer.h"
 #include "UClass.h"
+#include "UBatchShaderManager.h"
 
 IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
 
-bool UGizmoComponent::Init(UMeshManager* meshManager)
+bool UGizmoComponent::Init()
 {
+	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
+	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
 	if (meshManager)
 	{
-		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
-		return mesh != nullptr;
+		mesh = meshManager->GetMesh(GetClass()->GetMeta("MeshName"));
 	}
-	return false;
+	if (batchShaderManager)
+	{
+		std::string vertexShaderName = GetClass()->GetMeta("VertexShaderName");
+		std::string pixelShaderName = GetClass()->GetMeta("PixelShaderName");
+
+		if (vertexShaderName == "")
+			vertexShaderName = "Vertex";
+		if (pixelShaderName == "")
+			pixelShaderName = "Pixel";
+
+		vertexShader = batchShaderManager->GetShaderByName(vertexShaderName);
+		pixelShader = batchShaderManager->GetShaderByName(pixelShaderName);
+	}
+
+	return mesh && vertexShader && pixelShader;
 }
 
 FMatrix UGizmoComponent::GetWorldTransform()
@@ -21,34 +37,35 @@ FMatrix UGizmoComponent::GetWorldTransform()
 	return FMatrix::SRTRowQuaternion(RelativeLocation, (OriginQuaternion * RelativeQuaternion).ToMatrixRow(), RelativeScale3D);
 }
 
-void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, GetColor(), bIsSelected, bIsShaderReflectionEnabled);
+	renderer.SetModel(M, GetColor(), bIsSelected);
 }
 
 void UGizmoComponent::Update(float deltaTime)
 {
 }
 
-void UGizmoComponent::Draw(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UGizmoComponent::Draw(URenderer& renderer)
 {
 	if (!mesh || !mesh->VertexBuffer)
 	{
 		return;
 	}
 
-	UpdateConstantBuffer(renderer, bIsShaderReflectionEnabled);
-	renderer.DrawMesh(mesh);
+	UpdateConstantBuffer(renderer);
+	renderer.DrawGizmoComponent(this);
 }
 
-void UGizmoComponent::DrawOnTop(URenderer& renderer, bool bIsShaderReflectionEnabled)
+void UGizmoComponent::DrawOnTop(URenderer& renderer)
 {
 	if (!mesh || !mesh->VertexBuffer)
 	{
 		return;
 	}
 
-	UpdateConstantBuffer(renderer, bIsShaderReflectionEnabled);
-	renderer.DrawMeshOnTop(mesh);
+	renderer.SetShader(vertexShader, pixelShader);
+	UpdateConstantBuffer(renderer);
+	renderer.DrawGizmoComponent(this, true);
 }

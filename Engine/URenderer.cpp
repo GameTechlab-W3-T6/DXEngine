@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "URenderer.h"
 #include "UClass.h"
+#include "ConfigManager.h"
 #include "UPrimitiveComponent.h"
 
 IMPLEMENT_UCLASS(URenderer, UEngineSubsystem)
@@ -21,7 +22,15 @@ URenderer::URenderer()
 	, bIsInitialized(false)
 	, DrawCallCount(0)
 {
-	ZeroMemory(&Viewport, sizeof(Viewport));
+	ConfigData* config = ConfigManager::GetConfig("editor");
+
+	if (config)
+		bIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");
+
+	else
+		bIsShaderReflectionEnabled = false;
+
+	ZeroMemory(&viewport, sizeof(viewport));
 }
 
 URenderer::~URenderer()
@@ -178,8 +187,8 @@ bool URenderer::CreateShader()
 
 bool URenderer::CreateShader_SR()
 {
-	VertexShader_SR = MakeUnique<UShader>(GetDevice(), EShaderType::VertexShader, "ShaderW0.vs", "main");
-	PixelShader_SR = MakeUnique<UShader>(GetDevice(), EShaderType::PixelShader, "ShaderW0.ps", "main");
+	VertexShader_SR = MakeUnique<UShader>(GetDevice(), 0, EShaderType::VertexShader, std::filesystem::path("ShaderW0.vs"), "main");
+	PixelShader_SR = MakeUnique<UShader>(GetDevice(), 1, EShaderType::PixelShader, std::filesystem::path("ShaderW0.ps"), "main");
 
 	return true;
 }
@@ -421,7 +430,7 @@ void URenderer::Prepare()
 	Clear();
 }
 
-void URenderer::PrepareShader(bool bIsShaderReflectionEnabled)
+void URenderer::PrepareShader()
 {
 	if (!DeviceContext)
 	{
@@ -524,6 +533,92 @@ void URenderer::DrawLine(UMesh* Mesh)
 	DeviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	Draw(Mesh->NumVertices, 0);
+}
+
+void URenderer::DrawPrimitiveComponent(UPrimitiveComponent* component)
+{
+	UMesh* mesh = component->GetMesh();
+
+	if (!mesh || !mesh->IsInitialized())
+		return;
+
+	UINT offset = 0;
+
+	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
+	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+
+	if (mesh->IndexBuffer)
+	{
+		deviceContext->IASetIndexBuffer(mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->DrawIndexed(mesh->NumIndices, 0, 0);
+	}
+	else
+	{
+		deviceContext->Draw(mesh->NumVertices, 0);
+	}
+}
+
+void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
+{
+	UMesh* mesh = component->GetMesh();
+
+	if (!mesh || !mesh->IsInitialized())
+		return;
+
+	// Create appropriate depth-stencil state based on drawOnTop parameter
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	if (drawOnTop)
+	{
+		// Disable depth testing for on-top rendering
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+	}
+	else
+	{
+		// Enable normal depth testing
+		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	}
+
+	ID3D11DepthStencilState* pDSState = nullptr;
+	HRESULT hr = Device->CreateDepthStencilState(&dsDesc, &pDSState);
+	if (FAILED(hr))
+	{
+		LogError("CreateDepthStencilState (DrawGizmoComponent)", hr);
+		return;
+	}
+
+	// Backup current depth-stencil state
+	ID3D11DepthStencilState* pOldState = nullptr;
+	UINT stencilRef = 0;
+	deviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
+
+	// Set new depth state
+	deviceContext->OMSetDepthStencilState(pDSState, 0);
+
+	UINT offset = 0;
+
+	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
+	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+
+	if (mesh->IndexBuffer)
+	{
+		deviceContext->IASetIndexBuffer(mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->DrawIndexed(mesh->NumIndices, 0, 0);
+	}
+	else
+	{
+		deviceContext->Draw(mesh->NumVertices, 0);
+	}
+
+	// Restore previous depth state
+	deviceContext->OMSetDepthStencilState(pOldState, stencilRef);
+
+	// Release local COM objects
+	SAFE_RELEASE(pOldState);
+	SAFE_RELEASE(pDSState);
 }
 
 void URenderer::DrawMeshOnTop(UMesh* Mesh)
@@ -846,6 +941,39 @@ void URenderer::GetBackBufferSize(int32& Width, int32& Height)
 		Width = static_cast<int32>(desc.Width);
 		Height = static_cast<int32>(desc.Height);
 		backBuffer->Release();
+	}
+}
+
+void URenderer::SetShader(UShader* vertexShader, UShader* pixelShader)
+{
+	if (bIsShaderReflectionEnabled)
+	{
+		currentVertexShader = vertexShader ? vertexShader : VertexShader_SR.get();
+		currentPixelShader = pixelShader ? pixelShader : PixelShader_SR.get();
+	}
+}
+
+void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelected)
+{
+	// per-object: MVP = M * VP
+	FMatrix MVP = M * mVP;
+	if (!bIsShaderReflectionEnabled)
+	{
+		D3D11_TEXTURE2D_DESC desc;
+		backBuffer->GetDesc(&desc);
+		Width = static_cast<int32>(desc.Width);
+		Height = static_cast<int32>(desc.Height);
+		backBuffer->Release();
+	}
+	else
+	{
+		(*currentVertexShader)["ConstantBuffer"]["MVP"] = MVP;
+		(*currentVertexShader)["ConstantBuffer"]["MeshColor"] = color;
+		(*currentVertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+
+		/** @brief: For now, binding should be done here. */
+		currentVertexShader->Bind(GetDeviceContext(), "ConstantBuffer");
+		currentPixelShader->Bind(GetDeviceContext());
 	}
 }
 

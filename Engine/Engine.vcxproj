@@ -225,6 +225,7 @@
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="UBatchShaderManager.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTimeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="UBatchShaderManager.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="UTimeManager.h" />
     <ClInclude Include="UGUI.h" />

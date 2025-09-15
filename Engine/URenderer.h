@@ -2,7 +2,8 @@
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"
-
+#include "UPrimitiveComponent.h"
+#include "UGizmoComponent.h"
 #include "UEngineSubsystem.h"
 
 class UPrimitiveComponent;
@@ -52,7 +53,35 @@ public:
 	bool ReleaseTexture(ID3D11Texture2D* Texture);
 	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* ShaderResourceView);
 
-	/** Getters */
+	// Rendering operations
+	void Prepare();
+	void PrepareShader();
+	void SwapBuffer();
+	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
+
+	// Drawing operations
+	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
+	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
+	void DrawMesh(UMesh* mesh);
+	void DrawLine(UMesh* mesh);
+	void DrawPrimitiveComponent(UPrimitiveComponent* component);
+	void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
+	void DrawMeshOnTop(UMesh* mesh);
+
+	// Resource binding
+	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
+	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
+	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
+	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
+	void SetRasterizerMode(bool isSolid);
+
+	// Constant buffer updates
+	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
+
+	// Window resize handling
+	bool ResizeBuffers(int32 width, int32 height);
+
+	// Getters
 	ID3D11Device* GetDevice() const { return Device; }
 	ID3D11DeviceContext* GetDeviceContext() const { return DeviceContext; }
 	IDXGISwapChain* GetSwapChain() const { return SwapChain; }
@@ -79,6 +108,9 @@ private:
 	/** Shader Objects using Shader Reflection */
 	TUniquePtr<UShader> VertexShader_SR;
 	TUniquePtr<UShader> PixelShader_SR;
+
+	UShader* currentVertexShader;
+	UShader* currentPixelShader;
 
 	ID3D11Buffer* ConstantBuffer;
 

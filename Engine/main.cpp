@@ -26,14 +26,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	ConfigData* editorConfig = ConfigManager::GetInstance()->GetConfig("editor");
-	if (editorConfig == nullptr)
-	{
-		assert(false && "Failed to open 'editor.ini'.");
-	}
-
-	bool bIsShaderReflectionEnabled = editorConfig->getBool("Graphics", "ShaderReflection", false);
-
 	// Create application instance
 	EditorApplication app;
 
@@ -45,7 +37,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Run main loop
-	app.Run(bIsShaderReflectionEnabled);
+	app.Run();
 
 	app.Shutdown();
 	_CrtDumpMemoryLeaks();

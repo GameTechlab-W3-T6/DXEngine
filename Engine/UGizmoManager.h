@@ -38,7 +38,7 @@ public:
 
 	void Update(float deltaTime);
 	// 매 프레임 호출되어 기즈모를 화면에 그립니다.
-	void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	void Draw(URenderer& renderer);
 
 	void NextTranslation();
 

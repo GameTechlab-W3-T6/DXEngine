@@ -19,6 +19,13 @@ private:
 			configDatas[configFilePath.stem().string()] = MakeUnique<ConfigData>(rootPath / configFilePath);
 		}
 	}
+	ConfigData* GetConfigInternal(const FString& configName) {
+		auto itr = configDatas.find(configName);
+
+		if (itr == configDatas.end()) return nullptr;
+
+		return itr->second.get();
+	}
 public:
 	static ConfigManager* GetInstance()
 	{
@@ -29,12 +36,9 @@ public:
 		return instance.get();
 	}
 
-	ConfigData* GetConfig(const FString& configName) {
-		auto itr = configDatas.find(configName);
-
-		if (itr == configDatas.end()) return nullptr;
-
-		return itr->second.get();
+	static ConfigData* GetConfig(const FString& configName)
+	{
+		return GetInstance()->GetConfigInternal(configName);
 	}
 };
 
