@@ -55,17 +55,8 @@ void UTextholderComp::SetText(int32 InNumber) // TODO : hex mode 넣어 말아?
 // 정적 타이핑 draw용 : primitive가 자신의 textholder를 call 할 때
 void UTextholderComp::DrawAboveParent(FVector location)
 {
-	// TODO : test
 	SetPosition(location);
 	Draw(*renderer, true, true);
-	// TODO : Set position도 draw와 분리 필요
-	//Initialize();
-	////SetScale(FVector(3.0f, 3.0f, 3.0f));
-
-	//CaptureTypedChars();
-
-	//UpdateConstantBuffer(*renderer, true, false);
-	//RenderTextLine(*renderer, false);
 }
 
 void UTextholderComp::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
@@ -107,8 +98,18 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
 		renderer.SetTextUV(TextInfo, true, bIsShaderReflectionEnabled);
 
-		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-		renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+		if (isEditable)
+		{
+			 FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+			 renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+		}
+		else
+		{
+			FVector p = RelativeLocation;
+			FMatrix M = FMatrix::TranslationRow(p.X + penX, p.Y, p.Z) * bill;
+			// renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
+		}
+		
 		renderer.DrawMesh(mesh);
 
 		penX += TextInfo.cellWidth * 0.01f;

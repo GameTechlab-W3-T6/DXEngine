@@ -20,7 +20,8 @@ void UStaticMeshComponent::Draw(URenderer& renderer, bool bUseTextTexture, bool 
 	renderer.DrawMesh(mesh);
 
 	FVector ParentLocation = GetPosition();
-	FVector Offset = FVector(30.0f, 30.0f, 30.0f); // 월드 z축 + 5정도 되는 위치 = 머리 위
+	FVector Offset = FVector(0.0f, 0.0f, 0.25f); // 월드 z축 + 5정도 되는 위치 = 머리 위
 	FVector labelLocation = ParentLocation + Offset;
+	// uuidQuad.SetPosition(ParentLocation);
 	uuidQuad.DrawAboveParent(labelLocation);
 }
