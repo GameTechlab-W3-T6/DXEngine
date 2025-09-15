@@ -147,7 +147,9 @@ public:
 	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
 	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
 	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
-	void SetRasterizerMode(bool isSolid);
+	void SetRasterizerMode(bool isSolid); 
+	 
+	void SetSampler(ID3D11SamplerState* sampler, UINT slot);
 
 	// Constant buffer updates
 

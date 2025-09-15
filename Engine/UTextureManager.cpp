@@ -96,7 +96,7 @@ void UTextureManager::UnBindPS(ID3D11DeviceContext* deviceContext, UINT textureS
 
 	deviceContext->PSSetShaderResources(textureSlot, 1, nullSRV);
 	deviceContext->PSSetSamplers(samplerSlot, 1, nullSampler);
-}
+} 
 
 void UTextureManager::CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl , int key)
 { 
@@ -112,7 +112,6 @@ void UTextureManager::CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl ,
 	
 	stringList.push_back(textInfo);  
 }
-
 
 
 

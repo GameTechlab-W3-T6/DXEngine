@@ -30,30 +30,7 @@ cbuffer ConstantBuffer : register(b0)
 {
     row_major float4x4 MVP; // Model   (row-vector)
     float4 MeshColor;
-};
-
-//VS_OUTPUT main(VS_INPUT input)
-//{
-//    VS_OUTPUT output;
-
-//    //float4 baseColor = input.Color;
-//    //
-//    //if (0.5f < IsSelected)
-//    //{
-//    //    baseColor.rgb = baseColor.rgb + 0.25f;
-//    //}
-//    //
-//    //output.Color = baseColor * MeshColor;
-
-//    float4 wpos = float4(input.Position.xyz, 1.0f);
-
-//    // row: v' = v * MVP
-//    output.Position = mul(wpos, MVP);
-//    output.UV = input.UV;
-//    output.Color = input.Color;
-
-//    return output;
-//}
+}; 
 
 VS_OUTPUT main(VS_INPUT input, VS_INST inst)
 {

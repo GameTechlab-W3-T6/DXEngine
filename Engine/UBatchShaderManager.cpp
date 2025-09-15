@@ -16,8 +16,8 @@ void UBatchShaderManager::Initialize(ID3D11Device* Device)
 	/** @todo: Remove this. */
 	LoadShaderFromFile(Device, EShaderType::VertexShader, "DefaultVS.hlsl", "main", "Vertex");
 	LoadShaderFromFile(Device, EShaderType::PixelShader, "DefaultPS.hlsl", "main", "Pixel");
-	LoadShaderFromFile(Device, EShaderType::VertexShader, "ShaderW0VS.hlsl", "main", "Text_VS");
-	LoadShaderFromFile(Device, EShaderType::PixelShader, "ShaderW0PS.hlsl", "main", "Text_PS");
+	LoadShaderFromFile(Device, EShaderType::VertexShader, "TexTestVS.hlsl", "main", "Text_VS");
+	LoadShaderFromFile(Device, EShaderType::PixelShader, "TexTestPS.hlsl", "main", "Text_PS");
 
 	// Gizmo shaders
 	LoadShaderFromFile(Device, EShaderType::VertexShader, "GizmoVS.hlsl", "main", "GizmoVertex");

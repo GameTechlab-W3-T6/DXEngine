@@ -7,9 +7,9 @@
 #include "UTextholderComp.h"
 #include "UInputManager.h"
 #include "UMeshManager.h"
-#include "UTextureManager.h"
 #include "USceneManager.h"
 #include "UScene.h"
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
@@ -132,8 +132,7 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 	//if (camera == nullptr) return;
 
 	USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
-	UCamera* camera  = sceneManager->GetScene()->GetCamera();
-
+	UCamera* camera  = sceneManager->GetScene()->GetCamera(); 
 
 	// 문자 개수만큼 인스턴스 배열 공간 확보
 	TArray<FTextInstance> instances;
@@ -197,5 +196,8 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 		// text 가운데 정렬
 		penX += TextInfo.cellWidth * 0.01f;
 	}
+
+	renderer.SetTexture(TextInfo.textTexture->srv, 0);
+	renderer.SetSampler(TextInfo.textTexture->samplerState, 0);
 	renderer.DrawInstanced(mesh, instances);
 }

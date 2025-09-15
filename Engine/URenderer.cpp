@@ -4,6 +4,7 @@
 #include "ConfigManager.h"
 #include "UPrimitiveComponent.h"
 #include "FTextInfo.h"
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(URenderer, UEngineSubsystem)
 
@@ -259,7 +260,7 @@ bool URenderer::CreateShader()
 	// Load pixel shader from file
 	ID3DBlob* psBlobIns = nullptr;
 	hr = D3DCompileFromFile(
-		L"ShaderW0PS.hlsl",           // 파일 경로
+		L"TexTestPS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
@@ -872,11 +873,11 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
  */
 void URenderer::DrawInstanced(UMesh* text, const TArray<FTextInstance>& instances)
 {
-	if (!text || instances.empty()) return;
+	//if (!text || instances.empty()) return;
 	 
 	// UPDATE CONSTABUFFER 
 	UpdateTextInstanceVB(instances);
-
+	 
 	 // 이전 상태 백업하고
 	 // vertexshader inputlayout을 intaced draw 용으로 교체
 	ID3D11VertexShader* prevVS = nullptr; 
@@ -1254,6 +1255,12 @@ D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const
 	}
 	return vp;
 }
+  
+void URenderer::SetSampler(ID3D11SamplerState* sampler, UINT slot)
+{
+	if (deviceContext && sampler)
+		deviceContext->PSSetSamplers(slot, 1, &sampler);
+} 
 
 void URenderer::DumpVSInputSignature(ID3DBlob* vsBlob)
 {
