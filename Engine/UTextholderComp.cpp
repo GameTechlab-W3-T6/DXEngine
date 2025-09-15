@@ -8,6 +8,8 @@
 #include "UInputManager.h"
 #include "UMeshManager.h"
 #include "UTextureManager.h"
+#include "USceneManager.h"
+#include "UScene.h"
 
 IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
@@ -21,20 +23,21 @@ void UTextholderComp::Initialize()
 	isInitailized = true;
 
 	cachedTextureManager = UEngineStatics::GetSubsystem<UTextureManager>();
-	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>();
-
+	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>(); 
+	 
 	if (cachedTextureManager)
 	{
 		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-		if (textTex)
+		if (textTex) 
 		{
 			TextInfo.SetParam(textTex, 16, 16);
 		}
 	}
 
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
-	vertexShader2 = batchShaderManager->GetShaderByName("Text_PS");
-	pixelShader2 = batchShaderManager->GetShaderByName("Text_VS");
+	
+	//vertexShader2 = batchShaderManager->GetShaderByName("Text_VS");
+	//pixelShader2 = batchShaderManager->GetShaderByName("Text_PS");
 }
 
 void UTextholderComp::SetText(const FString& textContent)
@@ -72,7 +75,7 @@ void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
 	renderer.SetModel(M, Color, bIsSelected);
 
 	//TODO : use bUseTextTexutre (use if)
-	renderer.SetTextUV(TextInfo, true, true);
+	//renderer.SetTextUV(TextInfo, true, true);
 }
 
 // 동적 타이핑 draw용 : scene에서 draw할 때
@@ -84,16 +87,9 @@ void UTextholderComp::Draw(URenderer& renderer)
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
 
-	//TODO : use bUseTextTexutre (use if)
-	if (isEditable)
-	{
-		renderer.SetShader()
+	//TODO : use bUseTextTexutre (use if) 
+	//renderer.SetShader(vertexShader2, pixelShader2);
 
-	}
-	else
-	{
-		renderer.SetShader()
-	}
 	UpdateConstantBuffer(renderer);
 	RenderTextLine(renderer, true);
 }
@@ -137,9 +133,13 @@ void UTextholderComp::CaptureTypedChars()
 
 void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled)
 {
-	if (!mesh || !mesh->VertexBuffer) return;
-	// atlas  구별 임시 
-	if (camera == nullptr) return;
+	//if (!mesh || !mesh->VertexBuffer) return;
+	//// atlas  구별 임시 
+	//if (camera == nullptr) return;
+
+	//TODO : exchange 
+	USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
+	UCamera* camera = sceneManager->GetScene()->GetCamera();
 
 	// 문자 개수만큼 인스턴스 배열 공간 확보
 	TArray<FTextInstance> instances;
@@ -158,7 +158,7 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 	{
 		//addobject
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
-		renderer.SetTextUV(TextInfo, true, bIsShaderReflectionEnabled);
+		//renderer.SetTextUV(TextInfo, true, bIsShaderReflectionEnabled);
 
 		FTextInstance inst{};
 		if (isEditable)

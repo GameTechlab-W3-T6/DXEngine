@@ -25,20 +25,22 @@ float4 main(PS_INPUT input) : SV_Target
     float2 cellScale = cellSize / texResolution;
     float2 cellOffsetUV = cellIndex * cellScale;
     float2 uv = input.UV * cellScale + cellOffsetUV;
-
-    float4 color;
-
-    if (bUseTextTexture)
-    {
-        float4 textColor = testText.Sample(testSampler, uv);
-        if (textColor.a < 0.1f)
-            discard;
-        //color = textColor; 
-    }
-    else
-    {
-        color = input.Color;
-    }
+     
+    float4 textColor = testText.Sample(testSampler, uv); 
+    if (textColor.a < 0.1f)
+        discard;
     
-    return color;
+    //if (bUseTextTexture)
+    //{
+    //    float4 textColor = testText.Sample(testSampler, uv);
+    //    if (textColor.a < 0.1f)
+    //        discard;
+    //    //color = textColor; 
+    //}
+    //else
+    //{
+    //    color = input.Color;
+    //}
+    
+    return textColor;
 }

@@ -4,7 +4,7 @@
 
 class USceneManager;
 class UTextureManager;
-class Urmsp : public UPrimitiveComponent
+class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
@@ -16,8 +16,14 @@ public:
 private:
 	// Hold those two subsystem due to caching
 	UTextureManager* cachedTextureManager;
-	UInputManager* cachedInputManager;
+	UInputManager* cachedInputManager; 
 	UShader* vertexShader2, * pixelShader2;
+
+	ID3D11VertexShader* cachedVertexShader;
+	ID3D11InputLayout* cachedLayoutTextInst;
+	ID3D11Buffer* cachedTextInstanceVB;
+
+
 	//  TODO : pointer로 들고 있기
 	FTextInfo TextInfo;
 	bool isEditable = true;

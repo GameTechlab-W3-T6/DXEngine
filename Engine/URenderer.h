@@ -66,6 +66,7 @@ private:
 
 	//Text (Instantced Draw) 
 	ID3D11VertexShader* textVertexShaderInst;
+	ID3D11PixelShader* textPixelShaderInst;
 	ID3D11InputLayout* InputLayoutTextInst;
 	ID3D11Buffer* textInstanceVB;
 
