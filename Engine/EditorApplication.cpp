@@ -53,12 +53,14 @@ void EditorApplication::HandleCameraInput(float deltaTime)
 	UCamera* camera = scene->GetCamera();
 	if (!camera) return;
 
+	const float baseSensitivity = ConfigManager::GetConfig("editor")->getFloat("Camera", "Sensitivity") * deltaTime / 100.0f;
+
 	// Mouse look handling
 	if (inputManager.IsMouseLooking())
 	{
 		float mdx = 0.f, mdy = 0.f;
 		inputManager.ConsumeMouseDelta(mdx, mdy);
-		const float mouseSensitivity = 0.0015f;
+		const float mouseSensitivity = baseSensitivity;
 		camera->AddYawPitch(mdx * mouseSensitivity, mdy * mouseSensitivity);
 	}
 

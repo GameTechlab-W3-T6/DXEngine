@@ -34,6 +34,8 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 450)), SceneManager(sceneManager), GizmoManager(gizmoManager)
 {
 	Renderer = renderer;
+	config = ConfigManager::GetConfig("editor");
+
 	for (const auto& registeredType : UClass::GetClassList())
 	{
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
@@ -205,6 +207,15 @@ void UControlPanel::CameraManagementSection()
 	ImGui::EndDisabled();
 
 
+	float cameraSensitivity = config->getFloat("Camera", "Sensitivity");
+
+	ImGui::Text("Camera Sensitivity");
+
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##camera_sensitivity", &cameraSensitivity, 0.01f, 0.0f, 1000.0f, "%.3f"))
+	{
+		config->setFloat("Camera", "Sensitivity", cameraSensitivity);
+	}
 
 	// --- Euler(XYZ) 편집 ---
 	// Location
@@ -295,13 +306,12 @@ void UControlPanel::CameraManagementSection()
 
 void UControlPanel::GridManagementSection()
 {
-	ConfigData* config = ConfigManager::GetConfig("editor");
 	float gridSize = config->getFloat("Gizmo", "GridSize");
 
 	ImGui::Text("Grid Size");
 
 	// DragFloat로 교체
-	if (ImGui::DragFloat("Grid Size", &gridSize, 0.01f, 0.0f, 1000.0f, "%.3f"))
+	if (ImGui::DragFloat("##grid_size", &gridSize, 0.01f, 0.0f, 1000.0f, "%.3f"))
 	{
 		config->setFloat("Gizmo", "GridSize", gridSize);
 	}
