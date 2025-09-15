@@ -56,6 +56,10 @@ private:
 	TUniquePtr<UShader> VertexShader_SR;
 	TUniquePtr<UShader> PixelShader_SR;
 
+	// Gizmo shaders
+	TUniquePtr<UShader> GizmoVertexShader;
+	TUniquePtr<UShader> GizmoPixelShader;
+
 	UShader* currentVertexShader;
 	UShader* currentPixelShader;
 
@@ -187,8 +191,6 @@ public:
 	void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
-	void SetTextUV(FTextInfo& textInfo, bool bUseTextTexture);
-	void SetTextUV(std::nullopt_t, bool bUseTextTexture, bool bIsShaderReflectionEnabled);
 
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
 	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;

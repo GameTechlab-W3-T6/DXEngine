@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "stdafx.h"
+#include "UObjectMacros.h"
 #include "UPrimitiveComponent.h"
 
 class USceneManager;
 class UTextureManager;
-class Urmsp : public UPrimitiveComponent
+class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
@@ -17,7 +18,6 @@ private:
 	// Hold those two subsystem due to caching
 	UTextureManager* cachedTextureManager;
 	UInputManager* cachedInputManager;
-	UShader* vertexShader2, * pixelShader2;
 	//  TODO : pointer로 들고 있기
 	FTextInfo TextInfo;
 	bool isEditable = true;

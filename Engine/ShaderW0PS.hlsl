@@ -24,12 +24,5 @@ float4 main(PS_INPUT input) : SV_Target
     //float2 cellOffsetUV  = cellIndex * cellScale;             
     //float2 uv = input.UV * cellScale + cellOffsetUV; 
 
-   float4 color; 
-
-    float4 textColor = testText.Sample(testSampler, input.UV);
-    if (textColor.a < 0.1f)
-        discard;
-    color = textColor * input.Color;
-    
-    return color;
+   return input.Color;
 }

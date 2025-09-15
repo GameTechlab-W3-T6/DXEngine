@@ -161,7 +161,7 @@ bool URenderer::CreateShader()
 		L"ShaderW0VS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
-		"main_instanced",                   // 진입점 함수명
+		"main",						// 진입점 함수명
 		"vs_5_0",                 // 셰이더 모델
 		0,                        // 컴파일 플래그
 		0,                        // 효과 플래그
@@ -948,7 +948,6 @@ void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
 	FMatrix identity = FMatrix::Identity;
 	FVector4 color(1, 1, 0, 1); // 노란색, 필요하면 파라미터로
 	SetModel(identity, color, true);
-	SetTextUV(std::nullopt, false, true);
 	deviceContext->Draw((UINT)verts.size(), 0);
 }
 
@@ -1187,41 +1186,10 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	{
 		(*currentVertexShader)["ConstantBuffer"]["MVP"] = MVP;
 		(*currentVertexShader)["ConstantBuffer"]["MeshColor"] = color;
-		(*currentVertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
 
 		/** @brief: For now, binding should be done here. */
 		currentVertexShader->Bind(GetDeviceContext(), "ConstantBuffer");
 		currentPixelShader->Bind(GetDeviceContext());
-	}
-}
-
-void URenderer::SetTextUV(FTextInfo& textInfo, bool bUseTextTexture)
-{
-	if (bUseTextTexture)
-	{ 
-		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture; 
-		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");  
-	}
-	else
-	{
-		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
-
-		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
-	}
-}
-
-void URenderer::SetTextUV(std::nullopt_t, bool bUseTextTexture, bool bIsShaderReflectionEnabled)
-{
-	if (bIsShaderReflectionEnabled)
-	{
-		(*PixelShader_SR)["TextTestBuffer"]["bUseTextTexture"] = bUseTextTexture;
-
-		PixelShader_SR->Bind(GetDeviceContext(), "TextTestBuffer");
-	}
-	else
-	{
-		//TOOD
-
 	}
 }
 

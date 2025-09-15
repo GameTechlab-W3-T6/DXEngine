@@ -42,7 +42,6 @@ void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, GetColor(), bIsSelected);
-	renderer.SetTextUV(std::nullopt, false, true);
 }
 
 void UGizmoComponent::Update(float deltaTime)

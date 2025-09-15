@@ -13,6 +13,8 @@ IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
 UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
+UCLASS_META(UTextholderComp, VertexShaderName, "Text_VS")
+UCLASS_META(UTextholderComp, PixelShaderName, "Text_PS");
 
 void UTextholderComp::Initialize()
 {
@@ -33,8 +35,6 @@ void UTextholderComp::Initialize()
 	}
 
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
-	vertexShader2 = batchShaderManager->GetShaderByName("Text_PS");
-	pixelShader2 = batchShaderManager->GetShaderByName("Text_VS");
 }
 
 void UTextholderComp::SetText(const FString& textContent)
@@ -70,9 +70,6 @@ void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected);
-
-	//TODO : use bUseTextTexutre (use if)
-	renderer.SetTextUV(TextInfo, true, true);
 }
 
 // 동적 타이핑 draw용 : scene에서 draw할 때
@@ -83,17 +80,8 @@ void UTextholderComp::Draw(URenderer& renderer)
 	// TODO : delegate로 고치기 -> editable을 on off
 	// 텍스트 입력 먼저 처리 
 	CaptureTypedChars();
-
-	//TODO : use bUseTextTexutre (use if)
-	if (isEditable)
-	{
-		renderer.SetShader()
-
-	}
-	else
-	{
-		renderer.SetShader()
-	}
+	
+	renderer.SetShader(vertexShader, pixelShader);
 	UpdateConstantBuffer(renderer);
 	RenderTextLine(renderer, true);
 }
@@ -158,7 +146,6 @@ void UTextholderComp::RenderTextLine(URenderer& renderer, bool bIsShaderReflecti
 	{
 		//addobject
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
-		renderer.SetTextUV(TextInfo, true, bIsShaderReflectionEnabled);
 
 		FTextInstance inst{};
 		if (isEditable)

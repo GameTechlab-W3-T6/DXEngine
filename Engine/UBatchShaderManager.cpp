@@ -18,6 +18,10 @@ void UBatchShaderManager::Initialize(ID3D11Device* Device)
 	LoadShaderFromFile(Device, EShaderType::PixelShader, "DefaultPS.hlsl", "main", "Pixel");
 	LoadShaderFromFile(Device, EShaderType::VertexShader, "ShaderW0VS.hlsl", "main", "Text_VS");
 	LoadShaderFromFile(Device, EShaderType::PixelShader, "ShaderW0PS.hlsl", "main", "Text_PS");
+
+	// Gizmo shaders
+	LoadShaderFromFile(Device, EShaderType::VertexShader, "GizmoVS.hlsl", "main", "GizmoVertex");
+	LoadShaderFromFile(Device, EShaderType::PixelShader, "GizmoPS.hlsl", "main", "GizmoPixel");
 }
 
 void UBatchShaderManager::LoadShaderFromFile(ID3D11Device* Device, EShaderType ShaderType, const std::filesystem::path& FilePath, const FString& EntryPoint, const FString& Name)

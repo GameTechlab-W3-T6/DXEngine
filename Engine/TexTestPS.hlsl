@@ -11,8 +11,6 @@ cbuffer TextConstantBuffer : register(b0)
     float2 cellIndex;
     float2 cellSize;
     float2 texResolution;
-    int bUseTextTexture;
-    //float padding; 
 };
 
 Texture2D testText : register(t0);
@@ -28,17 +26,10 @@ float4 main(PS_INPUT input) : SV_Target
 
     float4 color;
 
-    if (bUseTextTexture)
-    {
-        float4 textColor = testText.Sample(testSampler, uv);
-        if (textColor.a < 0.1f)
-            discard;
-        //color = textColor; 
-    }
-    else
-    {
-        color = input.Color;
-    }
+    float4 textColor = testText.Sample(testSampler, uv);
+    if (textColor.a < 0.1f)
+        discard;
+    //color = textColor; 
     
     return color;
 }

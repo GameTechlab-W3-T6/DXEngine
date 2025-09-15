@@ -317,6 +317,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="editor.default.ini" />
+    <None Include="editor.ini" />
     <None Include="ShaderW0.ps">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
