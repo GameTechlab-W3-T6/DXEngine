@@ -5,12 +5,13 @@
 #include "UObject.h"
 #include "USceneComponent.h"
 #include "UPrimitiveComponent.h"
+#include "UStaticMeshComponent.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
 #include "UCamera.h" 
 #include "UTextureManager.h"
-#include "UTextholderComp.h"
 #include "FTextInfo.h"
+#include "UTextholderComp.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -43,7 +44,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im, UText
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager, inputManager, textureManager, camera);
+			primitive->Init(renderer, meshManager, inputManager, textureManager, camera);
 		}
 	}
 
@@ -84,13 +85,9 @@ void UScene::AddObject(USceneComponent* obj, bool hasText)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		if (hasText)
+		// if (hasText)
 		{
-			primitive->Init(meshManager, inputManager, textureManager, camera);
-		}
-		else
-		{
-			primitive->Init(meshManager, inputManager, textureManager);
+			primitive->Init(renderer, meshManager, inputManager, textureManager, camera);
 		}
 		if (obj->CountOnInspector())
 			++primitiveCount;
@@ -176,12 +173,18 @@ void UScene::Render(bool bIsShaderReflectionEnabled)
 		{
 			if (primitive->bVisible)
 			{
-				if (primitive->GetTextTexture() == nullptr)
-					primitive->Draw(*renderer, false, bIsShaderReflectionEnabled);
+				if (UStaticMeshComponent* staticMesh = primitive->Cast<UStaticMeshComponent>())
+				{
+					staticMesh->Draw(*renderer, false, bIsShaderReflectionEnabled);
+				}
 				else
-					primitive->Draw(*renderer, true, bIsShaderReflectionEnabled);
+				{
+					if (primitive->GetTextTexture() == nullptr)
+						primitive->Draw(*renderer, false, bIsShaderReflectionEnabled);
+					else
+						primitive->Draw(*renderer, true, bIsShaderReflectionEnabled);
+				}
 			}
-
 		}
 	}
 }
@@ -208,9 +211,11 @@ void UScene::Update(float deltaTime)
 		const float sens = 0.005f; // 일단 크게 해서 동작 확인
 		camera->AddYawPitch(mdx * sens, mdy * sens);
 	}
+
+	// TODO : delete/move after test
 	if (inputManager->IsKeyPressed(VK_CONTROL))
 	{
-		AddObject(new UTextholderComp, true);
+		AddObject(new UTextholderComp, true); 
 	}
 
 	static float t = 0.0f; t += deltaTime;

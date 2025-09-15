@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UPrimitiveComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
@@ -14,31 +14,22 @@
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 UCLASS_META(UPrimitiveComponent, TextInfo, "TextInfo");
 
-bool UPrimitiveComponent::Init(UMeshManager* meshManager, UInputManager* in, UTextureManager* tm, UCamera* cam)
+bool UPrimitiveComponent::Init(URenderer* rd, UMeshManager* mM, UInputManager* im, UTextureManager* tm, UCamera* cam)
 {
-	inputManager = in;
+	renderer = rd;
+	inputManager = im;
 	textureManager = tm;
-	/*
-	if (textureManager && meshManager)
-	{
-		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
-		texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextureType")); 
-		
-		FTexture* textTex = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo")); 
-		textInfo->SetParam(textTex, 16, 16); 
-		camera = cam;
+	meshManager = mM;
+	camera = cam;
 
-		return mesh != nullptr;
-	}*/
+	if (!meshManager)
+		return false;
 
-	if (meshManager)
-	{
-		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
-		return mesh != nullptr;
-	}
-	 
+	mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
+	// 해당 primitive의 texture
+	texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 
-	return false;
+	return mesh != nullptr;
 }
 
 void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer, bool bUseTextTexture, bool bIsShaderReflectionEnabled)

@@ -193,7 +193,10 @@
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="UTextholderComp.cpp">
-      <Filter>Engine\Subsystem</Filter>
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UStaticMeshComponent.cpp">
+      <Filter>Engine\Core\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -377,8 +380,16 @@
     <ClInclude Include="FTextInfo.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="DynamicBuffer.h" />
+    <ClInclude Include="IniFile.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderReflection.h" />
     <ClInclude Include="UTextholderComp.h">
-      <Filter>Engine\Subsystem</Filter>
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTypes.h" />
+    <ClInclude Include="UStaticMeshComponent.h">
+      <Filter>Engine\Core\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

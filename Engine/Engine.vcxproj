@@ -232,6 +232,7 @@
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTextholderComp.cpp" />
     <ClCompile Include="UTextureManager.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="RenderTypes.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
     <ClInclude Include="UCamera.h" />
@@ -296,6 +298,7 @@
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="UTextholderComp.h" />
     <ClInclude Include="UTextureManager.h" />

@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "URenderer.h"
-#include "UPrimitiveComponent.h"
+#include "UStaticMeshComponent.h"
 #include "Vector.h"
 
-class UPlaneComp : public UPrimitiveComponent
+class UPlaneComp : public UStaticMeshComponent
 {
-	DECLARE_UCLASS(UPlaneComp, UPrimitiveComponent)
+	DECLARE_UCLASS(UPlaneComp, UStaticMeshComponent)
 private:
 	bool IsManageable() override { return true; }
 public:
