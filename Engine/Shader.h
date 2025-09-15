@@ -13,9 +13,11 @@
 class UShader
 {
 public:
+	using ShaderID = uint8_t;
+
 	~UShader() = default;
 
-	UShader(ID3D11Device* Device, EShaderType InShaderType, const std::filesystem::path& FilePath, const FString& EntryPoint)
+	UShader(ID3D11Device* Device, ShaderID ID, EShaderType InShaderType, const std::filesystem::path& FilePath, const FString& EntryPoint)
 		: ShaderType(InShaderType)
 	{
 		if (!std::filesystem::exists(FilePath))
@@ -100,6 +102,22 @@ public:
 		return ShaderReflection->GetConstantDynamicBuffer(Name)[0];
 	}
 
+	ShaderID GetID() const
+	{
+		return ID;
+	}
+
+	void BindConstantBuffer(ID3D11DeviceContext* DeviceContext, const FString& BufferName)
+	{
+		ShaderReflection->Bind(DeviceContext, BufferName);
+	}
+
+	template<typename... TBufferNames>
+	void BindConstantBuffers(ID3D11DeviceContext* DeviceContext, TBufferNames&&... BufferNames)
+	{
+		(ShaderReflection->Bind(DeviceContext, std::forward<TBufferNames>(BufferNames)), ...);
+	}
+
 	template<typename... TBufferNames>
 	void Bind(ID3D11DeviceContext* DeviceContext, TBufferNames&&... BufferNames)
 	{
@@ -117,10 +135,13 @@ public:
 			break;
 		}
 
-		(ShaderReflection->Bind(DeviceContext, std::forward<TBufferNames>(BufferNames)), ...);
+		/** @todo: Remove? */
+		BindConstantBuffers(DeviceContext, std::forward<TBufferNames>(BufferNames)...);
 	}
 
 private:
+	ShaderID ID;
+
 	EShaderType ShaderType;
 
 	/** Composite Shader Reflection class. Unique pointer for creating it inside constructor. */

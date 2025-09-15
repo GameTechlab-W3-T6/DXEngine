@@ -213,7 +213,7 @@ TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int32 
 	// Main axis lines (X, Y, Z)
 	// --------------------------
 
-	float axisLength = gridSize * gridCount * 1.2f; // make them extend a bit beyond the grid
+	float axisLength = gridSize * gridCount;
 
 	// Positive side colors (strong RGB)
 	FVector4 xPos(1.0f, 0.0f, 0.0f, 1.0f); // red

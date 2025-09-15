@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
+#include "Shader.h"
 #include "USceneComponent.h"
 #include "Vector.h"
 
@@ -22,15 +23,15 @@ public:
 
 	bool bIsSelected = false;
 
-	bool Init(UMeshManager* meshManager);
+	bool Init();
 	bool CountOnInspector() override { return true; }
 
 	FMatrix GetWorldTransform() override;
 
 	virtual void Update(float deltaTime);
-	virtual void Draw(URenderer& renderer, bool bIsShaderReflectionEnabled);
-	virtual void DrawOnTop(URenderer& renderer, bool bIsShaderReflectionEnabled);
-	virtual void UpdateConstantBuffer(URenderer& renderer, bool bIsShaderReflectionEnabled);
+	virtual void Draw(URenderer& renderer);
+	virtual void DrawOnTop(URenderer& renderer);
+	virtual void UpdateConstantBuffer(URenderer& renderer);
 
 	UMesh* GetMesh() { return mesh; }
 
@@ -48,5 +49,6 @@ public:
 
 protected:
 	UMesh* mesh;
+	UShader* vertexShader, * pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 };

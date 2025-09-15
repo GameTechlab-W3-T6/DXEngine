@@ -86,6 +86,8 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
+	batchShaderManager.Initialize(renderer.GetDevice());
+
 	if (!sceneManager.Initialize(g_pApplication))
 	{
 		MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
@@ -113,7 +115,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	return true;
 }
 
-void UApplication::Run(bool bIsShaderReflectionEnabled)
+void UApplication::Run()
 {
 	if (!bIsInitialized)
 		return;
@@ -129,7 +131,7 @@ void UApplication::Run(bool bIsShaderReflectionEnabled)
 			break;
 
 		InternalUpdate();
-		InternalRender(bIsShaderReflectionEnabled);
+		InternalRender();
 
 		timeManager.EndFrame();
 		timeManager.WaitForTargetFrameTime();
@@ -164,12 +166,12 @@ void UApplication::Update(float deltaTime)
 	sceneManager.GetScene()->Update(deltaTime);
 }
 
-void UApplication::Render(bool bIsShaderReflectionEnabled)
+void UApplication::Render()
 {
 	// Base class render - handles GUI rendering
 	// Derived classes should call this after their rendering
 
-	sceneManager.GetScene()->Render(bIsShaderReflectionEnabled);
+	sceneManager.GetScene()->Render();
 }
 
 bool UApplication::CreateMainWindow(HINSTANCE hInstance)
@@ -241,14 +243,14 @@ void UApplication::InternalUpdate()
 	Update(deltaTime);
 }
 
-void UApplication::InternalRender(bool bIsShaderReflectionEnabled)
+void UApplication::InternalRender()
 {
 	// Prepare rendering
 	renderer.Prepare();
-	renderer.PrepareShader(bIsShaderReflectionEnabled);
+	renderer.PrepareShader();
 
 	// Call derived class render
-	Render(bIsShaderReflectionEnabled);
+	Render();
 
 	// Render GUI
 	gui.BeginFrame();
