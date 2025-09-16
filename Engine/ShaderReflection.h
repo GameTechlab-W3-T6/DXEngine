@@ -103,6 +103,11 @@ public:
 			ReflectConstantBuffer(ShaderReflectionConstantBuffer, &Layout);
 			ConstantDynamicBufferMap.try_emplace(ShaderBufferDesc.Name, std::move(Layout));
 		}
+
+		VertexBufferElementLayout.Finalize();
+		std::stringstream ss;
+		VertexBufferElementLayout.Print(ss);
+		UE_LOG(ss.str().c_str());
 	}
 
 	/** @brief Deleted copy and move constructors to prevent unwanted object copies. */

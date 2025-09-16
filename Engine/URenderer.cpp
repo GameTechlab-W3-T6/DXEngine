@@ -326,11 +326,11 @@ bool URenderer::CreateShader()
 	// Load pixel shader from file
 	ID3DBlob* psBlob = nullptr;
 	hr = D3DCompileFromFile(
-		L"ShaderW0PS.hlsl",           // 파일 경로
+		L"TexTestVS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
-		"ps_5_0",                 // 셰이더 모델
+		"vs_5_0",                 // 셰이더 모델
 		0,                        // 컴파일 플래그
 		0,                        // 효과 플래그
 		&psBlob,                  // 컴파일된 셰이더
@@ -341,7 +341,7 @@ bool URenderer::CreateShader()
 	{
 		if (errorBlob)
 		{
-			OutputDebugStringA("Pixel Shader Compile Error:\n");
+			OutputDebugStringA("Vertex Shader Compile Error:\n");
 			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 			SAFE_RELEASE(errorBlob);
 		}
@@ -857,12 +857,13 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 	// UPDATE CONSTABUFFER 
 	//UpdateTextInstanceVB(instances);
 
-	Component->BindShader(*this);
+	Component->UpdateConstantBuffer(*this);
 
+	Component->BindShader(*this); 
 	Component->BindTexture(*this);
-
+	
 	D3D11_MAPPED_SUBRESOURCE m{};
-
+	
 	DeviceContext->Map(textInstanceVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
 	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
 	DeviceContext->Unmap(textInstanceVB, 0);
@@ -871,7 +872,7 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 	// vertexshader inputlayout을 intaced draw 용으로 교체
 	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };
 	UINT strides[2] = { text->Stride, (UINT)sizeof(FTextInstance) };
-	UINT offsets[2] = { 0, 0 };
+	UINT offsets[2] = { 0, 40 };
 
 	DeviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
 	DeviceContext->IASetPrimitiveTopology(text->PrimitiveType);
@@ -1204,7 +1205,7 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 	{
 		(*currentVertexShader)["ConstantBuffer"]["MVP"] = MVP;
 		(*currentVertexShader)["ConstantBuffer"]["MeshColor"] = color;
-		(*currentVertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
+		//(*currentVertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
 
 		/** @brief: For now, binding should be done here. */
 		currentVertexShader->Bind(GetDeviceContext(), "ConstantBuffer");
