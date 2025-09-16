@@ -186,6 +186,13 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColorUV4& vertex
 	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
 
+FVector URaycastManager::TransformVertexToWorld(const FVector& vertex, const FMatrix& world)
+{
+	FVector4 pos4(vertex.X, vertex.Y, vertex.Z, 0.0f);
+	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
+	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
+}
+
 // bool RaycastManager::RayIntersectsSphere(FVector& rayOrigin, FVector& rayDirection, USphereComp& sphere, float& tHit)
 // {
 //     // R(t) = O + tD
@@ -256,3 +263,38 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 
 	return resultRay;
 }
+
+
+bool URaycastManager::MakeAABBInfo(UMesh* mesh, FMatrix M, FVector& outMin, FVector& outMax)
+{
+	if (mesh->Vertices.size() == 0) return false;
+
+	float maxPos[3] = { INT_MIN, INT_MIN, INT_MIN };
+	float minPos[3] = { INT_MAX, INT_MAX,INT_MAX };
+
+	auto UpdateMinMax = [&](const FVector4& p)
+	{
+			minPos[0] = (p.X < minPos[0]) ? p.X : minPos[0];
+			minPos[1] = (p.Y < minPos[1]) ? p.Y : minPos[1];
+			minPos[2] = (p.Z < minPos[2]) ? p.Z : minPos[2]; 
+
+			// max 갱신: 더 크면 교체
+			maxPos[0] = (p.X > maxPos[0]) ? p.X : maxPos[0];
+			maxPos[1] = (p.Y > maxPos[1]) ? p.Y : maxPos[1];
+			maxPos[2] = (p.Z > maxPos[2]) ? p.Z : maxPos[2]; 
+	};
+
+	for (auto v : mesh->Vertices)
+	{
+		UpdateMinMax( FMatrix::MultiplyVectorRow( { v.x, v.y, v.z, 1.0f}, M ));
+	}
+
+	outMin.X = minPos[0];
+	outMin.Y = minPos[1];
+	outMin.Z = minPos[2];
+
+	outMax.X = maxPos[0];
+	outMax.Y = maxPos[1];
+	outMax.Z = maxPos[2];
+}
+  
