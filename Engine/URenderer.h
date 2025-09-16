@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "UPrimitiveComponent.h"
 #include "UGizmoComponent.h"
+#include "UTextholderComp.h"
 #include "UEngineSubsystem.h"
 
 class UPrimitiveComponent;
@@ -42,10 +43,10 @@ public:
 	void ReleaseConstantBuffer();
 
 	/** Buffer */
-	ID3D11Buffer* CreateVertexBuffer(const void* Data, size_t Size);
-	ID3D11Buffer* CreateIndexBuffer(const void* Data, size_t Size);
-	bool ReleaseVertexBuffer(ID3D11Buffer* Buffer);
-	bool ReleaseIndexBuffer(ID3D11Buffer* Buffer);
+	[[deprecated]] ID3D11Buffer* CreateVertexBuffer(const void* Data, size_t Size);
+	[[deprecated]] ID3D11Buffer* CreateIndexBuffer(const void* Data, size_t Size);
+	[[deprecated]] bool ReleaseVertexBuffer(ID3D11Buffer* Buffer);
+	[[deprecated]] bool ReleaseIndexBuffer(ID3D11Buffer* Buffer);
 
 	/** Texture */
 	ID3D11Texture2D* CreateTexture2D(int32 Width, int32 Height, DXGI_FORMAT Format, const void* Data = nullptr);
@@ -86,6 +87,16 @@ protected:
 
 	ID3D11Buffer* ConstantBuffer;
 
+	// =================================================== //
+	// Text
+	ID3D11VertexShader* textVertexShaderInst;
+	ID3D11PixelShader* textPixelShaderInst;
+	ID3D11InputLayout* InputLayoutTextInst;
+	ID3D11Buffer* textInstanceVB;
+
+	// =================================================== //
+
+
 	/** Window handle */
 	HWND hWnd;
 
@@ -116,16 +127,17 @@ public:
 
 	virtual void DrawPrimitiveComponent(UPrimitiveComponent* component);
 	virtual void DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop = false);
+	virtual void DrawTextholderComponent(UTextholderComp* Component);
 
 	/** @note: These helper functions use Draw() or DrawMesh() Internally. */
 	void DrawLine(UMesh* Mesh);
 	void DrawMeshOnTop(UMesh* Mesh);
 
 	/** Resource binding */
-	void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
-	void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
-	void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
-	void SetShader(UShader* vertexShader, UShader* pixelShader);
+	[[deprecated]] void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
+	[[deprecated]] void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
+	[[deprecated]] void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
+	[[deprectead]] void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
 	void SetRasterizerMode(bool bIsSolid);
 

@@ -169,6 +169,12 @@ void UScene::Update(float deltaTime)
 	{
 		camera->SetAspect((float)backBufferWidth / (float)backBufferHeight);
 	}
+
+	// TODO : delete/move after test
+	if (inputManager->IsKeyPressed(VK_CONTROL))
+	{
+		AddObject(new UTextholderComp);
+	}
 }
 
 bool UScene::OnInitialize()

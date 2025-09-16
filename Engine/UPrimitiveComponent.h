@@ -8,7 +8,12 @@
 #include "ConfigData.h"
 #include "ConfigManager.h"
 
+#include "FTextInfo.h"
+
 class UMeshManager; // 전방 선언
+class UTextureManager;
+//class UCamera;
+class FTexture;
 
 /**
  * @brief Renderable component with mesh and material properties
@@ -20,6 +25,7 @@ public:
 	using LayerID = uint32;
 protected:
 	UMesh* mesh;
+	FTexture* texture;
 	UShader* vertexShader, *pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 	bool cachedIsShaderReflectionEnabled;
@@ -31,6 +37,7 @@ public:
 		cachedIsShaderReflectionEnabled = editorConfig->getBool("Graphics", "ShaderReflection");
 	}
 
+	bool bIsVisible = true;
 	bool bIsSelected = false;
 
 	virtual void UpdateConstantBuffer(URenderer& renderer);
@@ -42,6 +49,8 @@ public:
 	void BindShader(URenderer& renderer);
 
 	void BindMesh(URenderer& renderer);
+
+	void BindTexture(URenderer& renderer);
 
 	virtual void Draw(URenderer& renderer);
 

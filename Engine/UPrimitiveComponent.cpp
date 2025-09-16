@@ -1,15 +1,20 @@
 ﻿#include "stdafx.h"
-#include "UPrimitiveComponent.h"
-#include "UMeshManager.h"
-#include "URenderer.h"
 #include "ConfigManager.h"
+#include "FTextInfo.h"
+#include "FTexture.h"
 #include "UBatchShaderManager.h"
+//#include "UInputManager.h"
+#include "UMeshManager.h"
+#include "UPrimitiveComponent.h"
+#include "URenderer.h"
+#include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 bool UPrimitiveComponent::Init()
 {
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
+	UTextureManager* textureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	if (meshManager)
 	{
 		mesh = meshManager->GetMesh(GetClass()->GetMeta("MeshName"));
@@ -28,6 +33,7 @@ bool UPrimitiveComponent::Init()
 		pixelShader = batchShaderManager->GetShaderByName(pixelShaderName);
 	}
 
+	//texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 	return mesh && vertexShader && pixelShader;
 }
 
@@ -59,6 +65,12 @@ void UPrimitiveComponent::BindShader(URenderer& renderer)
 void UPrimitiveComponent::BindMesh(URenderer& renderer)
 {
 	mesh->Bind(renderer.GetDeviceContext());
+}
+
+void UPrimitiveComponent::BindTexture(URenderer& renderer)
+{
+	/** @todo: Hard-coded slot number. */
+	texture->Bind(renderer.GetDeviceContext(), 0);
 }
 
 void UPrimitiveComponent::Draw(URenderer& renderer)

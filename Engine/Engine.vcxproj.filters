@@ -189,6 +189,15 @@
     </ClCompile>
     <ClCompile Include="UBatchShaderManager.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="UTextholderComp.cpp">
+      <Filter>Engine\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UTextureManager.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FTextInfo.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -370,14 +379,46 @@
     </ClInclude>
     <ClInclude Include="UBatchShaderManager.h" />
     <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="UTextholderComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UTextureManager.h">
+      <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FTextInfo.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FTexture.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ShaderW0.ps">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="ShaderW0.vs">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="editor.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="TexTestVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexTestPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderW0VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderW0PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="GizmoVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="GizmoPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

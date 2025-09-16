@@ -92,6 +92,7 @@ bool URenderer::Initialize(HWND InhWnd)
 	return true;
 }
 
+/*
 bool URenderer::CreateShader()
 {
 	// Load vertex shader from file
@@ -99,7 +100,7 @@ bool URenderer::CreateShader()
 	ID3DBlob* ShaderErrorBlob = nullptr;
 
 	HRESULT hResult = D3DCompileFromFile(
-		L"ShaderW0.vs",           // 파일 경로
+		L"ShaderW0VS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
@@ -154,7 +155,7 @@ bool URenderer::CreateShader()
 	// Load pixel shader from file
 	ID3DBlob* PixelShaderBlob = nullptr;
 	hResult = D3DCompileFromFile(
-		L"ShaderW0.ps",           // 파일 경로
+		L"ShaderW0PS.hlsl",           // 파일 경로
 		nullptr,                  // 매크로 정의
 		nullptr,                  // Include 핸들러
 		"main",                   // 진입점 함수명
@@ -187,11 +188,218 @@ bool URenderer::CreateShader()
 
 	return CheckResult(hResult, "CreatePixelShader");
 }
+*/
+
+
+bool URenderer::CreateShader()
+{
+	// Load vertex shader from file
+	ID3DBlob* vsBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+
+	HRESULT hr = D3DCompileFromFile(
+		L"ShaderW0VS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main",                   // 진입점 함수명
+		"vs_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&vsBlob,                  // 컴파일된 셰이더
+		&errorBlob                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA("Vertex Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			SAFE_RELEASE(errorBlob);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load vertex shader file: ShaderW0.vs\n");
+		}
+		return false;
+	}
+
+	// Create vertex shader
+	hr = Device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+		nullptr, &VertexShader);
+	if (!CheckResult(hr, "CreateVertexShader"))
+	{
+		SAFE_RELEASE(vsBlob);
+		return false;
+	}
+
+	// Create input layout
+	//D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	//};
+
+	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0 ,16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
+	hr = Device->CreateInputLayout(inputElements, ARRAYSIZE(inputElements),
+		vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+		&InputLayout);
+
+	SAFE_RELEASE(vsBlob);
+
+	if (!CheckResult(hr, "CreateInputLayout"))
+	{
+		return false;
+	}
+
+	ID3DBlob* vsBlobInst = nullptr;
+	ID3DBlob* errorBlobInst = nullptr;
+	hr = D3DCompileFromFile(
+		L"TexTestVS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main",						// 진입점 함수명
+		"vs_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&vsBlobInst,                // 컴파일된 셰이더
+		&errorBlobInst                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlobInst)
+		{
+			OutputDebugStringA("Instanced Vertex Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlobInst->GetBufferPointer());
+			SAFE_RELEASE(errorBlobInst);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load Instanced vertex shader file: ShaderW0.vs\n");
+		}
+		return false;
+	}
+
+	// Create vertex shader
+	hr = Device->CreateVertexShader(vsBlobInst->GetBufferPointer(), vsBlobInst->GetBufferSize(),
+		nullptr, &textVertexShaderInst);
+	if (!CheckResult(hr, "CreateInstancedVertexShader"))
+	{
+		SAFE_RELEASE(vsBlobInst);
+		return false;
+	}
+
+
+	D3D11_INPUT_ELEMENT_DESC textInput[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0 ,16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD",    0,  DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+
+		// instanced
+		{ "INST_M", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INST_M", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INST_M", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_UV_OFFSET", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_UV_SCALE",  0, DXGI_FORMAT_R32G32_FLOAT, 1, 56, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+		{ "INST_COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+	};
+
+	hr = Device->CreateInputLayout(textInput, ARRAYSIZE(textInput),
+		vsBlobInst->GetBufferPointer(), vsBlobInst->GetBufferSize(),
+		&InputLayoutTextInst);
+	if (!CheckResult(hr, "CreateInstanced InpuyLayout"))
+	{
+		//DumpVSInputSignature(vsBlobInst);
+		SAFE_RELEASE(vsBlobInst);
+		return false;
+	}
+	// Load pixel shader from file
+	ID3DBlob* psBlob = nullptr;
+	hr = D3DCompileFromFile(
+		L"ShaderW0PS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main",                   // 진입점 함수명
+		"ps_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&psBlob,                  // 컴파일된 셰이더
+		&errorBlob                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA("Pixel Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			SAFE_RELEASE(errorBlob);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load pixel shader file: ShaderW0.ps\n");
+		}
+		return false;
+	}
+
+	// Create pixel shader
+	hr = Device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
+		nullptr, &PixelShader);
+	SAFE_RELEASE(psBlob);
+
+	// Load pixel shader from file
+	ID3DBlob* psBlobIns = nullptr;
+	hr = D3DCompileFromFile(
+		L"TexTestPS.hlsl",           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		"main",                   // 진입점 함수명
+		"ps_5_0",                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&psBlobIns,                  // 컴파일된 셰이더
+		&errorBlob                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA("Pixel Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			SAFE_RELEASE(errorBlob);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load pixel shader file: ShaderW0.ps\n");
+		}
+		return false;
+	}
+
+	// Create pixel shader
+	hr = Device->CreatePixelShader(psBlobIns->GetBufferPointer(), psBlobIns->GetBufferSize(),
+		nullptr, &textPixelShaderInst);
+
+	SAFE_RELEASE(psBlobIns);
+
+
+	return CheckResult(hr, "CreatePixelShader");
+}
 
 bool URenderer::CreateShader_SR()
 {
-	VertexShader_SR = MakeUnique<UShader>(GetDevice(), 0, EShaderType::VertexShader, std::filesystem::path("ShaderW0.vs"), "main");
-	PixelShader_SR = MakeUnique<UShader>(GetDevice(), 1, EShaderType::PixelShader, std::filesystem::path("ShaderW0.ps"), "main");
+	VertexShader_SR = MakeUnique<UShader>(GetDevice(), 0, EShaderType::VertexShader, std::filesystem::path("ShaderW0VS.hlsl"), "main");
+	PixelShader_SR = MakeUnique<UShader>(GetDevice(), 1, EShaderType::PixelShader, std::filesystem::path("ShaderW0PS.hlsl"), "main");
 
 	return true;
 }
@@ -622,6 +830,38 @@ void URenderer::DrawGizmoComponent(UGizmoComponent* component, bool drawOnTop)
 	SAFE_RELEASE(pDSState);
 
 	IncrementDepthStencilViewClearCount();
+}
+
+void URenderer::DrawTextholderComponent(UTextholderComp* Component)
+{
+	auto instances = Component->GetInstance();
+	auto text = Component->GetMesh();
+
+	//if (!text || instances.empty()) return;
+
+	// UPDATE CONSTABUFFER 
+	//UpdateTextInstanceVB(instances);
+
+	Component->BindShader(*this);
+
+	Component->BindTexture(*this);
+
+	D3D11_MAPPED_SUBRESOURCE m{};
+
+	DeviceContext->Map(textInstanceVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
+	DeviceContext->Unmap(textInstanceVB, 0);
+
+	// 이전 상태 백업하고
+	// vertexshader inputlayout을 intaced draw 용으로 교체
+	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };
+	UINT strides[2] = { text->Stride, (UINT)sizeof(FTextInstance) };
+	UINT offsets[2] = { 0, 0 };
+
+	DeviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
+	DeviceContext->IASetPrimitiveTopology(text->PrimitiveType);
+
+	DeviceContext->DrawInstanced(text->NumVertices, (UINT)instances.size(), 0, 0);
 }
 
 [[deprecated]] void URenderer::DrawMeshOnTop(UMesh* Mesh)
