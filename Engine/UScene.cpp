@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
+#include "UApplication.h"
 #include "UObject.h"
 #include "USceneComponent.h"
 #include "UPrimitiveComponent.h"
@@ -26,8 +27,9 @@ UScene::~UScene()
 	delete camera;
 }
 
-bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
+bool UScene::Initialize(UApplication* app, URenderer* r, UMeshManager* mm, UInputManager* im)
 {
+	application = app;
 	renderer = r;
 	meshManager = mm;
 	inputManager = im;
@@ -209,6 +211,7 @@ void UScene::Update(float deltaTime)
 		sceneManager->GetScene()->RemoveObject(component);
 		inputManager->UnregisterCallbacks(std::to_string(component->InternalIndex));
 		GUObjectArray.erase(std::find(GUObjectArray.begin(), GUObjectArray.end(), component));
+		application->OnObjectDestroyed(component);
 		delete(component);
 	}
 

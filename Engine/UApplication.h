@@ -58,6 +58,8 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Render();
 
+	virtual void OnObjectDestroyed(UObject* obj){}
+
 	// System access
 	URenderer& GetRenderer() { return *renderer; }
 	UMeshManager& GetMeshManager() { return meshManager; }

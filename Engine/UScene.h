@@ -23,6 +23,7 @@ protected:
 	TArray<USceneComponent*> objects;
 
 	// Reference from outside
+	UApplication* application;
 	URenderer* renderer;
 	UMeshManager* meshManager;
 	UInputManager* inputManager;
@@ -37,7 +38,7 @@ protected:
 public:
 	UScene();
 	virtual ~UScene();
-	virtual bool Initialize(URenderer* r, UMeshManager* mm, UInputManager* im = nullptr);
+	virtual bool Initialize(UApplication* app, URenderer* r, UMeshManager* mm, UInputManager* im = nullptr);
 
 	virtual void Render();
 	virtual void Update(float deltaTime);

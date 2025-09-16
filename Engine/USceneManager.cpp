@@ -16,6 +16,7 @@ bool USceneManager::Initialize(UApplication* _application)
 	application = _application;
 	currentScene = _application->CreateDefaultScene();
 	currentScene->Initialize(
+		application,
 		&application->GetRenderer(),
 		&application->GetMeshManager(),
 		&application->GetInputManager());
@@ -37,6 +38,7 @@ void USceneManager::SetScene(UScene* scene)
 	currentScene = scene;
 
 	currentScene->Initialize(
+		application,
 		&application->GetRenderer(),
 		&application->GetMeshManager(),
 		&application->GetInputManager());

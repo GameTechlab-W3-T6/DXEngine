@@ -226,9 +226,13 @@ void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 
 void EditorApplication::HandleEmptySpaceClick()
 {
+	ResetSelectedTarget();
+}
+
+void EditorApplication::ResetSelectedTarget()
+{
 	gizmoManager.SetTarget(nullptr);
 	propertyWindow->SetTarget(nullptr);
-
 }
 
 void EditorApplication::Render()
@@ -321,5 +325,16 @@ void EditorApplication::HandlePrimitiveSelect(UPrimitiveComponent* Component)
 	if (Component->IsManageable())
 	{
 		propertyWindow->SetTarget(Component);
+	}
+}
+
+void EditorApplication::OnObjectDestroyed(UObject* obj)
+{
+	if (USceneComponent* component = obj->Cast<USceneComponent>())
+	{
+		if (selectedSceneComponent == component)
+		{
+			ResetSelectedTarget();
+		}
 	}
 }

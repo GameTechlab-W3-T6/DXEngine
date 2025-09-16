@@ -41,6 +41,7 @@ public:
 
 	/** @brief: API for selecting objects through various methods(e.g., Line Casting, Heirarchy window, etc...).*/
 	void HandlePrimitiveSelect(UPrimitiveComponent* Component);
+	void OnObjectDestroyed(UObject* obj);
 
 protected:
 	void Update(float deltaTime) override;
@@ -63,4 +64,5 @@ private:
 	void HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint);
 	void HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive);
 	void HandleEmptySpaceClick();
+	void ResetSelectedTarget();
 };
