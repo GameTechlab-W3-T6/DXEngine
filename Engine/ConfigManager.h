@@ -43,9 +43,9 @@ public:
 		return GetInstance()->GetConfigInternal(configName);
 	}
 
-	static std::map<std::string, std::string>& GetSection(const FString& configName, const std::string& sectionName)
+	static std::map<FString, FString>& GetSection(const FString& configName, const FString& sectionName)
 	{
-		static std::map<std::string, std::string> emptySection;
+		static std::map<FString, FString> emptySection;
 
 		ConfigData* config = GetConfig(configName);
 		if (!config)
@@ -58,14 +58,14 @@ public:
 		if (it == config->data.end())
 		{
 			// Create new section if it doesn't exist
-			config->data[sectionName] = std::map<std::string, std::string>();
+			config->data[sectionName] = std::map<FString, FString>();
 			return config->data[sectionName];
 		}
 
 		return it->second;
 	}
 
-	static std::string GetValue(const FString& configName, const std::string& sectionName, const std::string& key, const std::string& defaultValue = "")
+	static FString GetValue(const FString& configName, const FString& sectionName, const FString& key, const FString& defaultValue = "")
 	{
 		ConfigData* config = GetConfig(configName);
 		if (!config)

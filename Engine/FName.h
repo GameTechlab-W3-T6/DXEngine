@@ -5,7 +5,7 @@
 struct FName
 {
 private:
-	static inline TArray<std::string> data;
+	static inline TArray<FString> data;
 	static inline int nextIndex = 0;
 public:
 	int32 DisplayIndex;
@@ -28,6 +28,6 @@ public:
 	bool operator==(const FName& other) const {
 		return Compare(other) == 0;
 	}
-	std::string ToString() const { return data[DisplayIndex]; }
+	FString ToString() const { return data[DisplayIndex]; }
 };
 
