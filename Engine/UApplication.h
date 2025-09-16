@@ -10,6 +10,7 @@
 #include "USceneManager.h"
 #include "UGizmoManager.h"
 #include "UBatchShaderManager.h"
+#include "UTextureManager.h"
 
 /**
  * @brief Main application class managing the engine's core systems and lifecycle
@@ -28,6 +29,7 @@ private:
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
 	UBatchShaderManager batchShaderManager;
+	UTextureManager textureManager;
 
 	// Application state
 	bool bIsRunning;
@@ -66,6 +68,7 @@ public:
 	UTimeManager& GetTimeManager() { return timeManager; }
 	URaycastManager& GetRaycastManager() { return raycastManager; }
 	UBatchShaderManager& GetBatchShaderManager() { return batchShaderManager; }
+	UTextureManager& GetTextureManageR() { return textureManager;  }
 
 	// Window management
 	HWND GetWindowHandle() const { return hWnd; }

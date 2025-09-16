@@ -91,6 +91,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
+	textureManager.Initialize(&GetRenderer());
 	batchShaderManager.Initialize(GetRenderer().GetDevice());
 
 	if (!sceneManager.Initialize(g_pApplication))

@@ -30,6 +30,7 @@ void UTextholderComp::ResourcesInitialize()
 	if (cachedTextureManager)
 	{
 		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
+		texture = textTex;
 		if (textTex)
 		{
 			TextInfo.SetParam(textTex, 16, 16);
@@ -44,7 +45,6 @@ void UTextholderComp::SetText(const FString& textContent)
 	if (isEditable)
 	{
 		isEditable = false;
-		ResourcesInitialize();
 	}
 
 	TextInfo.orderOfChar.clear();
