@@ -70,13 +70,17 @@ void UTextholderComp::DrawAboveParent(URenderer& renderer, FVector location)
 // ====================================================== //
 
 void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
-{
-	UPrimitiveComponent::UpdateConstantBuffer(renderer);
+{ 
+	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
+	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
+	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color; 
+	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UTextholderComp::BindVertexShader(URenderer& renderer)
 {
-	UPrimitiveComponent::BindVertexShader(renderer);
+	//renderer.GetDeviceContext()->IASetInputLayout(vertexShader->GetInputLayout());
+	vertexShader->Bind(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
 void UTextholderComp::BindPixelShader(URenderer& renderer)
@@ -141,12 +145,11 @@ void UTextholderComp::CreateInstanceData()
 	//if (!mesh || !mesh->VertexBuffer) return;
 	// atlas  구별 임시 
 	//if (camera == nullptr) return;
-
 	USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
 	UCamera* camera = sceneManager->GetScene()->GetCamera();
 
 	// 문자 개수만큼 인스턴스 배열 공간 확보
-	TArray<FTextInstance> instances;
+	//TArray<FTextInstance> instances;
 	instances.reserve(TextInfo.orderOfChar.size());
 
 	// 텍스트 전체 너비 계산 및 중앙 정렬용 penX 초기화
@@ -165,26 +168,13 @@ void UTextholderComp::CreateInstanceData()
 		if (isEditable)
 		{
 			FMatrix bill = TextInfo.MakeBillboard(view);
-			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-			//renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-
-			// 행렬을 float4 로 분리해 인스턴스 구조체에 저장 
+			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill; 
 			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 		}
 		else
 		{
-			FMatrix bill = TextInfo.MakeBillboard(view);
-			FVector p = RelativeLocation;
-			//SetPosition(p);
-			UE_LOG("%.2f, %.2f, %.2f", p.X + penX, p.Y, p.Z);
-			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
-			// FMatrix bill = TextInfo.MakeBillboard(RelativeLocation, camera->GetLocation());
-			// FMatrix M = FMatrix::Identity  * bill;// GetWorldTransform();
-			// FMatrix M = FMatrix::TranslationRow(p.X, p.Y, p.Z);//*bill;
-			// FMatrix M = FMatrix::TranslationRow(p.X + penX, p.Y, p.Z);//*bill;
-			// renderer.SetModel(M, Color, bIsSelected, bIsShaderReflectionEnabled);
-
-			// 행렬을 float4 로 분리해 인스턴스 구조체에 저장
+			FMatrix bill = TextInfo.MakeBillboard(view); 
+			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;   
 			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 		}
 

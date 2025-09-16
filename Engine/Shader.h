@@ -140,6 +140,11 @@ public:
 		BindConstantBuffers(DeviceContext, std::forward<TBufferNames>(BufferNames)...);
 	}
 
+	ID3D11InputLayout* GetInputLayout()
+	{
+		return ShaderReflection->GetInputLayout();
+	}
+
 private:
 	TOptional<ShaderID> ID;
 

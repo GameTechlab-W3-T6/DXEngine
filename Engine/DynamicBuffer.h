@@ -431,6 +431,7 @@ public:
      */
     void Finalize()
     {
+        if (bIsFinalized) return;
         assert(!bIsFinalized && "Cannot finalize a layout for multiple times");
         size_t Offset = 0;
         for (size_t i = 0; i < Fields.size(); ++i)
