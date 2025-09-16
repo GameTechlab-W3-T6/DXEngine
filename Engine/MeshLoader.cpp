@@ -1,12 +1,7 @@
 ﻿#include "stdafx.h"
-
 #include <sstream>
 #include <random>
-#include <tuple>
-#include <map>
-
 #include "MeshLoader.h"
-
 #include "FVertexPosColor.h"
 
 template<>
@@ -16,8 +11,7 @@ std::pair<TArray<FVertexPosColor>, TArray<UINT>> MeshLoader::LoadMeshWithIndex(c
 
 	TArray<FVertexPosColor> VertexArray;
 	TArray<UINT> IndexArray;
-	/** @todo: Change this into TMap after implementing hashing algorithm */
-	std::map<std::tuple<int32, int32, int32>, UINT> IndexMap;
+	TOrderedMap<std::tuple<int32, int32, int32>, UINT> IndexMap;
 	for (const auto& Face : Faces)
 	{
 		auto FaceKey = std::make_tuple(Face.PositionIndex, Face.NormalIndex, Face.TexCoordIndex);

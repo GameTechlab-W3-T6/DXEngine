@@ -11,7 +11,13 @@
 #include "UScene.h"
 #include "UTextureManager.h"
 
-IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
+UObject* UTextholderComp::CreateInstance() {
+	return new UTextholderComp();
+} UClass* UTextholderComp::s_StaticClass = UClass::RegisterToFactory("UTextholderComp", &UTextholderComp::CreateInstance, "UPrimitiveComponent"); UClass* UTextholderComp::StaticClass() {
+	return s_StaticClass;
+} UClass* UTextholderComp::GetClass() const {
+	return StaticClass();
+}
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
 UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
