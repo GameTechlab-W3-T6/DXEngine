@@ -3,11 +3,34 @@
 #include "USceneComponent.h"
 #include "json.hpp"
 #include "UClass.h"
+#include "UInputManager.h"
+#include "UScene.h"
 
 IMPLEMENT_UCLASS(USceneComponent, UObject)
 FMatrix USceneComponent::GetWorldTransform()
 {
     return FMatrix::SRTRowQuaternion(RelativeLocation, RelativeQuaternion.ToMatrixRow(), RelativeScale3D);
+}
+
+bool USceneComponent::Initialize()
+{
+    UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();
+    inputManager->RegisterKeyCallback(std::to_string(InternalIndex), [this](int32 keyCode) {HandleInput(keyCode);});
+    
+    return true;
+}
+
+void USceneComponent::Update(float deltaTime)
+{
+
+}
+
+void USceneComponent::HandleInput(int32 keyCode)
+{
+    if (keyCode == VK_DELETE && bIsSelected)
+    {
+        markedAsDestroyed = true;
+    }
 }
 
 json::JSON USceneComponent::Serialize() const

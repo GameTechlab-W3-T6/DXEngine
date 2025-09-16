@@ -40,7 +40,8 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init();
+			bool success = primitive->Initialize();
+			if (!success) return false;
 		}
 	}
 
@@ -74,10 +75,20 @@ void UScene::AddObject(USceneComponent* obj)
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init();
+		primitive->Initialize();
 		if (obj->CountOnInspector())
 			++primitiveCount;
 	}
+}
+
+void UScene::RemoveObject(USceneComponent* obj)
+{
+	auto itr = std::find(objects.begin(), objects.end(), obj);
+
+	if (itr == objects.end()) return;
+
+	objects.erase(itr);
+	--primitiveCount;
 }
 
 json::JSON UScene::Serialize() const
@@ -163,11 +174,24 @@ void UScene::Render()
 
 void UScene::Update(float deltaTime)
 {
-	renderer->GetBackBufferSize(backBufferWidth, backBufferHeight);
+  	renderer->GetBackBufferSize(backBufferWidth, backBufferHeight);
 
 	if (backBufferHeight > 0)
 	{
 		camera->SetAspect((float)backBufferWidth / (float)backBufferHeight);
+	}
+
+	TArray<USceneComponent*> deleteTarget;
+
+	for (UObject* obj : objects)
+	{
+		if (USceneComponent* sceneComponent = obj->Cast<USceneComponent>())
+		{
+			sceneComponent->Update(deltaTime);
+
+			if (sceneComponent->markedAsDestroyed)
+				deleteTarget.push_back(sceneComponent);
+		}
 	}
 
 	// TODO : delete/move after test
@@ -175,6 +199,19 @@ void UScene::Update(float deltaTime)
 	{
 		AddObject(new UTextholderComp);
 	}
+
+	for (USceneComponent* component : deleteTarget)
+	{
+		component->OnShutdown();
+		USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
+		UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();
+
+		sceneManager->GetScene()->RemoveObject(component);
+		inputManager->UnregisterCallbacks(std::to_string(component->InternalIndex));
+		GUObjectArray.erase(std::find(GUObjectArray.begin(), GUObjectArray.end(), component));
+		delete(component);
+	}
+
 }
 
 bool UScene::OnInitialize()

@@ -38,7 +38,6 @@ public:
 	}
 
 	bool bIsVisible = true;
-	bool bIsSelected = false;
 
 	virtual void UpdateConstantBuffer(URenderer& renderer);
 
@@ -52,14 +51,13 @@ public:
 
 	void BindTexture(URenderer& renderer);
 
+	bool Initialize() override;
+
 	virtual void Draw(URenderer& renderer);
 
 	virtual LayerID GetLayer() const { return 2;  }
 
 	virtual ~UPrimitiveComponent() {}
-
-	// 별도의 초기화 메서드
-	virtual bool Init();
 
 	bool CountOnInspector() override { return true; }
 

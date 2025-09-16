@@ -23,12 +23,13 @@ public:
 
 	bool bIsSelected = false;
 
-	bool Init();
 	bool CountOnInspector() override { return true; }
 
 	FMatrix GetWorldTransform() override;
 
 	virtual void Update(float deltaTime);
+	
+	bool Initialize() override;
 
 	virtual void UpdateConstantBuffer(URenderer& renderer) override;
 

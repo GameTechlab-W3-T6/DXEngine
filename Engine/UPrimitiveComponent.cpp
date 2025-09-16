@@ -3,15 +3,18 @@
 #include "FTextInfo.h"
 #include "FTexture.h"
 #include "UBatchShaderManager.h"
-//#include "UInputManager.h"
+#include "UInputManager.h"
 #include "UMeshManager.h"
 #include "UPrimitiveComponent.h"
 #include "URenderer.h"
 #include "UTextureManager.h"
+#include "USceneManager.h"
+#include "UScene.h"
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
-bool UPrimitiveComponent::Init()
+bool UPrimitiveComponent::Initialize()
 {
+	if (!USceneComponent::Initialize()) return false;
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
 	UTextureManager* textureManager = UEngineStatics::GetSubsystem<UTextureManager>();

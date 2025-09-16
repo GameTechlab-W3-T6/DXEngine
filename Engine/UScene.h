@@ -50,6 +50,7 @@ public:
 	static UScene* Create(json::JSON data);
 
 	void AddObject(USceneComponent* obj);
+	void RemoveObject(USceneComponent* obj);
 	void SetVersion(int32 v) { version = v; }
 
 	json::JSON Serialize() const override;

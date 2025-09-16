@@ -14,6 +14,8 @@ public:
 	FVector RelativeLocation;
 	FVector RelativeScale3D;
 	FQuaternion RelativeQuaternion;
+	bool bIsSelected = false;
+	bool markedAsDestroyed = false;
 	USceneComponent(FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: RelativeLocation(pos), //RelativeRotation(rot), 
 		RelativeScale3D(scl), RelativeQuaternion(FQuaternion::FromEulerXYZDeg(rot))
@@ -24,8 +26,11 @@ public:
 	virtual FMatrix GetWorldTransform();
 
 	virtual bool IsManageable() { return false; }
-	virtual void Update(float deltaTime) {}
+	virtual bool Initialize();
+	virtual void Update(float deltaTime);
 	virtual void OnShutdown(){}
+
+	virtual void HandleInput(int32 keyCode);
 
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }

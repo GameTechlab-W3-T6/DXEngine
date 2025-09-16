@@ -39,21 +39,16 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    //float4 baseColor = input.Color;
-    //
-    //if (0.5f < IsSelected)
-    //{
-    //    baseColor.rgb = baseColor.rgb + 0.25f;
-    //}
-    //
-    //output.Color = baseColor * MeshColor;
-
     float4 wpos = float4(input.Position.xyz, 1.0f);
 
     // row: v' = v * MVP
     output.Position = mul(wpos, MVP);
     output.UV = input.UV;
     output.Color = input.Color;
+    if (IsSelected)
+    {
+        output.Color = output.Color + 0.25f;
+    }
 
     return output;
 }

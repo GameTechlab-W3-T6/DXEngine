@@ -100,7 +100,7 @@ UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))); // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))) ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
 	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 

@@ -7,7 +7,7 @@
 
 IMPLEMENT_UCLASS(UGizmoComponent, UPrimitiveComponent)
 
-bool UGizmoComponent::Init()
+bool UGizmoComponent::Initialize()
 {
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();

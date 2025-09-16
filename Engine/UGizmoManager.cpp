@@ -110,9 +110,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 
 	// =================================================
 
-	if (!gridPrimitive->Init() || !arrowX->Init() || !arrowY->Init() || !arrowZ->Init()
-		|| !rotationX->Init() || !rotationY->Init() || !rotationZ->Init()
-		|| !scaleX->Init() || !scaleY->Init() || !scaleZ->Init())
+	if (!gridPrimitive->Initialize() || !arrowX->Initialize() || !arrowY->Initialize() || !arrowZ->Initialize()
+		|| !rotationX->Initialize() || !rotationY->Initialize() || !rotationZ->Initialize()
+		|| !scaleX->Initialize() || !scaleY->Initialize() || !scaleZ->Initialize())
 	{
 		delete gridPrimitive;
 
