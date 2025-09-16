@@ -16,12 +16,12 @@ UMesh::UMesh()
 //}
 
 UMesh::UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColorUV4))
+	: ID(ID), Vertices(vertices), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColorUV4)), PrimitiveType(primitiveType)
 {
 }
 
 UMesh::UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& VertexArray, const TArray<uint32>& IndexArray, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: ID(ID), Vertices(VertexArray), Indices(IndexArray), NumVertices(VertexArray.size()), NumIndices(IndexArray.size()), Stride(sizeof(FVertexPosColorUV4))
+	: ID(ID), Vertices(VertexArray), Indices(IndexArray), NumVertices(VertexArray.size()), NumIndices(IndexArray.size()), Stride(sizeof(FVertexPosColorUV4)), PrimitiveType(primitiveType)
 {
 }
 

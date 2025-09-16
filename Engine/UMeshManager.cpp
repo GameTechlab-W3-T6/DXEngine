@@ -50,9 +50,8 @@ TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVert
 TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const std::filesystem::path& FilePath, D3D_PRIMITIVE_TOPOLOGY PrimitiveType)
 {
 	auto& MeshLoader = MeshLoader::GetInstance();
-	//auto [VertexArray, IndexArray] = MeshLoader.LoadMeshWithIndex<FVertexPosColorUV4>(FilePath);
-	//return MakeUnique<UMesh>(ID, VertexArray, IndexArray, PrimitiveType);
-	return MakeUnique<UMesh>(ID, MeshLoader.LoadMesh<FVertexPosColorUV4>(FilePath), PrimitiveType);
+	auto [VertexArray, IndexArray] = MeshLoader.LoadMeshWithIndex<FVertexPosColorUV4>(FilePath);
+	return MakeUnique<UMesh>(ID, VertexArray, IndexArray, PrimitiveType);
 }
 
 static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
@@ -109,7 +108,7 @@ UMeshManager::UMeshManager()
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
 	//meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))) ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
 	meshes["Sphere"] = CreateMeshInternal(GetNextID(), "Meshes/Sphere.obj");
-	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
+	meshes["Plane"] = CreateMeshInternal(GetNextID(), "Meshes/Plane.obj");
 	//meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 	meshes["Cube"] = CreateMeshInternal(GetNextID(), "Meshes/Cube.obj");
 
@@ -118,7 +117,8 @@ UMeshManager::UMeshManager()
 	int gridCount = config->getInt("Gizmo", "GridCount");
 
 	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(GridGenerator::CreateGridVertices(1, gridCount)), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(gizmo_arrow_vertices));
+	//meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(gizmo_arrow_vertices));
+	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), "Meshes/ArrowGizmo.obj");
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(GridGenerator::CreateRotationHandleVertices()));
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV( gizmo_scale_handle_vertices));
 

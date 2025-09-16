@@ -90,6 +90,7 @@ std::pair<TArray<FVertexPosColorUV4>, TArray<UINT>> MeshLoader::LoadMeshWithInde
 				Vertex.x = Position.X;
 				Vertex.y = Position.Y;
 				Vertex.z = Position.Z;
+				Vertex.w = 1.0f;
 			}
 			if (Face.NormalIndex != -1)
 			{
@@ -134,6 +135,7 @@ TArray<FVertexPosColorUV4> MeshLoader::LoadMesh(const std::filesystem::path& Fil
 			Vertex.x = Position.X;
 			Vertex.y = Position.Y;
 			Vertex.z = Position.Z;
+			Vertex.w = 1.0f;
 		}
 		if (Face.NormalIndex != -1)
 		{
