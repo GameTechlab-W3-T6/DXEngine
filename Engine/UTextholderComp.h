@@ -30,7 +30,7 @@ public:
 	}
 
 	bool Initialize() override;
-	void SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH);
+	void SetText(const FString& textContent);
 	void SetParentTransform(USceneComponent* parent) { parentTransform = parent; }
 
 	// ============================= //
@@ -51,6 +51,8 @@ public:
 	virtual void Draw(URenderer& renderer) override;
 
 	virtual LayerID GetLayer() const { return 4;  }
+
+	bool IsManageable() override { return false; }
 
 private:
 	// Hold those two subsystem due to caching

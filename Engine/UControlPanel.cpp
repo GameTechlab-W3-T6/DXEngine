@@ -115,7 +115,7 @@ void UControlPanel::SpawnPrimitiveSection()
 			UTextholderComp* labelUUID = new UTextholderComp;
 			labelUUID->Initialize();
 			const FString generated = "UID : " + std::to_string(sceneComponent->UUID);
-			labelUUID->SetText(generated, 1, 1);
+			labelUUID->SetText(generated);
 			labelUUID->SetParentTransform(sceneComponent);
 			SceneManager->GetScene()->AddObject(labelUUID);
 		}

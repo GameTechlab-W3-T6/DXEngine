@@ -206,7 +206,7 @@ void EditorApplication::CollectRaycastableObjects(TArray<UGizmoComponent*>& outG
 void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint)
 {
 	auto target = gizmoManager.GetTarget();
-	if (!target) return;
+	if (!target || !target->IsManageable()) return;
 
 	target->bIsSelected = true;
 	hitGizmo->bIsSelected = true;
@@ -235,29 +235,30 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
-	gizmoManager.SetTarget(hitPrimitive);
 	hitPrimitive->bIsSelected = true;
 	  
-	SelectedPrimitive = hitPrimitive;
-
 	//hitPrimitive->RelativeQuaternion.ToMatrixRow();
 	///hitPrimitive->RelativeLocation();
 	     
 	FVector localMin, localMax; 
-	if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(),localMin, localMax))
-	{ 
-		MaxWSPos = localMax;
-		MinWSPos = localMin;
-		bAABBFlag = true;
-	}
-	else {
-		bAABBFlag = false; 
-
-	}
+	
+	bAABBFlag = false;
 
 	if (hitPrimitive->IsManageable())
 	{
+		gizmoManager.SetTarget(hitPrimitive);
 		propertyWindow->SetTarget(hitPrimitive);
+		SelectedPrimitive = hitPrimitive;
+		if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(), localMin, localMax))
+		{
+			MaxWSPos = localMax;
+			MinWSPos = localMin;
+			bAABBFlag = true;
+		}
+	}
+	else
+	{
+		bAABBFlag = false;
 	}
 }
 

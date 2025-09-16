@@ -10,7 +10,7 @@ void USceneManagerWindow::RenderContent()
 	{
 		auto Component = Object->Cast<UPrimitiveComponent>();
 		/** @note: If Object is not PrimitiveComponent, then it is ignored. */
-		if (!Component)
+		if (!Component || !Component->IsManageable())
 		{
 			continue;
 		}
