@@ -8,6 +8,7 @@
 *.d
 
 # Compiled Object files
+!Engine/Meshes/*.obj
 *.slo
 *.lo
 *.o
