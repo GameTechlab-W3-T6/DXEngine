@@ -14,6 +14,8 @@ public:
 	FVector RelativeLocation;
 	FVector RelativeScale3D;
 	FQuaternion RelativeQuaternion;
+
+	bool bIsSelected = false;
 	USceneComponent(FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: RelativeLocation(pos), //RelativeRotation(rot), 
 		RelativeScale3D(scl), RelativeQuaternion(FQuaternion::FromEulerXYZDeg(rot))

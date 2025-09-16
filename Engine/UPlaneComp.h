@@ -15,5 +15,14 @@ private:
 public:
 	UPlaneComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 });
 
-	~UPlaneComp();
+	virtual ~UPlaneComp();
+
+	virtual uint32 GetID() const { return ID;  }
+
+protected:
+	virtual const char* GetDefaultName() const override { return "Plane"; }
+
+private:
+	static uint32 PlaneID;
+	uint32 ID;
 };

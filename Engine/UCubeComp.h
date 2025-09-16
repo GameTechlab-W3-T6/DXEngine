@@ -24,8 +24,20 @@ private:
 	bool IsManageable() override { return true; }
 
 public:
+	virtual ~UCubeComp() = default;
 	UCubeComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
 		:UPrimitiveComponent(pos, rot, scl)
 	{
+		ID = CubeID++;
+		Name = GetDefaultName();
 	}
+
+	virtual uint32 GetID() const { return ID;  }
+
+protected:
+	virtual const char* GetDefaultName() const override { return "Cube"; }
+
+private:
+	static uint32 CubeID;
+	uint32 ID;
 };

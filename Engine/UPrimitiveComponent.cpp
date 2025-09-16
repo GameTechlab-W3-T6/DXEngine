@@ -10,6 +10,9 @@
 #include "UTextureManager.h"
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
+
+uint32 UPrimitiveComponent::PrimitiveID = 0;
+
 bool UPrimitiveComponent::Init()
 {
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
