@@ -201,6 +201,7 @@
     <ClCompile Include="FTextInfo.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="USceneManagerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -395,9 +396,11 @@
       <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeIndex.h" />
+    <ClInclude Include="USceneManagerWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="editor.ini" />
+    <None Include="ShaderW0.ps" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TexTestVS.hlsl">

@@ -1,8 +1,7 @@
-﻿#include <sstream>
+﻿#include "stdafx.h"
+#include <sstream>
 #include <random>
-
 #include "MeshLoader.h"
-
 #include "FVertexPosColor.h"
 
 template<>
@@ -12,7 +11,7 @@ inline std::pair<TArray<FVertexPosColor>, TArray<UINT>> MeshLoader::LoadMesh(con
 	
 	TArray<FVertexPosColor> VertexArray;
 	TArray<UINT> IndexArray;
-	TMap<std::tuple<int32, int32, int32>, UINT> IndexMap;
+	TOrderedMap<std::tuple<int32, int32, int32>, UINT> IndexMap;
 	for (const auto& Face : Faces)
 	{
 		auto FaceKey = std::make_tuple(Face.PositionIndex, Face.NormalIndex, Face.TexCoordIndex);

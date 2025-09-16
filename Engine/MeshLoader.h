@@ -1,7 +1,5 @@
 ﻿#pragma once
-
 #include <filesystem>
-
 #include "Vector.h"
 #include "TArray.h"
 #include "UEngineStatics.h"
