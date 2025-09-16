@@ -139,7 +139,7 @@ public:
 	[[deprecated]] void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
 	[[deprecated]] void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
 	[[deprecated]] void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
-	[[deprectead]] void SetShader(UShader* vertexShader, UShader* pixelShader);
+	[[deprecated]] void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
 	void SetRasterizerMode(EViewModeIndex vmi);
 
