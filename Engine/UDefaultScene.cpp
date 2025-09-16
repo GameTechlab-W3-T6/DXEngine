@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
+#include "AStaticMeshActor.h"
 
 void UDefaultScene::Update(float deltaTime)
 {
@@ -14,10 +15,19 @@ bool UDefaultScene::OnInitialize()
     UScene::OnInitialize();
     if (IsFirstTime)
     {
-        // 컴포넌트 생성
-        USphereComp* sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
-
-        AddObject(sphere);
+        // Create default sphere actor
+        AStaticMeshActor* sphereActor = AStaticMeshActor::CreateSphere();
+        if (sphereActor)
+        {
+            USceneComponent* rootComponent = sphereActor->GetRootComponent();
+            if (rootComponent)
+            {
+                rootComponent->SetPosition({ 0.0f, 0.0f, 0.0f });
+                rootComponent->SetRotation({ 0.0f, 0.0f, 0.0f });
+                rootComponent->SetScale({ 0.5f, 0.5f, 0.5f });
+            }
+            AddActor(sphereActor);
+        }
         IsFirstTime = false;
     }
 

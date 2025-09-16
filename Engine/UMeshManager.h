@@ -50,4 +50,15 @@ public:
 
 		return nullptr;
 	}
+
+	// Get all available mesh names
+	TArray<FString> GetAvailableMeshNames() const
+	{
+		TArray<FString> meshNames;
+		for (const auto& pair : meshes)
+		{
+			meshNames.push_back(pair.first);
+		}
+		return meshNames;
+	}
 };

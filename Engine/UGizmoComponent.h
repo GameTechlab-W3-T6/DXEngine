@@ -25,11 +25,12 @@ public:
 
 	bool CountOnInspector() override { return true; }
 
-	FMatrix GetWorldTransform() override;
+	FMatrix GetWorldTransform() const override;
 
-	virtual void Update(float deltaTime);
-	
-	bool Initialize() override;
+	virtual void Update(float deltaTime) override;  // TODO: Rename to TickComponent() later
+	virtual void OnShutdown() override;  // TODO: Rename to EndPlay() later
+
+	bool Initialize() override;  // TODO: Rename to InitializeComponent() later
 
 	virtual void UpdateConstantBuffer(URenderer& renderer) override;
 

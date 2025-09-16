@@ -54,7 +54,9 @@ public:
 
 	void BindTexture(URenderer& renderer);
 
-	bool Initialize() override;
+	bool Initialize() override;  // TODO: Rename to InitializeComponent() later
+	virtual void Update(float deltaTime) override;  // TODO: Rename to TickComponent() later
+	virtual void OnShutdown() override;  // TODO: Rename to EndPlay() later
 
 	virtual void Draw(URenderer& renderer);
 

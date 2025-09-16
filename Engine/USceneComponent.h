@@ -1,36 +1,71 @@
 ﻿#pragma once
 #include "Matrix.h"
-#include "UObject.h"
+#include "UActorComponent.h"
 #include "Vector.h"
 #include "Quaternion.h"
+#include "TArray.h"
 
 /**
  * @brief Base component for objects with transform in 3D space
  */
-class USceneComponent : public UObject
+class USceneComponent : public UActorComponent
 {
-	DECLARE_UCLASS(USceneComponent, UObject)
+	DECLARE_UCLASS(USceneComponent, UActorComponent)
 public:
 	FVector RelativeLocation;
 	FVector RelativeScale3D;
 	FQuaternion RelativeQuaternion;
 	bool bIsSelected = false;
 	bool markedAsDestroyed = false;
+
+protected:
+	USceneComponent* AttachParent = nullptr;
+	TArray<USceneComponent*> AttachChildren;
+
+public:
 	USceneComponent(FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: RelativeLocation(pos), //RelativeRotation(rot), 
+		: UActorComponent(), RelativeLocation(pos), //RelativeRotation(rot),
 		RelativeScale3D(scl), RelativeQuaternion(FQuaternion::FromEulerXYZDeg(rot))
 	{
 		UUID = UEngineStatics::GenUUID();
 	}
 
-	virtual FMatrix GetWorldTransform();
+	virtual FMatrix GetWorldTransform() const;
+	virtual FMatrix GetRelativeTransform() const;
+
+	// Attachment functions
+	void AttachToComponent(USceneComponent* Parent);
+	void DetachFromComponent();
+	void DetachAllChildren();
+
+	USceneComponent* GetAttachParent() const { return AttachParent; }
+	const TArray<USceneComponent*>& GetAttachChildren() const { return AttachChildren; }
+
+	// Hierarchy query functions
+	bool IsAttachedTo(USceneComponent* Component) const;
+	USceneComponent* GetRootComponent() const;
+	void GetAllChildren(TArray<USceneComponent*>& OutChildren, bool bIncludeNestedChildren = true) const;
+
+	// Transform functions for hierarchy
+	FVector GetWorldLocation() const;
+	FQuaternion GetWorldRotation() const;
+	FVector GetWorldScale() const;
+	void SetWorldLocation(const FVector& NewLocation);
+	void SetWorldRotation(const FQuaternion& NewRotation);
+	void SetWorldScale(const FVector& NewScale);
 
 	virtual bool IsManageable() { return false; }
-	virtual bool Initialize();
-	virtual void Update(float deltaTime);
-	virtual void OnShutdown();
+
+	// Lifecycle methods (using existing names)
+	virtual bool Initialize() override;     // TODO: Rename to InitializeComponent() later
+	virtual void Update(float deltaTime) override;  // TODO: Rename to TickComponent() later
+	virtual void OnShutdown() override;     // TODO: Rename to EndPlay() later
 
 	virtual void HandleInput(int32 keyCode);
+
+	// TODO: Add these methods later for full Unreal-style lifecycle
+	// virtual void BeginPlay();
+	// virtual void EndPlay();
 
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }

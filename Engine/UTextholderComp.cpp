@@ -32,7 +32,7 @@ bool UTextholderComp::Initialize()
 	cachedTextureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>();
 
-	float scaleNumber = 0.3f;
+	float scaleNumber = 3.0f;
 	SetScale({ scaleNumber, scaleNumber, scaleNumber });
 	
 	if (cachedTextureManager && cachedInputManager)
@@ -88,11 +88,9 @@ void UTextholderComp::Draw(URenderer& renderer)
 {
 	CaptureTypedChars(); // TODO : will be deprecated, just for test
 
-	if (parentTransform)
-	{
-		FVector updatedTransform = parentTransform->GetPosition() + FVector{0.0f, 0.0f, 0.3f};
-		SetPosition(updatedTransform);
-	}
+
+	FVector updatedTransform = FVector{ 0.0f, 0.0f, 1.0f };
+	SetPosition(updatedTransform);
 
 	CreateInstanceData();
 

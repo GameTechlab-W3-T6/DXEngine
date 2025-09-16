@@ -43,6 +43,23 @@ bool UPrimitiveComponent::Initialize()
 	return mesh && vertexShader && pixelShader;
 }
 
+void UPrimitiveComponent::Update(float deltaTime)
+{
+	// Call parent update first
+	Super::Update(deltaTime);
+
+	// Add primitive-specific update logic here if needed
+}
+
+void UPrimitiveComponent::OnShutdown()
+{
+	// Cleanup primitive-specific resources
+	// Note: mesh, shaders, texture are managed by subsystems, don't delete them here
+
+	// Call parent shutdown
+	Super::OnShutdown();
+}
+
 void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
@@ -88,4 +105,13 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 	}
 
 	renderer.DrawPrimitiveComponent(this);
+
+	// Draw attached child components
+	for (USceneComponent* child : AttachChildren)
+	{
+		if (UPrimitiveComponent* childPrimitive = child->Cast<UPrimitiveComponent>())
+		{
+			childPrimitive->Draw(renderer);
+		}
+	}
 }

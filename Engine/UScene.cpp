@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
+#include "AActor.h"
 #include "UApplication.h"
 #include "UObject.h"
 #include "USceneComponent.h"
@@ -100,6 +101,8 @@ json::JSON UScene::Serialize() const
 	// UScene 특성에 맞는 JSON 구성
 	result["Version"] = version;
 	result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
+
+	// Serialize legacy objects (components)
 	int32 validCount = 0;
 	for (UObject* object : objects)
 	{
@@ -107,11 +110,24 @@ json::JSON UScene::Serialize() const
 		json::JSON _json = object->Serialize();
 		if (!_json.IsNull())
 		{
-			//result["Primitives"][std::to_string(validCount)] = _json;
 			result["Primitives"][std::to_string(object->UUID)] = _json;
 			++validCount;
 		}
 	}
+
+	// Serialize actors
+	int32 validActorCount = 0;
+	for (AActor* actor : actors)
+	{
+		if (actor == nullptr) continue;
+		json::JSON actorJson = actor->Serialize();
+		if (!actorJson.IsNull())
+		{
+			result["Actors"][std::to_string(actor->UUID)] = actorJson;
+			++validActorCount;
+		}
+	}
+
 	return result;
 }
 
@@ -121,6 +137,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	//nextUUID = data.at("NextUUID").ToInt();
 
 	objects.clear();
+	actors.clear();
 
 	if (!data.hasKey("Primitives")) return false;
 	json::JSON primitivesJson = data.at("Primitives");
@@ -142,6 +159,33 @@ bool UScene::Deserialize(const json::JSON& data)
 		objects.push_back(component);
 		if (component->CountOnInspector())
 			++primitiveCount;
+	}
+
+	// Deserialize actors if they exist
+	if (data.hasKey("Actors"))
+	{
+		json::JSON actorsJson = data.at("Actors");
+		for (auto& actorJson : actorsJson.ObjectRange())
+		{
+			uint32 uuid = stoi(actorJson.first);
+			json::JSON actorData = actorJson.second;
+
+			if (actorData.hasKey("ActorClass"))
+			{
+				FString actorClassName = actorData.at("ActorClass").ToString();
+				UClass* actorClass = UClass::FindClassWithDisplayName(actorClassName);
+
+				if (actorClass)
+				{
+					if (AActor* actor = actorClass->CreateDefaultObject()->Cast<AActor>())
+					{
+						actor->Deserialize(actorData);
+						actor->SetUUID(uuid);
+						actors.push_back(actor);
+					}
+				}
+			}
+		}
 	}
 
 	USceneComponent* gizmoGrid = new UGizmoGridComp(
@@ -179,6 +223,7 @@ void UScene::Render()
 
 	renderer->SetViewProj(camera->GetView(), camera->GetProj());
 
+	// Render legacy objects (components)
 	for (UObject* obj : objects)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
@@ -190,6 +235,29 @@ void UScene::Render()
 				continue;
 
 			primitive->Draw(*renderer);
+		}
+	}
+
+	// Render actors
+	for (AActor* actor : actors)
+	{
+		if (actor)
+		{
+			// Draw only root-level primitive components (children will be drawn by their parents)
+			auto components = actor->GetComponents<UPrimitiveComponent>();
+			for (UPrimitiveComponent* primitive : components)
+			{
+				if (primitive && !primitive->GetAttachParent())  // Only draw if no parent (root-level)
+				{
+					const bool isText = primitive->IsA<UTextholderComp>();
+					if (hidePrimitive && !isText)
+						continue;
+					if (hideTextholder && isText)
+						continue;
+
+					primitive->Draw(*renderer);  // This will also draw attached children
+				}
+			}
 		}
 	}
 }
@@ -204,7 +272,9 @@ void UScene::Update(float deltaTime)
 	}
 
 	TArray<USceneComponent*> deleteTarget;
+	TArray<AActor*> deleteActorTarget;
 
+	// Update legacy components
 	for (UObject* obj : objects)
 	{
 		if (USceneComponent* sceneComponent = obj->Cast<USceneComponent>())
@@ -216,12 +286,25 @@ void UScene::Update(float deltaTime)
 		}
 	}
 
+	// Update actors
+	for (AActor* actor : actors)
+	{
+		if (actor)
+		{
+			actor->Update(deltaTime);
+
+			if (actor->markedAsDestroyed)
+				deleteActorTarget.push_back(actor);
+		}
+	}
+
 	// TODO : delete/move after test
 	if (inputManager->IsKeyPressed(VK_CONTROL))
 	{
 		AddObject(new UTextholderComp);
 	}
 
+	// Delete legacy components
 	for (USceneComponent* component : deleteTarget)
 	{
 		component->OnShutdown();
@@ -235,11 +318,40 @@ void UScene::Update(float deltaTime)
 		delete(component);
 	}
 
+	// Delete actors
+	for (AActor* actor : deleteActorTarget)
+	{
+		RemoveActor(actor);
+	}
+
 }
 
 bool UScene::OnInitialize()
 {
 
 	return true;
+}
+
+void UScene::AddActor(AActor* actor)
+{
+	if (!actor)
+		return;
+
+	actors.push_back(actor);
+	actor->Initialize();
+}
+
+void UScene::RemoveActor(AActor* actor)
+{
+	if (!actor)
+		return;
+
+	auto it = std::find(actors.begin(), actors.end(), actor);
+	if (it != actors.end())
+	{
+		actor->OnShutdown();
+		actors.erase(it);
+		delete actor;
+	}
 }
 
