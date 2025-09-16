@@ -39,7 +39,7 @@ public:
 
 	virtual void Draw(URenderer& renderer) override;
 
-	virtual LayerID GetLayer() const override { return 1; } 
+	virtual LayerID GetLayer() const override { return 3; } 
 
 	void DrawOnTop(URenderer& renderer);
 

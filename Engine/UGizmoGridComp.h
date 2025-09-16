@@ -14,7 +14,7 @@ class UGizmoGridComp : public UGizmoComponent
 public:
 	using UGizmoComponent::UGizmoComponent;
 	
-	 virtual LayerID GetLayer() const override { return 3; } 
+	 virtual LayerID GetLayer() const override { return 1; } 
 
 	json::JSON Serialize() const override
 	{

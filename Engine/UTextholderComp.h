@@ -50,7 +50,7 @@ public:
 
 	virtual void Draw(URenderer& renderer) override;
 
-	virtual LayerID GetLayer() const { return 2;  }
+	virtual LayerID GetLayer() const { return 4;  }
 
 private:
 	// Hold those two subsystem due to caching
