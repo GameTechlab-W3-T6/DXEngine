@@ -6,6 +6,7 @@
 #include "UGizmoComponent.h"
 #include "UTextholderComp.h"
 #include "UEngineSubsystem.h"
+#include "ViewModeIndex.h"
 
 class UPrimitiveComponent;
 
@@ -139,7 +140,7 @@ public:
 	[[deprecated]] void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
 	[[deprectead]] void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
-	void SetRasterizerMode(bool bIsSolid);
+	void SetRasterizerMode(EViewModeIndex vmi);
 
 	/** Constant buffer updates */
 	void SetViewProj(const FMatrix& View, const FMatrix& Projection); // 내부에 VP 캐시

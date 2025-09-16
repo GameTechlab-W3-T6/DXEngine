@@ -145,9 +145,18 @@ void UControlPanel::SceneManagementSection()
 
 void UControlPanel::CameraManagementSection()
 {
-	if (ImGui::Checkbox("Wireframe", &isSolid)) {
-		Renderer->SetRasterizerMode(/*bSolid=*/isSolid); // false면 Wireframe
-	}
+	ImGui::TextUnformatted("Shading Mode");
+	if (ImGui::RadioButton("Lit", CurrentViewMode == EViewModeIndex::VMI_Lit))
+		CurrentViewMode = EViewModeIndex::VMI_Lit;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Unlit", CurrentViewMode == EViewModeIndex::VMI_Unlit))
+		CurrentViewMode = EViewModeIndex::VMI_Unlit;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Wireframe", CurrentViewMode == EViewModeIndex::VMI_Wireframe))
+		CurrentViewMode = EViewModeIndex::VMI_Wireframe;
+
+	// 선택된 모드 적용
+	Renderer->SetRasterizerMode(CurrentViewMode);
 
 	UCamera* camera = SceneManager->GetScene()->GetCamera();
 	// 카메라 정보
