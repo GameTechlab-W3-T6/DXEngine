@@ -90,7 +90,7 @@ void UTextholderComp::Draw(URenderer& renderer)
 
 	CaptureTypedChars();
 
-	CreateInstance();
+	CreateInstanceData();
 
 	renderer.DrawTextholderComponent(this);
 }

@@ -474,6 +474,21 @@ void URenderer::ReleaseConstantBuffer()
 	SAFE_RELEASE(ConstantBuffer);
 }
 
+bool URenderer::CreateInstancedVB()
+{
+	int maxInstances = 30;
+	D3D11_BUFFER_DESC bd{};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth =  maxInstances * sizeof(FTextInstance);
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd.MiscFlags = 0;
+	bd.StructureByteStride = 0;
+	HRESULT hr = Device->CreateBuffer(&bd, 0, &textInstanceVB);
+
+	return CheckResult(hr, "Create Text Instance");
+}
+
 ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes)
 {
 	if (!Device || !data || sizeInBytes == 0)

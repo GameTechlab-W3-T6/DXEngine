@@ -33,7 +33,7 @@ bool UPrimitiveComponent::Init()
 		pixelShader = batchShaderManager->GetShaderByName(pixelShaderName);
 	}
 
-	//texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
+	texture = textureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 	return mesh && vertexShader && pixelShader;
 }
 
@@ -70,6 +70,7 @@ void UPrimitiveComponent::BindMesh(URenderer& renderer)
 void UPrimitiveComponent::BindTexture(URenderer& renderer)
 {
 	/** @todo: Hard-coded slot number. */
+	// texture를 보내주는ㄱ ㅔ맞을ㅇ듯Bind 
 	texture->Bind(renderer.GetDeviceContext(), 0);
 }
 

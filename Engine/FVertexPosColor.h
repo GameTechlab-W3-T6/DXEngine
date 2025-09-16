@@ -63,12 +63,119 @@ struct FVertexPosColor4
 		return newVertices;
 	}
 
+
 	FVector GetPosition()
 	{
-		return {x, y, z};
+		return { x, y, z };
 	}
 
 };
 
 
 
+
+struct FVertexPosColorUV
+{
+	float x, y, z;
+	float r, g, b, a;
+	float u, v; 
+
+
+	static TArray<FVertexPosColorUV> ConvertToVertexPosColorUV(TArray<FVertexPosColor> oldVertices)
+	{
+		int count = oldVertices.size();
+		TArray<FVertexPosColorUV> newVertices;
+		newVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosColorUV newVertex;
+
+			// Position: w = 1.0f 추가
+			newVertex.x = oldVertices[i].x;
+			newVertex.y = oldVertices[i].y;
+			newVertex.z = oldVertices[i].z;
+
+			// Color: 그대로 복사
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
+
+			newVertex.u = 0.0f;
+			newVertex.v = 0.0f;
+
+			newVertices.push_back(newVertex);
+		}
+
+		return newVertices;
+
+	}
+};
+
+struct FVertexPosColorUV4
+{
+	float x, y, z, w;
+	float r, g, b, a;
+	float u, v;
+	static TArray<FVertexPosColorUV4> ConvertVertexData(const FVertexPosColorUV* oldVertices, int32 count)
+	{
+		TArray<FVertexPosColorUV4> newVertices;
+		newVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosColorUV4 newVertex;
+
+			// Position: w = 1.0f 추가
+			newVertex.x = oldVertices[i].x;
+			newVertex.y = oldVertices[i].y;
+			newVertex.z = oldVertices[i].z;
+			newVertex.w = 1.0f;  // 동차좌표 w 컴포넌트
+
+			// Color: 그대로 복사
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
+
+			newVertex.u = oldVertices[i].u;
+			newVertex.v = oldVertices[i].v;
+
+			newVertices.push_back(newVertex);
+		}
+
+		return newVertices;
+	}
+	static TArray<FVertexPosColorUV4> ConvertToPosColorUV4(TArray<FVertexPosColor4> oldVertices)
+	{
+		int count = oldVertices.size();
+		TArray<FVertexPosColorUV4> newVertices;
+		newVertices.reserve(count);
+
+		for (int32 i = 0; i < count; i++)
+		{
+			FVertexPosColorUV4 newVertex;
+
+			// Position: w = 1.0f 추가
+			newVertex.x = oldVertices[i].x;
+			newVertex.y = oldVertices[i].y;
+			newVertex.z = oldVertices[i].z;
+			newVertex.w = 1.0f;  // 동차좌표 w 컴포넌트
+
+			// Color: 그대로 복사
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
+
+			newVertex.u = 0.0f;
+			newVertex.v = 0.0f;
+
+			newVertices.push_back(newVertex);
+		}
+
+		return newVertices;
+	}
+
+};

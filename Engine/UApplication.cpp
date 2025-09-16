@@ -108,6 +108,15 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
+	if (!textureManager.Initialize(renderer.get()))
+	{
+		return false;
+	}
+
+	if (!renderer->CreateInstancedVB())
+	{
+		return false; 
+	}
 	// Allow derived classes to initialize
 	if (!OnInitialize())
 	{
