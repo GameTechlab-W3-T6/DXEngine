@@ -25,6 +25,12 @@ void USceneComponent::Update(float deltaTime)
 
 }
 
+void USceneComponent::OnShutdown()
+{
+    UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();
+    inputManager->UnregisterCallbacks(std::to_string(InternalIndex));
+}
+
 void USceneComponent::HandleInput(int32 keyCode)
 {
     if (keyCode == VK_DELETE && bIsSelected)

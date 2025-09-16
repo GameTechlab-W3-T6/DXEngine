@@ -28,7 +28,7 @@ public:
 	virtual bool IsManageable() { return false; }
 	virtual bool Initialize();
 	virtual void Update(float deltaTime);
-	virtual void OnShutdown(){}
+	virtual void OnShutdown();
 
 	virtual void HandleInput(int32 keyCode);
 

@@ -102,7 +102,7 @@ private:
 	virtual uint32 GetID() const { return ID;  }
 
 protected:
-	virtual const char* GetDefaultName() const override { return "Sphere"; }
+	virtual const char* GetDefaultName() const override { return "Textholder"; }
 
 private:
 	static uint32 TextHolderID;

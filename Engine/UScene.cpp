@@ -148,7 +148,7 @@ bool UScene::Deserialize(const json::JSON& data)
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.2f, 0.2f, 0.2f }
 	);
-	objects.push_back(gizmoGrid);
+	//objects.push_back(gizmoGrid);
 
 	FString uuidStr = data.at("NextUUID").ToString();
 
