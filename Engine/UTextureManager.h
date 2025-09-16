@@ -17,8 +17,6 @@ public:
 	void BindPS(ID3D11DeviceContext* deviceContext, FTexture* texture, UINT textureSlot, UINT samplerSlot = -1);
 	void UnBindPS(ID3D11DeviceContext* deviceContext, UINT textureSlot = 0, UINT samplerSlot = 0);
 
-	// text atlas
-	void CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl, int key);
 private:
 	TMap<FString, FTexture*> textures;
 
