@@ -953,16 +953,26 @@ void URenderer::SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Sl
 	}
 }
 
-void URenderer::SetRasterizerMode(bool bIsSolid)
+void URenderer::SetRasterizerMode(EViewModeIndex vmi)
 {
-	if (bIsSolid)
+	ID3D11RasterizerState* rss;
+	switch (vmi)
 	{
-		DeviceContext->RSSetState(RasterizerStateSolid);
+	case EViewModeIndex::VMI_Lit:
+		rss = RasterizerStateSolid;
+		break;
+	case EViewModeIndex::VMI_Wireframe:
+		rss = RasterizerStateWireFrame;
+		break;
+	default:
+		rss = RasterizerStateSolid;
+		break;
 	}
-	else
-	{
-		DeviceContext->RSSetState(RasterizerStateWireFrame);
-	}
+
+	if (!rss)
+		return;
+
+	DeviceContext->RSSetState(rss);
 }
 
 void URenderer::SetViewProj(const FMatrix& View, const FMatrix& Projection)

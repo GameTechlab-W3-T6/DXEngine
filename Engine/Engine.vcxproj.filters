@@ -394,6 +394,7 @@
     <ClInclude Include="FTexture.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="ViewModeIndex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="editor.ini" />
