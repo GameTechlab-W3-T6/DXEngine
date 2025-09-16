@@ -5,6 +5,7 @@
 #include "PlaneVertices.h"
 #include "CubeVertices.h"
 #include "UClass.h"
+#include "MeshLoader.h"
 
 // Triangle winding order flip utility function
 TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& vertices)
@@ -44,6 +45,14 @@ TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVert
 	auto convertedVertices = FVertexPosColorUV4::ConvertVertexData(vertices.data(), vertices.size());
 	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(ID, convertedVertices, primitiveType);
 	return mesh;
+}
+
+TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const std::filesystem::path& FilePath, D3D_PRIMITIVE_TOPOLOGY PrimitiveType)
+{
+	auto& MeshLoader = MeshLoader::GetInstance();
+	//auto [VertexArray, IndexArray] = MeshLoader.LoadMeshWithIndex<FVertexPosColorUV4>(FilePath);
+	//return MakeUnique<UMesh>(ID, VertexArray, IndexArray, PrimitiveType);
+	return MakeUnique<UMesh>(ID, MeshLoader.LoadMesh<FVertexPosColorUV4>(FilePath), PrimitiveType);
 }
 
 static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
@@ -98,9 +107,11 @@ UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))) ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	//meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))) ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	meshes["Sphere"] = CreateMeshInternal(GetNextID(), "Meshes/Sphere.obj");
 	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
-	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
+	//meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
+	meshes["Cube"] = CreateMeshInternal(GetNextID(), "Meshes/Cube.obj");
 
 	ConfigData* config = ConfigManager::GetConfig("editor");
 	//float gridSize = config->getFloat("Gizmo", "GridSize");

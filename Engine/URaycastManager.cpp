@@ -113,6 +113,7 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 			auto result = RayIntersectsTriangle(triangleVertices);
 			if (result.has_value())
 			{
+				UE_LOG("HIT!!!");
 				float t = (*result - RayOrigin).Length(); // distance along ray
 				if (t < closestHit)
 				{
