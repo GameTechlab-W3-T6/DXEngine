@@ -16,7 +16,12 @@ UMesh::UMesh()
 //}
 
 UMesh::UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColorUV4))
+	: ID(ID), Vertices(vertices), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColorUV4)), PrimitiveType(primitiveType)
+{
+}
+
+UMesh::UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& VertexArray, const TArray<uint32>& IndexArray, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: ID(ID), Vertices(VertexArray), Indices(IndexArray), NumVertices(VertexArray.size()), NumIndices(IndexArray.size()), Stride(sizeof(FVertexPosColorUV4)), PrimitiveType(primitiveType)
 {
 }
 
@@ -42,7 +47,7 @@ void UMesh::Init(ID3D11Device* device) {
 	if (Indices.size() > 0)
 	{
 		D3D11_BUFFER_DESC indexBufferDesc = {};
-		indexBufferDesc.ByteWidth = sizeof(Indices);
+		indexBufferDesc.ByteWidth = sizeof(uint32) * Indices.size();
 		indexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		indexBufferDesc.CPUAccessFlags = 0;

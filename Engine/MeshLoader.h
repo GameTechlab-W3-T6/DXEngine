@@ -33,7 +33,10 @@ public:
 
 	template<typename TVertex>
 	std::pair<TArray<TVertex>, TArray<UINT>>
-		LoadMesh(const std::filesystem::path& FilePath);
+		LoadMeshWithIndex(const std::filesystem::path& FilePath);
+
+	template<typename TVertex>
+	TArray<TVertex> LoadMesh(const std::filesystem::path& FilePath);
 
 private:
 	MeshLoader() = default;

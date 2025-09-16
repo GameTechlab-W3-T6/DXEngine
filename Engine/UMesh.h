@@ -29,10 +29,12 @@ public:
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
 	//UMesh(MeshID ID, const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& vertices, const TArray<uint32>& IndexArray, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	~UMesh()
 	{
 		if (VertexBuffer) VertexBuffer->Release();
+		if (IndexBuffer) IndexBuffer->Release();
 	}
 
 	void Bind(ID3D11DeviceContext* DeviceContext)
