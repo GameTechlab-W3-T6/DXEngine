@@ -11,7 +11,8 @@
 *.slo
 *.lo
 *.o
-*.obj
+!Engine/Meshes/*.obj
+Engine/x64/*.obj
 
 # Precompiled Headers
 *.gch

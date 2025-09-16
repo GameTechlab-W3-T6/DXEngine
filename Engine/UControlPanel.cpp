@@ -160,16 +160,22 @@ void UControlPanel::ViewManagementSection()
 {
 	ImGui::TextUnformatted("Shading Mode");
 	if (ImGui::RadioButton("Lit", CurrentViewMode == EViewModeIndex::VMI_Lit))
+	{
 		CurrentViewMode = EViewModeIndex::VMI_Lit;
+		Renderer->SetRasterizerMode(CurrentViewMode);
+	}
 	ImGui::SameLine();
 	if (ImGui::RadioButton("Unlit", CurrentViewMode == EViewModeIndex::VMI_Unlit))
+	{
 		CurrentViewMode = EViewModeIndex::VMI_Unlit;
+		Renderer->SetRasterizerMode(CurrentViewMode);
+	}
 	ImGui::SameLine();
 	if (ImGui::RadioButton("Wireframe", CurrentViewMode == EViewModeIndex::VMI_Wireframe))
+	{
 		CurrentViewMode = EViewModeIndex::VMI_Wireframe;
-
-	// 선택된 모드 적용
-	Renderer->SetRasterizerMode(CurrentViewMode);
+		Renderer->SetRasterizerMode(CurrentViewMode);
+	}
 
 	ImGui::Separator();
 	ImGui::TextUnformatted("Show Flags");
@@ -346,6 +352,7 @@ void UControlPanel::CameraManagementSection()
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
 	}
 }
+
 
 void UControlPanel::GridManagementSection()
 {

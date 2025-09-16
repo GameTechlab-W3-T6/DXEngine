@@ -5,10 +5,10 @@
 #include "FVertexPosColor.h"
 
 template<>
-inline std::pair<TArray<FVertexPosColor>, TArray<UINT>> MeshLoader::LoadMesh(const std::filesystem::path& FilePath)
+std::pair<TArray<FVertexPosColor>, TArray<UINT>> MeshLoader::LoadMeshWithIndex(const std::filesystem::path& FilePath)
 {
 	LoadMeshImpl(FilePath);
-	
+
 	TArray<FVertexPosColor> VertexArray;
 	TArray<UINT> IndexArray;
 	TOrderedMap<std::tuple<int32, int32, int32>, UINT> IndexMap;
@@ -49,10 +49,111 @@ inline std::pair<TArray<FVertexPosColor>, TArray<UINT>> MeshLoader::LoadMesh(con
 			Vertex.g = Dist(Gen);
 			Vertex.b = Dist(Gen);
 			Vertex.a = 1.0f;
-		}
 
-		return { VertexArray, IndexArray };
+			VertexArray.push_back(Vertex);
+			IndexArray.push_back(IndexMap[FaceKey]);
+		}
 	}
+	return { VertexArray, IndexArray };
+}
+
+template<>
+std::pair<TArray<FVertexPosColorUV4>, TArray<UINT>> MeshLoader::LoadMeshWithIndex(const std::filesystem::path& FilePath)
+{
+	LoadMeshImpl(FilePath);
+
+	TArray<FVertexPosColorUV4> VertexArray;
+	TArray<UINT> IndexArray;
+	/** @todo: Change this into TMap after implementing hashing algorithm */
+	std::map<std::tuple<int32, int32, int32>, UINT> IndexMap;
+	for (const auto& Face : Faces)
+	{
+		auto FaceKey = std::make_tuple(Face.PositionIndex, Face.NormalIndex, Face.TexCoordIndex);
+
+		if (IndexMap.find(FaceKey) != IndexMap.end())
+		{
+			IndexArray.push_back(IndexMap[FaceKey]);
+		}
+		else
+		{
+			IndexMap[FaceKey] = VertexArray.size();
+			FVertexPosColorUV4 Vertex;
+			if (Face.PositionIndex != -1)
+			{
+				FVector Position = Positions[Face.PositionIndex];
+				Vertex.x = Position.X;
+				Vertex.y = Position.Y;
+				Vertex.z = Position.Z;
+				Vertex.w = 1.0f;
+			}
+			if (Face.NormalIndex != -1)
+			{
+				FVector Normal = Normals[Face.NormalIndex];
+				// DO NOTHING
+			}
+			if (Face.TexCoordIndex != -1)
+			{
+				FVector2 TexCoord = TexCoords[Face.TexCoordIndex];
+				Vertex.u = TexCoord.X;
+				Vertex.v = TexCoord.Y;
+			}
+			/* COLOR */
+			std::random_device RandomDevice;
+			std::mt19937 Gen(RandomDevice());
+			std::uniform_real_distribution<float> Dist(0.0f, 1.0f);
+			Vertex.r = Dist(Gen);
+			Vertex.g = Dist(Gen);
+			Vertex.b = Dist(Gen);
+			Vertex.a = 1.0f;
+
+			VertexArray.push_back(Vertex);
+			IndexArray.push_back(IndexMap[FaceKey]);
+		}
+	}
+	return { VertexArray, IndexArray };
+}
+
+template<>
+TArray<FVertexPosColorUV4> MeshLoader::LoadMesh(const std::filesystem::path& FilePath)
+{
+	LoadMeshImpl(FilePath);
+
+	TArray<FVertexPosColorUV4> VertexArray;
+	/** @todo: Change this into TMap after implementing hashing algorithm */
+	for (const auto& Face : Faces)
+	{
+		FVertexPosColorUV4 Vertex;
+		if (Face.PositionIndex != -1)
+		{
+			FVector Position = Positions[Face.PositionIndex];
+			Vertex.x = Position.X;
+			Vertex.y = Position.Y;
+			Vertex.z = Position.Z;
+			Vertex.w = 1.0f;
+		}
+		if (Face.NormalIndex != -1)
+		{
+			FVector Normal = Normals[Face.NormalIndex];
+			// DO NOTHING
+		}
+		if (Face.TexCoordIndex != -1)
+		{
+			FVector2 TexCoord = TexCoords[Face.TexCoordIndex];
+			Vertex.u = TexCoord.X;
+			Vertex.v = TexCoord.Y;
+		}
+		/* COLOR */
+		std::random_device RandomDevice;
+		std::mt19937 Gen(RandomDevice());
+		std::uniform_real_distribution<float> Dist(0.0f, 1.0f);
+		Vertex.r = Dist(Gen);
+		Vertex.g = Dist(Gen);
+		Vertex.b = Dist(Gen);
+		Vertex.a = 1.0f;
+
+		VertexArray.push_back(Vertex);
+	}
+	return VertexArray;
 }
 
 void MeshLoader::LoadMeshImpl(const std::filesystem::path& FilePath)
