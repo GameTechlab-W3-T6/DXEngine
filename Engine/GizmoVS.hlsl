@@ -15,7 +15,7 @@ cbuffer ConstantBuffer : register(b0)
 {
     row_major float4x4 MVP;
     float4 MeshColor;
-    float IsSelected;
+    bool IsSelected;
 };
 
 VS_OUTPUT main(VS_INPUT input)
@@ -25,9 +25,9 @@ VS_OUTPUT main(VS_INPUT input)
     float4 baseColor = input.Color;
 
     // Apply selection highlighting
-    if (IsSelected > 0.5f)
+    if (IsSelected)
     {
-        baseColor.rgb = baseColor.rgb + 0.25f;
+        baseColor.rgb = baseColor.rgb + 0.5f;
     }
 
     // Apply mesh color from constant buffer

@@ -5,6 +5,8 @@
 
 IMPLEMENT_UCLASS(UGizmoArrowComp, UGizmoComponent)
 UCLASS_META(UGizmoArrowComp, MeshName, "GizmoArrow")
+UCLASS_META(UGizmoArrowComp, VertexShaderName, "GizmoVertex")
+UCLASS_META(UGizmoArrowComp, PixelShaderName, "GizmoPixel")
 
 UGizmoArrowComp::UGizmoArrowComp()
 {
