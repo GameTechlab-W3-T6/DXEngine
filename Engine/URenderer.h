@@ -6,7 +6,7 @@
 #include "UGizmoComponent.h"
 #include "UTextholderComp.h"
 #include "UEngineSubsystem.h"
-#include "ViewModeIndex.h"
+#include "Constant.h"
 
 class UPrimitiveComponent;
 

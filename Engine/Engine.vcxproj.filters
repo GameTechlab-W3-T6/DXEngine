@@ -395,7 +395,7 @@
     <ClInclude Include="FTexture.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ViewModeIndex.h" />
+    <ClInclude Include="Constant.h" />
     <ClInclude Include="USceneManagerWindow.h" />
   </ItemGroup>
   <ItemGroup>

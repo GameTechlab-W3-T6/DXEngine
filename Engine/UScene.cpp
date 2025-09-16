@@ -9,6 +9,7 @@
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
 #include "UCamera.h"
+#include "Constant.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -158,6 +159,19 @@ bool UScene::Deserialize(const json::JSON& data)
 	return true;
 }
 
+void  UScene::SetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide, bool isOn)
+{
+	switch (InPrimitiveToHide)
+	{
+	case EEngineShowFlags::SF_Primitives:
+		hidePrimitive = isOn;
+		break;
+	case EEngineShowFlags::SF_BillboardText:
+		hideTextholder = isOn;
+		break;
+	}
+}
+
 void UScene::Render()
 {
 	// 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
@@ -169,6 +183,12 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
+			const bool isText = primitive->IsA<UTextholderComp>();
+			if (hidePrimitive && !isText)
+				continue;
+			if (hideTextholder && isText)
+				continue;
+
 			primitive->Draw(*renderer);
 		}
 	}

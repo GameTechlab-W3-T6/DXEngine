@@ -65,6 +65,8 @@ void UControlPanel::RenderContent()
 	ImGui::Separator();
 	CameraManagementSection();
 	ImGui::Separator();
+	ViewManagementSection();
+	ImGui::Separator();
 	GridManagementSection();
 	// ====================== //
 	ImGui::Separator();
@@ -154,7 +156,7 @@ void UControlPanel::SceneManagementSection()
 	}
 }
 
-void UControlPanel::CameraManagementSection()
+void UControlPanel::ViewManagementSection()
 {
 	ImGui::TextUnformatted("Shading Mode");
 	if (ImGui::RadioButton("Lit", CurrentViewMode == EViewModeIndex::VMI_Lit))
@@ -169,6 +171,28 @@ void UControlPanel::CameraManagementSection()
 	// 선택된 모드 적용
 	Renderer->SetRasterizerMode(CurrentViewMode);
 
+	ImGui::Separator();
+	ImGui::TextUnformatted("Show Flags");
+	auto* scene = SceneManager->GetScene();
+
+	// Primitives 체크박스
+	bool showPrims = !scene->hidePrimitive; // hidePrimitive=false → 보이는 상태
+	if (ImGui::Checkbox("Primitives", &showPrims))
+	{
+		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_Primitives, !showPrims);
+	}
+
+	// Billboard Text 체크박스
+	bool showText = !scene->hideTextholder;
+	if (ImGui::Checkbox("Billboard Text", &showText))
+	{
+		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_BillboardText, !showText);
+	}
+	ImGui::Separator();
+}
+
+void UControlPanel::CameraManagementSection()
+{
 	UCamera* camera = SceneManager->GetScene()->GetCamera();
 	// 카메라 정보
 	FVector pos = camera->GetLocation();

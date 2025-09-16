@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "ImGuiWindowWrapper.h"
 #include "ConfigData.h"
-#include "ViewModeIndex.h"
+#include "Constant.h"
 
 class USceneComponent;
 class USceneManager;
@@ -33,6 +33,7 @@ public:
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	void ViewManagementSection();
 	void GridManagementSection();
 
 	USceneComponent* CreateSceneComponentFromChoice(int index);

@@ -5,6 +5,7 @@
 #include "USceneManager.h"
 #include "json.hpp"
 #include "UGizmoManager.h"
+#include "Constant.h"
 
 class UCamera;
 class URaycastManager;
@@ -20,6 +21,7 @@ protected:
 	int32 version;
 	int32 primitiveCount;
 	bool isInitialized;
+
 	TArray<USceneComponent*> objects;
 
 	// Reference from outside
@@ -65,4 +67,9 @@ public:
 
 	int32 GetBackBufferWidth() { return backBufferWidth; };
 	int32 GetBackBufferHeight() { return backBufferHeight; };
+
+	bool hidePrimitive = false;
+	bool hideTextholder = false;
+
+	void SetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide, bool isOn);
 };
