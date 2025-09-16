@@ -52,6 +52,8 @@ public:
 
 	virtual LayerID GetLayer() const { return 2;  }
 
+	bool IsManageable() override { return false; }
+
 private:
 	// Hold those two subsystem due to caching
 	UTextureManager* cachedTextureManager;
