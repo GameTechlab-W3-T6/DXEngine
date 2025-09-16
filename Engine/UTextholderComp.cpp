@@ -34,6 +34,7 @@ bool UTextholderComp::Initialize()
 		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 		if (textTex)
 		{
+			// 16 x 16 is only fit for "TextInfo" texture(fontBlack.png, font.png)
 			TextInfo.SetParam(textTex, 16, 16);
 		}
 		return true;

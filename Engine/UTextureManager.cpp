@@ -10,9 +10,9 @@ IMPLEMENT_UCLASS(UTextureManager, UEngineSubsystem)
 
 bool UTextureManager::Initialize(URenderer* renderer)
 {
-	textures["TextInfo"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\font.png", false);
+	textures["TextInfo"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\font.dds", true);
 
-	textures["PlaneBaseColor"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\fire.png", false);
+	textures["PlaneBaseColor"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\fire.dds", true);
 
 	BindPS(renderer->GetDeviceContext(), textures["TextInfo"], 0, 0);
 	return true;
