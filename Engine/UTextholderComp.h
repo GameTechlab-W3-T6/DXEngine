@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UObjectMacros.h"
 #include "UPrimitiveComponent.h"
@@ -67,8 +67,7 @@ private:
 	// ============================= //
 
 	bool isEditable = true;
-	bool isInitailized = false;
-
+	
 	void CaptureTypedChars();                 // 이번 프레임 타이핑된 글자들을 수집
 
 	void CreateInstanceData();

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UClass.h"
 #include "UCamera.h"
 #include "URenderer.h"
@@ -26,6 +26,9 @@ bool UTextholderComp::Initialize()
 	cachedTextureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>();
 
+	float scaleNumber = 0.3f;
+	SetScale({ scaleNumber, scaleNumber, scaleNumber });
+	
 	if (cachedTextureManager && cachedInputManager)
 	{
 		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
@@ -87,12 +90,15 @@ void UTextholderComp::Draw(URenderer& renderer)
 {
 	CaptureTypedChars(); // TODO : will be deprecated, just for test
 
-	if(parentTransform)
-		SetPosition(parentTransform->GetPosition());
+	if (parentTransform)
+	{
+		FVector updatedTransform = parentTransform->GetPosition() + FVector{0.0f, 0.0f, 0.3f};
+		SetPosition(updatedTransform);
+	}
 
 	CreateInstanceData();
 
-	renderer.DrawTextholderComponent(this);
+	renderer.DrawTextholderComponent(this );
 }
 
 // ====================================================== //
