@@ -41,21 +41,12 @@ bool UTextholderComp::Initialize()
 	return false;
 }
 
-void UTextholderComp::SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH)
+void UTextholderComp::SetText(const FString& textContent)
 {
 	// TODO : 이딴 식으로 editable 핸들링 하지 말기;;
 	if (isEditable)
 	{
 		isEditable = false;
-	}
-
-	if (cachedTextureManager)
-	{
-		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-		if (textTex)
-		{
-			TextInfo.SetParam(textTex, fontSizeW, fontSizeH);
-		}
 	}
 
 	TextInfo.orderOfChar.clear();

@@ -235,11 +235,8 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
-	gizmoManager.SetTarget(hitPrimitive);
 	hitPrimitive->bIsSelected = true;
 	  
-	SelectedPrimitive = hitPrimitive;
-
 	//hitPrimitive->RelativeQuaternion.ToMatrixRow();
 	///hitPrimitive->RelativeLocation();
 	     
@@ -249,13 +246,15 @@ void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 
 	if (hitPrimitive->IsManageable())
 	{
+		gizmoManager.SetTarget(hitPrimitive);
+		propertyWindow->SetTarget(hitPrimitive);
+		SelectedPrimitive = hitPrimitive;
 		if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(), localMin, localMax))
 		{
 			MaxWSPos = localMax;
 			MinWSPos = localMin;
 			bAABBFlag = true;
 		}
-		propertyWindow->SetTarget(hitPrimitive);
 	}
 	else
 	{

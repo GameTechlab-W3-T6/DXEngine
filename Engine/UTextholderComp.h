@@ -30,7 +30,7 @@ public:
 	}
 
 	bool Initialize() override;
-	void SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH);
+	void SetText(const FString& textContent);
 	void SetParentTransform(USceneComponent* parent) { parentTransform = parent; }
 
 	// ============================= //
