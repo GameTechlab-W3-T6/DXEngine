@@ -5,6 +5,7 @@
 #include "URaycastManager.h"
 #include "UControlPanel.h"
 #include "USceneComponentPropertyWindow.h"
+#include "USceneManagerWindow.h"
 
 /**
  * @brief Editor application with gizmo management and object selection
@@ -20,6 +21,9 @@ private:
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
 
+	/** @todo: Should manage life-time of other windows through smart pointer. */
+	TUniquePtr<USceneManagerWindow> SceneManagerWindow;
+
 	ConfigData* config;
 
 public:
@@ -34,6 +38,9 @@ public:
 	UScene* CreateDefaultScene() override;
 
 	void OnSceneChange() override;
+
+	/** @brief: API for selecting objects through various methods(e.g., Line Casting, Heirarchy window, etc...).*/
+	void HandlePrimitiveSelect(UPrimitiveComponent* Component);
 
 protected:
 	void Update(float deltaTime) override;

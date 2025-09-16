@@ -9,6 +9,8 @@ IMPLEMENT_UCLASS(UPlaneComp, UPrimitiveComponent)
 UCLASS_META(UPlaneComp, DisplayName, "Plane")
 UCLASS_META(UPlaneComp, MeshName, "Plane")
 
+uint32 UPlaneComp::PlaneID = 0;
+
 UPlaneComp::UPlaneComp(FVector pos, FVector rot, FVector scl)
 	:UPrimitiveComponent(pos, rot, scl)
 {
@@ -23,6 +25,8 @@ UPlaneComp::UPlaneComp(FVector pos, FVector rot, FVector scl)
 		);
 	}
 
+	Name = GetDefaultName();
+	ID = PlaneID++;
 }
 
 UPlaneComp::~UPlaneComp()

@@ -46,8 +46,6 @@ TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVert
 	return mesh;
 }
 
-
-
 static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 {
 	if (a > b) std::swap(a, b);                 // 무방향 키(작은,큰)

@@ -18,6 +18,9 @@ UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 UCLASS_META(UTextholderComp, VertexShaderName, "Text_VS")
 UCLASS_META(UTextholderComp, PixelShaderName, "Text_PS");
 
+
+uint32 UTextholderComp::TextHolderID = 0;
+
 void UTextholderComp::ResourcesInitialize()
 {
 	if (isInitailized) return;

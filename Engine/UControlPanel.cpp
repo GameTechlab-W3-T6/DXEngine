@@ -344,16 +344,14 @@ void UControlPanel::PerformanceSection()
 	).count();
 
 	double DeltaTime = CurrentTime - PreviousTime;
-	if (PreviousTime == 0.0) DeltaTime = 0.0; // 첫 프레임 처리
+	if (PreviousTime == 0.0) DeltaTime = 0.0; 
 
-	// 현재 누적 카운트
 	uint32 DrawCallCount = SceneManager->GetScene()->GetRenderer()->GetDrawCallCount();
 	uint32 VertexShaderSwitchCount = SceneManager->GetScene()->GetRenderer()->GetVertexShaderSwitchCount();
 	uint32 PixelShaderSwitchCount = SceneManager->GetScene()->GetRenderer()->GetPixelShaderSwitchCount();
 	uint32 DepthStencilClearCount = SceneManager->GetScene()->GetRenderer()->GetDepthStencilViewClearCount();
 	uint32 MeshSwitchCount = SceneManager->GetScene()->GetRenderer()->GetMeshSwitchCount();
 
-	// 프레임 단위 계산 (delta count / delta time)
 	double DrawCallsPerSec = (DeltaTime > 0.0) ? (DrawCallCount - PrevDrawCallCount) / DeltaTime : 0.0;
 	double VertexShaderSwitchesPerSec = (DeltaTime > 0.0) ? (VertexShaderSwitchCount - PrevVertexShaderSwitchCount) / DeltaTime : 0.0;
 	double PixelShaderSwitchesPerSec = (DeltaTime > 0.0) ? (PixelShaderSwitchCount - PrevPixelShaderSwitchCount) / DeltaTime : 0.0;
@@ -386,7 +384,6 @@ void UControlPanel::PerformanceSection()
 	ImGui::Text("%.2f", DepthStencilClearsPerSec);
 	ImGui::Text("%.2f", MeshSwitchesPerSec);
 
-	// 이전 프레임 값 업데이트
 	PreviousTime = CurrentTime;
 	PrevDrawCallCount = DrawCallCount;
 	PrevVertexShaderSwitchCount = VertexShaderSwitchCount;

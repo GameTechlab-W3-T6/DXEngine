@@ -234,6 +234,7 @@
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="UBatchShaderManager.cpp" />
+    <ClCompile Include="USceneManagerWindow.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTextholderComp.cpp" />
     <ClCompile Include="UTextureManager.cpp" />
@@ -257,6 +258,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="USceneManagerWindow.h" />
     <ClInclude Include="ViewModeIndex.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
@@ -342,7 +344,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="TexTestPS.hlsl">
-        <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <None Include="editor.default.ini" />
     <None Include="ShaderW0.ps">

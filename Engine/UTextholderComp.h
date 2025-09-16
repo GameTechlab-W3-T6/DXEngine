@@ -21,6 +21,14 @@ class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
+	virtual ~UTextholderComp() = default;
+
+	UTextholderComp()
+	{
+		Name = GetDefaultName();
+		ID = TextHolderID++;
+	}
+
 	void ResourcesInitialize();
 	void SetText(const FString& textContent);
 	void SetText(int32 InNumber);
@@ -90,4 +98,13 @@ private:
 		outUVOffset[0] = u0; outUVOffset[1] = v0;
 		outUVScale[0] = du; outUVScale[1] = dv;
 	}
+
+	virtual uint32 GetID() const { return ID;  }
+
+protected:
+	virtual const char* GetDefaultName() const override { return "Sphere"; }
+
+private:
+	static uint32 TextHolderID;
+	uint32 ID;
 };
