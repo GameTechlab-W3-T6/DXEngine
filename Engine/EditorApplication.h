@@ -25,6 +25,10 @@ private:
 	TUniquePtr<USceneManagerWindow> SceneManagerWindow;
 
 	ConfigData* config;
+	// AABB
+	bool bAABBFlag;
+	FVector MinWSPos, MaxWSPos; 
+	UPrimitiveComponent* SelectedPrimitive = nullptr;
 
 public:
 	EditorApplication() = default;

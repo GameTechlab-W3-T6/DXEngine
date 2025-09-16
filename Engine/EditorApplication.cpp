@@ -134,6 +134,16 @@ void EditorApplication::UpdateDragOperation()
 	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
 	if (!camera) return;
 
+
+	FVector localMin, localMax;
+	if (GetRaycastManager().MakeAABBInfo(SelectedPrimitive->GetMesh(), SelectedPrimitive->GetWorldTransform(), localMin, localMax)) {
+		
+		MinWSPos = localMin;
+		MaxWSPos = localMax;
+		bAABBFlag = true;
+	}
+
+
 	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(camera);
 	gizmoManager.UpdateDrag(ray);
 }
@@ -154,14 +164,18 @@ void EditorApplication::HandleMouseClick()
 	if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, impactPoint))
 	{
 		HandleGizmoHit(hitGizmo, impactPoint);
+		bAABBFlag = true;
 	}
 	else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, impactPoint))
 	{
 		HandlePrimitiveHit(hitPrimitive);
+		bAABBFlag = true;
 	}
 	else
 	{
 		HandleEmptySpaceClick();
+		bAABBFlag = false;
+		SelectedPrimitive = nullptr;
 	}
 }
 
@@ -221,7 +235,30 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
-	HandlePrimitiveSelect(hitPrimitive);
+	gizmoManager.SetTarget(hitPrimitive);
+	hitPrimitive->bIsSelected = true;
+	  
+	SelectedPrimitive = hitPrimitive;
+
+	//hitPrimitive->RelativeQuaternion.ToMatrixRow();
+	///hitPrimitive->RelativeLocation();
+	     
+	FVector localMin, localMax; 
+	if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(),localMin, localMax))
+	{ 
+		MaxWSPos = localMax;
+		MinWSPos = localMin;
+		bAABBFlag = true;
+	}
+	else {
+		bAABBFlag = false; 
+
+	}
+
+	if (hitPrimitive->IsManageable())
+	{
+		propertyWindow->SetTarget(hitPrimitive);
+	}
 }
 
 void EditorApplication::HandleEmptySpaceClick()
@@ -238,6 +275,12 @@ void EditorApplication::ResetSelectedTarget()
 void EditorApplication::Render()
 {
 	UApplication::Render();
+
+	if (bAABBFlag)
+	{
+		GetRenderer().DrawAABBLines(MinWSPos, MaxWSPos);
+	}
+
 	gizmoManager.Draw(GetRenderer());
 }
 

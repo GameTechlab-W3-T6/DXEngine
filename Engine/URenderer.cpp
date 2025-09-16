@@ -24,6 +24,7 @@ URenderer::URenderer()
 	, MeshSwitchCount(0)
 	, VertexShaderSwitchCount(0)
 	, PixelShaderSwitchCount(0)
+	, aabbLineVB(nullptr)
 {
 	ConfigData* config = ConfigManager::GetConfig("editor");
 
@@ -641,6 +642,97 @@ bool URenderer::ReleaseShaderResourceView(ID3D11ShaderResourceView* ShaderResour
 // ==========================================================================
 // Rendering Features
 
+void URenderer::BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColorUV4>& out)
+{
+	out.clear();
+	out.reserve(24);
+
+	//VertexPosColorUV4로 바꿔주는 람다식
+	auto V = [&](float x, float y, float z) {
+		FVertexPosColorUV4 v{};
+		v.x = x; v.y = y; v.z = z; v.w = 1.0f;
+		v.r = 1.0f; v.g = 1.0f; v.b = 1.0f; v.a = 1.0f;
+		v.u = 0.0f; v.v = 0.0f; // UV 기본값 설정
+		out.push_back(v);
+		};
+
+	// AABB를 그리기 위한 8 corners
+	FVector c000{ mn.X,mn.Y,mn.Z }, c100{ mx.X,mn.Y,mn.Z },
+		c110{ mx.X,mx.Y,mn.Z }, c010{ mn.X,mx.Y,mn.Z },
+		c001{ mn.X,mn.Y,mx.Z }, c101{ mx.X,mn.Y,mx.Z },
+		c111{ mx.X,mx.Y,mx.Z }, c011{ mn.X,mx.Y,mx.Z };
+
+	// bottom face
+	V(c000.X, c000.Y, c000.Z); V(c100.X, c100.Y, c100.Z);
+	V(c100.X, c100.Y, c100.Z); V(c110.X, c110.Y, c110.Z);
+	V(c110.X, c110.Y, c110.Z); V(c010.X, c010.Y, c010.Z);
+	V(c010.X, c010.Y, c010.Z); V(c000.X, c000.Y, c000.Z);
+
+	// top face
+	V(c001.X, c001.Y, c001.Z); V(c101.X, c101.Y, c101.Z);
+	V(c101.X, c101.Y, c101.Z); V(c111.X, c111.Y, c111.Z);
+	V(c111.X, c111.Y, c111.Z); V(c011.X, c011.Y, c011.Z);
+	V(c011.X, c011.Y, c011.Z); V(c001.X, c001.Y, c001.Z);
+
+	// verticals
+	V(c000.X, c000.Y, c000.Z);
+	V(c001.X, c001.Y, c001.Z);
+
+	V(c100.X, c100.Y, c100.Z);
+	V(c101.X, c101.Y, c101.Z);
+
+	V(c110.X, c110.Y, c110.Z);
+	V(c111.X, c111.Y, c111.Z);
+
+	V(c010.X, c010.Y, c010.Z);
+	V(c011.X, c011.Y, c011.Z);
+}
+
+void URenderer::EnsureAabbLineVB(UINT bytes)
+{
+	if (aabbLineVB != nullptr) return;
+
+	D3D11_BUFFER_DESC bd{};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = bytes;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	HRESULT hr = Device->CreateBuffer(&bd, nullptr, &aabbLineVB);
+
+	if (FAILED(hr))
+	{
+		LogError(hr, "AABB BUFFER ERROR");
+		return;
+	}
+}
+
+void URenderer::DrawAABBLines(const FVector& mn, const FVector& mx)
+{
+	SetShader(currentVertexShader, currentPixelShader);
+
+	// AABB를 위한 verts 생성
+	TArray<FVertexPosColorUV4> verts;
+	BuildAabbLineVerts(mn, mx, verts);
+
+	UINT bytes = (UINT)(verts.size() * sizeof(FVertexPosColorUV4));
+	EnsureAabbLineVB(bytes);
+
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+	DeviceContext->Map(aabbLineVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	memcpy(mapped.pData, verts.data(), bytes);
+	DeviceContext->Unmap(aabbLineVB, 0);
+
+	UINT stride = sizeof(FVertexPosColorUV4), offset = 0;
+	DeviceContext->IASetVertexBuffers(0, 1, &aabbLineVB, &stride, &offset);
+	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	 
+	FMatrix identity = FMatrix::Identity;
+	FVector4 color(1, 1, 0, 1); // 노란색, 필요하면 파라미터로
+	SetModel(identity, color, true);
+	DeviceContext->Draw((UINT)verts.size(), 0);
+}
+
 void URenderer::Prepare()
 {
 	if (!DeviceContext)
@@ -1217,7 +1309,7 @@ void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelect
 		(*currentVertexShader)["ConstantBuffer"]["MVP"] = MVP;
 		(*currentVertexShader)["ConstantBuffer"]["MeshColor"] = color;
 		//(*currentVertexShader)["ConstantBuffer"]["IsSelected"] = bIsSelected;
-
+	
 		/** @brief: For now, binding should be done here. */
 		currentVertexShader->Bind(GetDeviceContext(), "ConstantBuffer");
 		currentPixelShader->Bind(GetDeviceContext());

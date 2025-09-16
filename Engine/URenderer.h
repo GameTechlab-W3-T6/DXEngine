@@ -94,8 +94,7 @@ protected:
 	ID3D11VertexShader* textVertexShaderInst;
 	ID3D11PixelShader* textPixelShaderInst;
 	ID3D11InputLayout* InputLayoutTextInst;
-	ID3D11Buffer* textInstanceVB;
-
+	ID3D11Buffer* textInstanceVB; 
 	// =================================================== //
 
 
@@ -135,11 +134,19 @@ public:
 	void DrawLine(UMesh* Mesh);
 	void DrawMeshOnTop(UMesh* Mesh);
 
+	/** @note: These helper functions use Draw AABB */
+	ID3D11Buffer* aabbLineVB;
+
+	void BuildAabbLineVerts(const FVector& mn, const FVector& mx, TArray<FVertexPosColorUV4>& out);
+	void EnsureAabbLineVB(UINT bytes);
+	void DrawAABBLines(const FVector& mn, const FVector& mx);
+
+
 	/** Resource binding */
 	[[deprecated]] void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
 	[[deprecated]] void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
 	[[deprecated]] void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
-	[[deprecated]] void SetShader(UShader* vertexShader, UShader* pixelShader);
+	void SetShader(UShader* vertexShader, UShader* pixelShader);
 	void SetTexture(ID3D11ShaderResourceView* ShaderResourceView, UINT Slot = 0);
 	void SetRasterizerMode(EViewModeIndex vmi);
 
