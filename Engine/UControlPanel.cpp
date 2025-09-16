@@ -31,9 +31,11 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 }
 
 UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, URenderer* renderer)
-	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager)
+	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 450)), SceneManager(sceneManager), GizmoManager(gizmoManager)
 {
 	Renderer = renderer;
+	config = ConfigManager::GetConfig("editor");
+
 	for (const auto& registeredType : UClass::GetClassList())
 	{
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
@@ -62,6 +64,8 @@ void UControlPanel::RenderContent()
 	SceneManagementSection();
 	ImGui::Separator();
 	CameraManagementSection();
+	ImGui::Separator();
+	GridManagementSection();
 	// ====================== //
 	ImGui::Separator();
 	PerformanceSection();
@@ -165,7 +169,7 @@ void UControlPanel::CameraManagementSection()
 	if (isOrthogonal)
 	{
 		// 원하는 직교 크기로 (예시: 월드 단위 10x10)
-		camera->SetOrtho(10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/true);
+		camera->SetOrtho(camera->GetAspect() * 10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/true);
 	}
 	else
 	{
@@ -206,6 +210,15 @@ void UControlPanel::CameraManagementSection()
 	ImGui::EndDisabled();
 
 
+	float cameraSensitivity = config->getFloat("Camera", "Sensitivity");
+
+	ImGui::Text("Camera Sensitivity");
+
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##camera_sensitivity", &cameraSensitivity, 0.01f, 0.0f, 1000.0f, "%.3f"))
+	{
+		config->setFloat("Camera", "Sensitivity", cameraSensitivity);
+	}
 
 	// --- Euler(XYZ) 편집 ---
 	// Location
@@ -291,6 +304,19 @@ void UControlPanel::CameraManagementSection()
 	if (rotCommitted)
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+	}
+}
+
+void UControlPanel::GridManagementSection()
+{
+	float gridSize = config->getFloat("Gizmo", "GridSize");
+
+	ImGui::Text("Grid Size");
+
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##grid_size", &gridSize, 0.01f, 0.0f, 1000.0f, "%.3f"))
+	{
+		config->setFloat("Gizmo", "GridSize", gridSize);
 	}
 }
 

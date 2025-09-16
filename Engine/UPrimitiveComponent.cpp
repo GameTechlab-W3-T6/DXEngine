@@ -21,8 +21,8 @@ bool UPrimitiveComponent::Init()
 	}
 	if (batchShaderManager)
 	{
-		std::string vertexShaderName = GetClass()->GetMeta("VertexShaderName");
-		std::string pixelShaderName = GetClass()->GetMeta("PixelShaderName");
+		FString vertexShaderName = GetClass()->GetMeta("VertexShaderName");
+		FString pixelShaderName = GetClass()->GetMeta("PixelShaderName");
 
 		if (vertexShaderName == "")
 			vertexShaderName = "Vertex";

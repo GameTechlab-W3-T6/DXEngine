@@ -53,12 +53,14 @@ void EditorApplication::HandleCameraInput(float deltaTime)
 	UCamera* camera = scene->GetCamera();
 	if (!camera) return;
 
+	const float baseSensitivity = config->getFloat("Camera", "Sensitivity") * deltaTime / 100.0f;
+
 	// Mouse look handling
 	if (inputManager.IsMouseLooking())
 	{
 		float mdx = 0.f, mdy = 0.f;
 		inputManager.ConsumeMouseDelta(mdx, mdy);
-		const float mouseSensitivity = 0.0015f;
+		const float mouseSensitivity = baseSensitivity;
 		camera->AddYawPitch(mdx * mouseSensitivity, mdy * mouseSensitivity);
 	}
 
@@ -246,7 +248,7 @@ void EditorApplication::RenderGUI()
 	controlPanel->Render();
 	propertyWindow->Render();
 
-	ImGui::SetNextWindowPos(ImVec2(0, 500));         // Fixed position (x=20, y=20)
+	ImGui::SetNextWindowPos(ImVec2(0, 560));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
 	ImGui::Begin("Memory Stats", nullptr,
 		ImGuiWindowFlags_NoResize |
@@ -270,6 +272,7 @@ bool EditorApplication::OnInitialize()
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetRenderer());
 	propertyWindow = new USceneComponentPropertyWindow();
+	config = ConfigManager::GetConfig("editor");
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))
 	{

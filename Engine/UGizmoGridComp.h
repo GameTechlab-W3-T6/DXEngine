@@ -22,4 +22,6 @@ public:
 	}
 
 	UGizmoGridComp();
+
+	void Update(float deltaTime) override;
 };
