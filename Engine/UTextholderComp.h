@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UObjectMacros.h"
 #include "UPrimitiveComponent.h"
@@ -21,6 +21,14 @@ class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
+	virtual ~UTextholderComp() = default;
+
+	UTextholderComp()
+	{
+		Name = GetDefaultName();
+		ID = TextHolderID++;
+	}
+
 	bool Initialize() override;
 	void SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH);
 	void SetParentTransform(USceneComponent* parent) { parentTransform = parent; }
@@ -88,4 +96,13 @@ private:
 		outUVOffset[0] = u0; outUVOffset[1] = v0;
 		outUVScale[0] = du; outUVScale[1] = dv;
 	}
+
+	virtual uint32 GetID() const { return ID;  }
+
+protected:
+	virtual const char* GetDefaultName() const override { return "Sphere"; }
+
+private:
+	static uint32 TextHolderID;
+	uint32 ID;
 };

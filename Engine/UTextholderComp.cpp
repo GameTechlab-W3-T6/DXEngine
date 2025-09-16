@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UClass.h"
 #include "UCamera.h"
 #include "URenderer.h"
@@ -18,6 +18,7 @@ UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 UCLASS_META(UTextholderComp, VertexShaderName, "Text_VS")
 UCLASS_META(UTextholderComp, PixelShaderName, "Text_PS");
 
+uint32 UTextholderComp::TextHolderID = 0;
 bool UTextholderComp::Initialize()
 {
 	if (!UPrimitiveComponent::Initialize()) return false;

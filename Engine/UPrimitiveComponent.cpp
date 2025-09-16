@@ -12,6 +12,9 @@
 #include "UScene.h"
 
 IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
+
+uint32 UPrimitiveComponent::PrimitiveID = 0;
+
 bool UPrimitiveComponent::Initialize()
 {
 	if (!USceneComponent::Initialize()) return false;

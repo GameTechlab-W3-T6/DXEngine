@@ -35,6 +35,9 @@ public:
 	{
 		ConfigData* config = ConfigManager::GetConfig("editor");
 		cachedIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");
+
+		Name = GetDefaultName();
+		ID = PrimitiveID++;
 	}
 
 	bool bIsVisible = true;
@@ -69,4 +72,17 @@ public:
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
 	FVector4 GetColor() const { return Color; }
+
+public:
+	FString GetName() const { return Name; }
+	void SetName(FString InName) { Name = InName; }
+	virtual uint32 GetID() const { return ID;  }
+
+protected:
+	virtual const char* GetDefaultName() const { return "Primitive"; }
+	FString Name;
+
+private:
+	static uint32 PrimitiveID;
+	uint32 ID;
 };

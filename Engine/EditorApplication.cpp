@@ -221,13 +221,7 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
-	gizmoManager.SetTarget(hitPrimitive);
-	hitPrimitive->bIsSelected = true;
-
-	if (hitPrimitive->IsManageable())
-	{
-		propertyWindow->SetTarget(hitPrimitive);
-	}
+	HandlePrimitiveSelect(hitPrimitive);
 }
 
 void EditorApplication::HandleEmptySpaceClick()
@@ -247,6 +241,7 @@ void EditorApplication::RenderGUI()
 {
 	controlPanel->Render();
 	propertyWindow->Render();
+	SceneManagerWindow->Render();
 
 	ImGui::SetNextWindowPos(ImVec2(0, 560));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
@@ -272,6 +267,7 @@ bool EditorApplication::OnInitialize()
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetRenderer());
 	propertyWindow = new USceneComponentPropertyWindow();
+	SceneManagerWindow = MakeUnique<USceneManagerWindow>(this);
 	config = ConfigManager::GetConfig("editor");
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))
@@ -310,4 +306,20 @@ void EditorApplication::OnSceneChange()
 	propertyWindow->SetTarget(nullptr);
 	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
 	gizmoManager.SetTarget(nullptr);
+}
+
+void EditorApplication::HandlePrimitiveSelect(UPrimitiveComponent* Component)
+{
+	if (selectedSceneComponent)
+	{
+		selectedSceneComponent->bIsSelected = false;
+	}
+	selectedSceneComponent = Component;
+	gizmoManager.SetTarget(Component);
+	Component->bIsSelected = true;
+
+	if (Component->IsManageable())
+	{
+		propertyWindow->SetTarget(Component);
+	}
 }
