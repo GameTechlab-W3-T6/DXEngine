@@ -862,8 +862,9 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 	Component->BindShader(*this); 
 	Component->BindTexture(*this);
 	
-	D3D11_MAPPED_SUBRESOURCE m{};
-	
+	DeviceContext->IASetInputLayout(InputLayoutTextInst); 
+
+	D3D11_MAPPED_SUBRESOURCE m{}; 
 	DeviceContext->Map(textInstanceVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
 	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
 	DeviceContext->Unmap(textInstanceVB, 0);
@@ -872,7 +873,7 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 	// vertexshader inputlayout을 intaced draw 용으로 교체
 	ID3D11Buffer* bufs[2] = { text->VertexBuffer, textInstanceVB };
 	UINT strides[2] = { text->Stride, (UINT)sizeof(FTextInstance) };
-	UINT offsets[2] = { 0, 40 };
+	UINT offsets[2] = { 0, 0 };
 
 	DeviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
 	DeviceContext->IASetPrimitiveTopology(text->PrimitiveType);
