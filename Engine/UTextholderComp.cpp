@@ -18,33 +18,40 @@ UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
 UCLASS_META(UTextholderComp, VertexShaderName, "Text_VS")
 UCLASS_META(UTextholderComp, PixelShaderName, "Text_PS");
 
-void UTextholderComp::ResourcesInitialize()
+bool UTextholderComp::Initialize()
 {
-	if (isInitailized) return;
-
-	isInitailized = true;
+	if (!UPrimitiveComponent::Initialize()) return false;
 
 	cachedTextureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>();
 
-	if (cachedTextureManager)
+	if (cachedTextureManager && cachedInputManager)
 	{
 		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
 		if (textTex)
 		{
 			TextInfo.SetParam(textTex, 16, 16);
 		}
+		return true;
 	}
-	// UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
+	return false;
 }
 
-void UTextholderComp::SetText(const FString& textContent)
+void UTextholderComp::SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH)
 {
 	// TODO : 이딴 식으로 editable 핸들링 하지 말기;;
 	if (isEditable)
 	{
 		isEditable = false;
-		ResourcesInitialize();
+	}
+
+	if (cachedTextureManager)
+	{
+		FTexture* textTex = cachedTextureManager->RetrieveTexture(GetClass()->GetMeta("TextInfo"));
+		if (textTex)
+		{
+			TextInfo.SetParam(textTex, fontSizeW, fontSizeH);
+		}
 	}
 
 	TextInfo.orderOfChar.clear();
@@ -52,19 +59,6 @@ void UTextholderComp::SetText(const FString& textContent)
 	{
 		TextInfo.orderOfChar.push_back(static_cast<int>(c));
 	}
-}
-
-void UTextholderComp::SetText(int32 InNumber) // TODO : hex mode 넣어 말아?
-{
-	FString Converted = std::to_string(InNumber);
-	SetText(Converted); // 위 함수 재사용
-}
-
-// 정적 타이핑 draw용 : primitive가 자신의 textholder를 call 할 때
-void UTextholderComp::DrawAboveParent(URenderer& renderer, FVector location)
-{
-	SetPosition(location);
-	Draw(renderer);
 }
 
 // ====================================================== //
@@ -90,9 +84,10 @@ void UTextholderComp::BindPixelShader(URenderer& renderer)
 
 void UTextholderComp::Draw(URenderer& renderer)
 {
-	ResourcesInitialize();
+	CaptureTypedChars(); // TODO : will be deprecated, just for test
 
-	CaptureTypedChars();
+	if(parentTransform)
+		SetPosition(parentTransform->GetPosition());
 
 	CreateInstanceData();
 
@@ -165,21 +160,9 @@ void UTextholderComp::CreateInstanceData()
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
 
 		FTextInstance inst{};
-		if (isEditable)
-		{
-			FMatrix bill = TextInfo.MakeBillboard(view);
-			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill; 
-			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
-		}
-		else
-		{
-			FMatrix bill = TextInfo.MakeBillboard(view); 
-			FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;   
-			Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
-		}
-
-		// 인스턴스 월드 행렬: X축으로 penX 만큼 이동 후 빌보드 적용
-
+		FMatrix bill = TextInfo.MakeBillboard(view);
+		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+		Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 
 		// 아틀라스에서 현재 글자의 UV 사각형 계산
 		const int texW = TextInfo.textTexture->width;

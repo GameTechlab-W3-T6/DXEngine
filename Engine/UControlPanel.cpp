@@ -111,6 +111,13 @@ void UControlPanel::SpawnPrimitiveSection()
 				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
 			));
 			SceneManager->GetScene()->AddObject(sceneComponent);
+
+			UTextholderComp* labelUUID = new UTextholderComp;
+			labelUUID->Initialize();
+			const FString generated = "UID : " + std::to_string(sceneComponent->UUID);
+			labelUUID->SetText(generated, 1, 1);
+			labelUUID->SetParentTransform(sceneComponent);
+			SceneManager->GetScene()->AddObject(labelUUID);
 		}
 	}
 	ImGui::SameLine();

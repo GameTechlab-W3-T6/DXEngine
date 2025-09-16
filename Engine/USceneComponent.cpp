@@ -15,7 +15,7 @@ FMatrix USceneComponent::GetWorldTransform()
 bool USceneComponent::Initialize()
 {
     UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();
-    inputManager->RegisterKeyCallback(std::to_string(InternalIndex), [this](int32 keyCode) {HandleInput(keyCode);});
+     inputManager->RegisterKeyCallback(std::to_string(InternalIndex), [this](int32 keyCode) {HandleInput(keyCode);});
     
     return true;
 }

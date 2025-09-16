@@ -98,23 +98,6 @@ void UTextureManager::UnBindPS(ID3D11DeviceContext* deviceContext, UINT textureS
 	deviceContext->PSSetSamplers(samplerSlot, 1, nullSampler);
 }
 
-void UTextureManager::CallCharacter(TArray<FTextInfo*>& stringList, UClass* cl, int key)
-{
-	////TODO: 정리
-	FTextInfo* textInfo = new FTextInfo();
-	FTexture* textTex = RetrieveTexture(GetClass()->GetMeta("TextInfo"));
-	textInfo->keyCode = key;
-	textInfo->textTexture = textTex;
-	textInfo->cellsPerColumn = 16;
-	textInfo->cellsPerRow = 16;
-	textInfo->cellWidth = textTex->width / textInfo->cellsPerRow;
-	textInfo->cellHeight = textTex->height / textInfo->cellsPerColumn;
-
-	stringList.push_back(textInfo);
-}
-
-
-
 UTextureManager::UTextureManager()
 {
 	//textures["fire"] = CreateTextureInternal();

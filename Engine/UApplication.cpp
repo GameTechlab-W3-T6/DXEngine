@@ -93,6 +93,11 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 
 	batchShaderManager.Initialize(GetRenderer().GetDevice());
 
+	if (!textureManager.Initialize(renderer.get()))
+	{
+		return false;
+	}
+
 	if (!sceneManager.Initialize(g_pApplication))
 	{
 		MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
@@ -104,11 +109,6 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 	if (!gui.Initialize(hWnd, GetRenderer().GetDevice(), GetRenderer().GetDeviceContext()))
-	{
-		return false;
-	}
-
-	if (!textureManager.Initialize(renderer.get()))
 	{
 		return false;
 	}

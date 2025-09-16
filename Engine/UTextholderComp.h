@@ -21,10 +21,9 @@ class UTextholderComp : public UPrimitiveComponent
 {
 	DECLARE_UCLASS(UTextholderComp, UPrimitiveComponent)
 public:
-	void ResourcesInitialize();
-	void SetText(const FString& textContent);
-	void SetText(int32 InNumber);
-	void DrawAboveParent(URenderer& renderer, FVector location);
+	bool Initialize() override;
+	void SetText(const FString& textContent, const int32 fontSizeW, const int32 fontSizeH);
+	void SetParentTransform(USceneComponent* parent) { parentTransform = parent; }
 
 	// ============================= //
 
@@ -49,6 +48,7 @@ private:
 	// Hold those two subsystem due to caching
 	UTextureManager* cachedTextureManager;
 	UInputManager* cachedInputManager;
+	USceneComponent* parentTransform;
 	//  TODO : pointer로 들고 있기
 	FTextInfo TextInfo;
 
@@ -64,8 +64,6 @@ private:
 	void CaptureTypedChars();                 // 이번 프레임 타이핑된 글자들을 수집
 
 	void CreateInstanceData();
-
-	void RenderTextLine(URenderer& renderer, bool bIsShaderReflectionEnabled); // 수집된 글자를 가로로 나열 렌더
 
 	inline void Build3x4Rows(const FMatrix& M, float outM0[4], float outM1[4], float outM2[4])
 	{
