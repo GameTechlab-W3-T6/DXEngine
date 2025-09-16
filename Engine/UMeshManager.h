@@ -21,8 +21,13 @@ private:
 
 	TMap<FString, TUniquePtr<UMesh>> meshes;
 
-	TUniquePtr<UMesh> CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
+	//TUniquePtr<UMesh> CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
+	//	D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	TUniquePtr<UMesh> CreateMeshInternal(MeshID ID, const TArray<FVertexPosColorUV>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 
 	TUniquePtr<UMesh> CreateWireframeMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

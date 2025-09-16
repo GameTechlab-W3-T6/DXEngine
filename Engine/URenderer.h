@@ -38,6 +38,7 @@ public:
 	bool CreateShader_SR();
 	bool CreateRasterizerState();
 	bool CreateConstantBuffer();
+	bool CreateInstancedVB();
 	void Release();
 	void ReleaseShader();
 	void ReleaseConstantBuffer();

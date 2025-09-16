@@ -28,14 +28,25 @@ TArray<FVertexPosColor> FlipTriangleWinding(const TArray<FVertexPosColor>& verti
 }
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
-TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
+//TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVertexPosColor>& vertices,
+//	D3D_PRIMITIVE_TOPOLOGY primitiveType)
+//{
+//	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
+//	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+//	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(ID, convertedVertices, primitiveType);
+//	return mesh;
+//}
+
+TUniquePtr<UMesh> UMeshManager::CreateMeshInternal(MeshID ID, const TArray<FVertexPosColorUV>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
-	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	auto convertedVertices = FVertexPosColorUV4::ConvertVertexData(vertices.data(), vertices.size());
 	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(ID, convertedVertices, primitiveType);
 	return mesh;
 }
+
+
 
 static inline uint64_t MakeEdgeKey(uint32_t a, uint32_t b)
 {
@@ -73,7 +84,8 @@ TUniquePtr<UMesh> UMeshManager::CreateWireframeMeshInternal(MeshID ID, const TAr
 	}
 	
 	// 정점 포맷 변환(필요시)
-	TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	///TArray<FVertexPosColor4> converted = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
+	TArray<FVertexPosColorUV4> converted = FVertexPosColorUV4::ConvertToPosColorUV4( FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size()) );
 
 	// 메시 생성: 토폴로지는 반드시 LINELIST
 	TUniquePtr<UMesh> mesh = MakeUnique<UMesh>(ID, converted, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -88,17 +100,19 @@ UMeshManager::UMeshManager()
 {
 	// Sphere needs winding order flip for LH coordinate system
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
-	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
+	meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(sphere_vertices)); ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
 	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 
 	ConfigData* config = ConfigManager::GetConfig("editor");
 	//float gridSize = config->getFloat("Gizmo", "GridSize");
 	int gridCount = config->getInt("Gizmo", "GridCount");
-	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateGridVertices(1, gridCount), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), gizmo_arrow_vertices);
-	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), GridGenerator::CreateRotationHandleVertices());
-	meshes["GizmoScaleHandle"] = CreateMeshInternal(GetNextID(), gizmo_scale_handle_vertices);
+
+	meshes["GizmoGrid"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(GridGenerator::CreateGridVertices(1, gridCount)), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	meshes["GizmoArrow"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(gizmo_arrow_vertices));
+	meshes["GizmoRotationHandle"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(GridGenerator::CreateRotationHandleVertices()));
+	meshes["GizmoScaleHandle"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV( gizmo_scale_handle_vertices));
+
 
 	// meshes["SphereWireframe"] = CreateWireframeMeshInternal(FlipTriangleWinding(sphere_vertices), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }

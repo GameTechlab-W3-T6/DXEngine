@@ -10,15 +10,21 @@ UMesh::UMesh()
 {
 }
 
-UMesh::UMesh(MeshID ID, const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+//UMesh::UMesh(MeshID ID, const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+//	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
+//{
+//}
+
+UMesh::UMesh(MeshID ID, const TArray<FVertexPosColorUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: ID(ID), Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColorUV4))
 {
 }
 
 void UMesh::Init(ID3D11Device* device) {
 	D3D11_BUFFER_DESC vertexBufferDesc = {};
 	vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDesc.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
+	//vertexBufferDesc.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
+	vertexBufferDesc.ByteWidth = sizeof(FVertexPosColorUV4) * NumVertices;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
