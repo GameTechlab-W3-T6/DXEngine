@@ -226,13 +226,6 @@ Even simple public members should use getters and setters for long-term maintain
 ```cpp
 class FGameSettings
 {
-private:
-    // Even simple values use getters/setters
-    int32 ScreenWidth;
-    int32 ScreenHeight;
-    bool bIsFullscreen;
-    FString WindowTitle;
-
 public:
     // Simple getters and setters
     int32 GetScreenWidth() const { return ScreenWidth; }
@@ -246,6 +239,13 @@ public:
 
     const FString& GetWindowTitle() const { return WindowTitle; }
     void SetWindowTitle(const FString& InTitle) { WindowTitle = InTitle; }
+
+private:
+    // Even simple values use getters/setters
+    int32 ScreenWidth;
+    int32 ScreenHeight;
+    bool bIsFullscreen;
+    FString WindowTitle;
 };
 ```
 
