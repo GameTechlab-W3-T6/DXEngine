@@ -1,0 +1,193 @@
+# DXEngine Clang-Tidy Configuration
+# Enforces coding conventions and best practices
+
+Checks: >
+  # Readability checks for naming conventions
+  readability-identifier-naming,
+  readability-function-size,
+  readability-parameter-name,
+  readability-redundant-member-init,
+  readability-simplify-boolean-expr,
+  readability-static-accessed-through-instance,
+  readability-uppercase-literal-suffix,
+  readability-const-return-type,
+  readability-container-size-empty,
+  readability-delete-null-pointer,
+  readability-isolate-declaration,
+  readability-misleading-indentation,
+  readability-named-parameter,
+  readability-non-const-parameter,
+  readability-redundant-declaration,
+  readability-redundant-function-ptr-dereference,
+  readability-redundant-smartptr-get,
+  readability-redundant-string-cstr,
+  readability-redundant-string-init,
+  readability-simplify-subscript-expr,
+  readability-static-definition-in-anonymous-namespace,
+  readability-string-compare,
+  readability-uniqueptr-delete-release,
+
+  # Modern C++ checks
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+
+  # Performance checks
+  performance-*,
+  -performance-avoid-endl,
+
+  # Misc checks
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  -misc-const-correctness,
+
+  # Bugprone checks
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+
+  # Google style checks
+  google-*,
+  -google-readability-todo,
+  -google-runtime-references,
+
+  # Cert security checks
+  cert-*,
+  -cert-err58-cpp,
+
+  # LLVM checks (selective)
+  llvm-include-order,
+  llvm-namespace-comment,
+
+  # Clang analyzer checks
+  clang-analyzer-*,
+
+  # Core guidelines checks (selective)
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-avoid-c-arrays
+
+CheckOptions:
+  # Naming conventions for Unreal Engine style
+  # Note: Clang-tidy cannot automatically detect inheritance, so we use a combination of rules
+  # Manual review is needed for UObject-derived classes to ensure U prefix
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassPrefix
+    value: ''  # Allow both F and U prefixes, manual enforcement needed
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructPrefix
+    value: 'F'
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumPrefix
+    value: 'E'
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.MethodCase
+    value: CamelCase
+  - key: readability-identifier-naming.VariableCase
+    value: CamelCase
+  - key: readability-identifier-naming.ParameterCase
+    value: CamelCase
+  - key: readability-identifier-naming.MemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.PublicMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.StaticConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.NamespaceCase
+    value: CamelCase
+
+  # Template parameter naming
+  - key: readability-identifier-naming.TemplateParameterCase
+    value: CamelCase
+  - key: readability-identifier-naming.TemplateParameterPrefix
+    value: 'T'
+
+  # Type alias naming
+  - key: readability-identifier-naming.TypeAliasCase
+    value: CamelCase
+  - key: readability-identifier-naming.TypedefCase
+    value: lower_case
+
+  # Function size limits
+  - key: readability-function-size.LineThreshold
+    value: 100
+  - key: readability-function-size.StatementThreshold
+    value: 50
+  - key: readability-function-size.BranchThreshold
+    value: 10
+  - key: readability-function-size.ParameterThreshold
+    value: 8
+  - key: readability-function-size.NestingThreshold
+    value: 4
+
+  # Magic numbers
+  - key: readability-magic-numbers.IgnoredIntegerValues
+    value: '0;1;2;3;4;8;16;32;64;128;256;512;1024'
+  - key: readability-magic-numbers.IgnoredFloatingPointValues
+    value: '0.0;1.0;2.0;0.5;0.25;0.75'
+
+  # Performance settings
+  - key: performance-move-const-arg.CheckTriviallyCopyableMove
+    value: false
+  - key: performance-for-range-copy.WarnOnAllAutoCopies
+    value: true
+
+  # Modernize settings
+  - key: modernize-loop-convert.MaxCopySize
+    value: 16
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable
+  - key: modernize-pass-by-value.IncludeStyle
+    value: google
+  - key: modernize-replace-auto-ptr.IncludeStyle
+    value: google
+  - key: modernize-use-nullptr.NullMacros
+    value: 'NULL'
+
+  # Google style specific
+  - key: google-readability-braces-around-statements.ShortStatementLines
+    value: 1
+  - key: google-readability-function-size.StatementThreshold
+    value: 50
+
+  # Core guidelines settings
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: true
+
+# Header filter to apply checks only to project files
+HeaderFilterRegex: '^((?!.*/(test|tests|3rdparty|external|thirdparty|third_party)/).)*$'
+
+# Format style (should match .clang-format)
+FormatStyle: file
+
+# Analysis options
+AnalyzeTemporaryDtors: false
+
+# Warnings as errors (optional, can be enabled for stricter enforcement)
+WarningsAsErrors: ''
+
+# System headers to ignore
+SystemHeaders: false

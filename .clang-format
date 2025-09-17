@@ -1,0 +1,134 @@
+# DXEngine Clang-Format Configuration
+# Based on Unreal Engine and Google C++ Style Guide conventions
+
+# Base style - closest to our requirements
+BasedOnStyle: Google
+
+# Language and standard
+Language: Cpp
+Standard: c++17
+
+# Indentation and spacing
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+
+# Access modifier indentation
+AccessModifierOffset: -4
+IndentAccessModifiers: false
+
+# Class and struct formatting
+BreakBeforeBraces: Allman
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+
+# Function and method formatting
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+
+# Parameter and argument formatting
+BinPackArguments: false
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+
+# Line breaking
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: true
+
+# Spacing rules
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Pointer and reference alignment
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+
+# Include sorting and formatting
+IncludeBlocks: Regroup
+SortIncludes: true
+IncludeCategories:
+  # Engine core headers first
+  - Regex: '^"Engine/Core/'
+    Priority: 1
+  # Other engine headers
+  - Regex: '^"Engine/'
+    Priority: 2
+  # Project headers
+  - Regex: '^"[A-Z]'
+    Priority: 3
+  # Local headers
+  - Regex: '^"'
+    Priority: 4
+  # System headers
+  - Regex: '^<'
+    Priority: 5
+
+# Comment formatting
+ReflowComments: true
+AlignTrailingComments: true
+
+# Macro and preprocessor
+IndentPPDirectives: AfterHash
+MacroBlockBegin: ''
+MacroBlockEnd: ''
+
+# Namespace formatting
+CompactNamespaces: false
+NamespaceIndentation: None
+
+# Constructor initializer list
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+
+# Case statement formatting
+IndentCaseLabels: true
+
+# Penalty settings for line breaking decisions
+PenaltyBreakAssignment: 100
+PenaltyBreakBeforeFirstCallParameter: 50
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 200
+
+# Experimental features
+ExperimentalAutoDetectBinPacking: false
+
+# Keep empty lines
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+
+# Sort using declarations
+SortUsingDeclarations: true
+
+# Align consecutive declarations
+AlignConsecutiveDeclarations: false
+AlignConsecutiveAssignments: false
+AlignConsecutiveMacros: false
+
+# Insert trailing commas in supported contexts
+InsertTrailingCommas: None

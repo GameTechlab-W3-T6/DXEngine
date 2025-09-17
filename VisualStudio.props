@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DXEngine Visual Studio Property Sheet -->
+<!-- Import this in your .vcxproj files to enforce coding standards -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Property Group for Code Analysis and Formatting -->
+  <PropertyGroup Label="DXEngine Code Standards">
+    <!-- Enable Code Analysis -->
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <ClangTidyChecks>-*,readability-*,modernize-*,performance-*,bugprone-*,google-*,cert-*,misc-*,cppcoreguidelines-*</ClangTidyChecks>
+
+    <!-- Enable IntelliSense Code Analysis -->
+    <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)DXEngine.ruleset</CodeAnalysisRuleSet>
+
+    <!-- Treat warnings as errors for critical issues -->
+    <TreatWarningAsError>false</TreatWarningAsError>
+    <WarningsAsErrors></WarningsAsErrors>
+    <WarningsNotAsErrors></WarningsNotAsErrors>
+
+    <!-- Set warning level -->
+    <WarningLevel>Level4</WarningLevel>
+
+    <!-- Enable additional warnings -->
+    <AdditionalOptions>/Wall /wd4820 /wd4668 /wd4514 /wd4710 /wd4711 /wd5045 %(AdditionalOptions)</AdditionalOptions>
+
+    <!-- Enable conformance mode -->
+    <ConformanceMode>true</ConformanceMode>
+
+    <!-- Set C++ standard -->
+    <LanguageStandard>stdcpp17</LanguageStandard>
+
+    <!-- Enable multi-processor compilation -->
+    <MultiProcessorCompilation>true</MultiProcessorCompilation>
+
+    <!-- Precompiled headers (optional) -->
+    <PrecompiledHeader>NotUsing</PrecompiledHeader>
+
+    <!-- Runtime library -->
+    <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
+    <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
+
+    <!-- Optimization -->
+    <Optimization Condition="'$(Configuration)'=='Debug'">Disabled</Optimization>
+    <Optimization Condition="'$(Configuration)'=='Release'">MaxSpeed</Optimization>
+
+    <!-- Debug information -->
+    <DebugInformationFormat Condition="'$(Configuration)'=='Debug'">EditAndContinue</DebugInformationFormat>
+    <DebugInformationFormat Condition="'$(Configuration)'=='Release'">ProgramDatabase</DebugInformationFormat>
+
+    <!-- Enable Clang-Format on save (Visual Studio 2019+) -->
+    <ClangFormatOnSave>true</ClangFormatOnSave>
+    <ClangFormatStyleFile>.clang-format</ClangFormatStyleFile>
+  </PropertyGroup>
+
+  <!-- Compiler-specific settings -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <!-- Warning settings -->
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+
+      <!-- Disabled warnings (common platform/compiler warnings that don't affect code quality) -->
+      <DisableSpecificWarnings>
+        4820;  <!-- padding added after data member -->
+        4668;  <!-- is not defined as a preprocessor macro -->
+        4514;  <!-- unreferenced inline function has been removed -->
+        4710;  <!-- function not inlined -->
+        4711;  <!-- function selected for automatic inline expansion -->
+        5045;  <!-- Spectre mitigation warning -->
+        4625;  <!-- copy constructor was implicitly defined as deleted -->
+        4626;  <!-- assignment operator was implicitly defined as deleted -->
+        5026;  <!-- move constructor was implicitly defined as deleted -->
+        5027;  <!-- move assignment operator was implicitly defined as deleted -->
+      </DisableSpecificWarnings>
+
+      <!-- Enable useful warnings -->
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+
+      <!-- Preprocessor definitions -->
+      <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">
+        _DEBUG;
+        DEBUG=1;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+
+      <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">
+        NDEBUG;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+
+      <!-- Common preprocessor definitions -->
+      <PreprocessorDefinitions>
+        WIN32_LEAN_AND_MEAN;
+        NOMINMAX;
+        UNICODE;
+        _UNICODE;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+
+      <!-- Additional include directories -->
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(ProjectDir)Engine\;
+        $(ProjectDir)Engine\Core\;
+        $(ProjectDir)Engine\Math\;
+        $(ProjectDir)Engine\Rendering\;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+
+      <!-- Code generation -->
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
+
+      <!-- Optimization -->
+      <Optimization Condition="'$(Configuration)'=='Debug'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)'=='Release'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)'=='Release'">true</IntrinsicFunctions>
+      <FavorSizeOrSpeed Condition="'$(Configuration)'=='Release'">Speed</FavorSizeOrSpeed>
+      <OmitFramePointers Condition="'$(Configuration)'=='Release'">true</OmitFramePointers>
+
+      <!-- Conformance -->
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PermissiveMode>false</PermissiveMode>
+
+      <!-- Code analysis -->
+      <EnablePREfast>true</EnablePREfast>
+      <PREfastAdditionalOptions>/analyze:stacksize 100000</PREfastAdditionalOptions>
+
+      <!-- Multi-processor compilation -->
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ProcessorNumber>0</ProcessorNumber>
+
+      <!-- Debug information -->
+      <DebugInformationFormat Condition="'$(Configuration)'=='Debug'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)'=='Release'">ProgramDatabase</DebugInformationFormat>
+
+      <!-- Floating point model -->
+      <FloatingPointModel>Fast</FloatingPointModel>
+
+      <!-- Exception handling -->
+      <ExceptionHandling>Sync</ExceptionHandling>
+
+      <!-- Runtime checks -->
+      <BasicRuntimeChecks Condition="'$(Configuration)'=='Debug'">EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+
+      <!-- String pooling -->
+      <StringPooling Condition="'$(Configuration)'=='Release'">true</StringPooling>
+
+      <!-- Function-level linking -->
+      <FunctionLevelLinking Condition="'$(Configuration)'=='Release'">true</FunctionLevelLinking>
+    </ClCompile>
+
+    <!-- Linker settings -->
+    <Link>
+      <!-- Debug information -->
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+
+      <!-- Subsystem -->
+      <SubSystem Condition="'$(ConfigurationType)'=='Application'">Console</SubSystem>
+
+      <!-- Optimization -->
+      <EnableCOMDATFolding Condition="'$(Configuration)'=='Release'">true</EnableCOMDATFolding>
+      <OptimizeReferences Condition="'$(Configuration)'=='Release'">true</OptimizeReferences>
+
+      <!-- Link-time code generation -->
+      <LinkTimeCodeGeneration Condition="'$(Configuration)'=='Release'">UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+
+      <!-- Stack size -->
+      <StackReserveSize>8388608</StackReserveSize>
+      <StackCommitSize>65536</StackCommitSize>
+
+      <!-- Libraries -->
+      <AdditionalDependencies>
+        d3d11.lib;
+        dxgi.lib;
+        d3dcompiler.lib;
+        dxguid.lib;
+        kernel32.lib;
+        user32.lib;
+        gdi32.lib;
+        winspool.lib;
+        comdlg32.lib;
+        advapi32.lib;
+        shell32.lib;
+        ole32.lib;
+        oleaut32.lib;
+        uuid.lib;
+        odbc32.lib;
+        odbccp32.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+
+    <!-- Resource compiler -->
+    <ResourceCompile>
+      <PreprocessorDefinitions>
+        UNICODE;
+        _UNICODE;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+
+  <!-- Post-build events for code formatting -->
+  <Target Name="FormatCode" AfterTargets="Build" Condition="'$(Configuration)'=='Debug'">
+    <Message Text="Running clang-format on modified files..." Importance="high" />
+    <!-- Note: This requires clang-format to be in PATH -->
+    <Exec Command="powershell -Command &quot;Get-ChildItem -Path '$(ProjectDir)' -Recurse -Include '*.cpp','*.h','*.hpp' | ForEach-Object { clang-format -i $_.FullName }&quot;"
+          ContinueOnError="true"
+          Condition="Exists('$(ProjectDir).clang-format')" />
+  </Target>
+
+</Project>

@@ -1,2 +1,142 @@
-[**/*.{cpp,h}]
-charset = utf-8-bom
+# DXEngine EditorConfig
+# Defines consistent coding styles across different editors and IDEs
+
+# Top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C++ source files
+[*.{cpp,cc,cxx,c++,hpp,h,hxx,h++,inl}]
+indent_style = space
+indent_size = 4
+tab_width = 4
+max_line_length = 120
+
+# Visual Studio specific settings for C++
+# Use spaces for indentation
+cpp_indent_braces = false
+cpp_indent_multi_line_relative_to = innermost_parenthesis
+cpp_indent_within_parentheses = align_to_parenthesis
+cpp_indent_preserve_within_parentheses = true
+
+# Spacing preferences
+cpp_space_before_function_open_parenthesis = remove
+cpp_space_within_parameter_list_parentheses = false
+cpp_space_between_empty_parameter_list_parentheses = false
+cpp_space_after_keywords_in_control_flow_statements = true
+cpp_space_within_control_flow_statement_parentheses = false
+cpp_space_before_lambda_open_parenthesis = false
+cpp_space_within_cast_parentheses = false
+cpp_space_after_cast_close_parenthesis = false
+cpp_space_within_expression_parentheses = false
+cpp_space_before_block_open_brace = true
+cpp_space_between_empty_braces = false
+cpp_space_before_initializer_list_open_brace = false
+cpp_space_within_initializer_list_braces = true
+cpp_space_preserve_in_initializer_list = true
+cpp_space_before_open_square_bracket = false
+cpp_space_within_square_brackets = false
+cpp_space_before_empty_square_brackets = false
+cpp_space_between_empty_square_brackets = false
+cpp_space_group_square_brackets = true
+cpp_space_within_lambda_brackets = false
+cpp_space_between_empty_lambda_brackets = false
+cpp_space_before_comma = false
+cpp_space_after_comma = true
+cpp_space_remove_around_member_operators = true
+cpp_space_before_inheritance_colon = true
+cpp_space_before_constructor_colon = true
+cpp_space_remove_before_semicolon = true
+cpp_space_after_semicolon = true
+cpp_space_remove_around_unary_operator = true
+cpp_space_around_binary_operator = insert
+cpp_space_around_assignment_operator = insert
+cpp_space_pointer_reference_alignment = left
+cpp_space_around_ternary_operator = insert
+
+# Newline preferences
+cpp_new_line_before_open_brace_namespace = same_line
+cpp_new_line_before_open_brace_type = new_line
+cpp_new_line_before_open_brace_function = new_line
+cpp_new_line_before_open_brace_block = new_line
+cpp_new_line_before_open_brace_lambda = same_line
+cpp_new_line_scope_braces_on_separate_lines = true
+cpp_new_line_close_brace_same_line_empty_type = false
+cpp_new_line_close_brace_same_line_empty_function = false
+cpp_new_line_before_catch = true
+cpp_new_line_before_else = true
+cpp_new_line_before_while_in_do_while = false
+
+# Wrapping preferences
+cpp_wrap_preserve_blocks = one_liners
+
+# HLSL shader files
+[*.{hlsl,fx,fxh}]
+indent_style = space
+indent_size = 4
+tab_width = 4
+max_line_length = 120
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+# XML files (project files, etc.)
+[*.{xml,vcxproj,vcxproj.filters,props,targets}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+# Markdown files
+[*.md]
+indent_style = space
+indent_size = 2
+tab_width = 2
+trim_trailing_whitespace = false
+
+# Batch files
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# PowerShell files
+[*.ps1]
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+# CMake files
+[{CMakeLists.txt,*.cmake}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+# Visual Studio solution files
+[*.sln]
+indent_style = tab
+tab_width = 4
+end_of_line = crlf
+
+# Git config files
+[.gitconfig]
+indent_style = tab
+tab_width = 4
+
+# Configuration files
+[*.{ini,cfg,conf}]
+indent_style = space
+indent_size = 4
+tab_width = 4

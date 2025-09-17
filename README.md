@@ -115,9 +115,10 @@ private:
 
 #### PascalCase for All Identifiers
 
-All classes, member variables, and parameters use PascalCase:
+All classes, member variables, and parameters use PascalCase with appropriate prefixes:
 
 ```cpp
+// Regular classes use F prefix
 class FGameEngine
 {
 public:
@@ -128,6 +129,30 @@ private:
     int32 CurrentFrameRate;
     FString GameTitle;
     TUniquePtr<FRenderer> GraphicsRenderer;
+};
+
+// Classes inheriting from UObject use U prefix
+class UPlayerController : public UObject
+{
+public:
+    void Initialize();
+    void ProcessInput(float32 DeltaTime);
+
+private:
+    bool bIsInputEnabled;
+    FVector3 PlayerPosition;
+};
+
+// Engine subsystems use U prefix
+class URenderer : public UEngineSubsystem
+{
+public:
+    void InitializeDirectX();
+    void RenderFrame();
+
+private:
+    TUniquePtr<FDirectXContext> DirectXContext;
+    bool bIsInitialized;
 };
 ```
 
@@ -545,6 +570,69 @@ private:
 - Methods where the name clearly describes the functionality
 - Private implementation details that are self-explanatory
 
+### Class Naming Prefix Rules
+
+#### Understanding Prefix Usage
+
+The choice of class prefix depends on the class's role and inheritance:
+
+```cpp
+// Use U prefix for classes that inherit from UObject or UObject-derived classes
+class UObject { };                              // Base engine object class
+class UEngineSubsystem : public UObject { };    // Engine subsystem base
+class URenderer : public UEngineSubsystem { };  // ✅ U prefix - inherits from UObject
+class UInputManager : public UObject { };       // ✅ U prefix - inherits from UObject
+class USceneComponent : public UObject { };     // ✅ U prefix - inherits from UObject
+class UActorComponent : public UObject { };     // ✅ U prefix - inherits from UObject
+
+// Use F prefix for regular classes (data structures, utilities, non-UObject classes)
+class FVector3 { };                     // ✅ F prefix - math data structure
+class FTransform { };                   // ✅ F prefix - transformation data
+class FString { };                      // ✅ F prefix - string utility class
+class FGameSettings { };               // ✅ F prefix - configuration data
+class FResourceManager { };            // ✅ F prefix - utility class
+class FRenderData { };                 // ✅ F prefix - data structure
+
+// Special cases and examples
+class FMyActor { };                     // ✅ F prefix - regular class, doesn't inherit from UObject
+class UMyActorComponent : public UActorComponent { }; // ✅ U prefix - inherits from UObject via UActorComponent
+
+// ❌ Wrong prefix usage
+class FPlayerController : public UObject { };    // ❌ Should be UPlayerController
+class UMathUtils { };                            // ❌ Should be FMathUtils (utility class)
+```
+
+#### Inheritance-Based Naming Decision Tree
+
+```cpp
+// Decision process for class naming:
+// 1. Does the class inherit from UObject (directly or indirectly)?
+//    → YES: Use U prefix (UMyClass)
+//    → NO: Continue to step 2
+//
+// 2. Is it a data structure, utility class, or math class?
+//    → YES: Use F prefix (FMyClass)
+//
+// 3. Is it an enum?
+//    → YES: Use E prefix (EMyEnum)
+//
+// 4. Is it a template class?
+//    → YES: Use T prefix (TMyTemplate)
+
+// Examples of correct usage:
+class UObject { };                                    // Engine base class
+class UMyCustomObject : public UObject { };          // ✅ Inherits from UObject → U prefix
+class UMyCustomComponent : public USceneComponent { }; // ✅ USceneComponent inherits from UObject → U prefix
+
+class FMyDataStructure { };                          // ✅ Regular data class → F prefix
+class FMyUtility { };                                // ✅ Utility class → F prefix
+
+enum class EMyEnum { Value1, Value2 };               // ✅ Enum → E prefix
+
+template<typename T>
+class TMyTemplate { };                               // ✅ Template → T prefix
+```
+
 ### Static Members and Functions
 
 #### Static Member Placement
@@ -893,9 +981,72 @@ void ExampleUsage()
 }
 ```
 
-### Complete Example
+### Complete Examples
 
-Here's a complete example demonstrating all conventions:
+Here are complete examples demonstrating all conventions:
+
+#### Example 1: UObject-derived Class (U prefix)
+
+```cpp
+/**
+ * Player controller that handles input and player logic
+ * Inherits from UObject for engine integration
+ */
+class UPlayerController : public UObject
+{
+public:
+    // Constructor and destructor
+    UPlayerController();
+    explicit UPlayerController(const FString& InPlayerName);
+    virtual ~UPlayerController() = default;
+
+    /**
+     * Initialize the player controller
+     * @param InInputManager Reference to the input management system
+     * @param InDefaultSettings Default input configuration
+     */
+    virtual void Initialize(UInputManager* InInputManager, const FInputSettings& InDefaultSettings);
+
+    /**
+     * Process player input each frame
+     * @param DeltaTime Time elapsed since last frame
+     */
+    virtual void ProcessInput(float32 DeltaTime);
+
+    // Getters and setters
+    const FString& GetPlayerName() const { return PlayerName; }
+    void SetPlayerName(const FString& InName) { PlayerName = InName; }
+
+    bool GetIsInputEnabled() const { return bIsInputEnabled; }
+    void SetIsInputEnabled(bool bInIsEnabled) { bIsInputEnabled = bInIsEnabled; }
+
+    const FVector3& GetPlayerPosition() const { return PlayerPosition; }
+    void SetPlayerPosition(const FVector3& InPosition) { PlayerPosition = InPosition; }
+
+protected:
+    // Protected virtual methods for derived classes
+    virtual void OnInputReceived(const FInputData& InputData) {}
+    virtual void OnPlayerMoved(const FVector3& NewPosition) {}
+
+    // Protected members
+    FString PlayerName;
+    TWeakPtr<UInputManager> InputManager;
+
+private:
+    // Private implementation
+    void ProcessMovementInput(const FVector2& InputVector, float32 DeltaTime);
+    void UpdatePlayerState();
+
+    // Private members
+    FVector3 PlayerPosition;
+    FInputSettings InputSettings;
+    bool bIsInputEnabled;
+    bool bIsInitialized;
+    float32 MovementSpeed;
+};
+```
+
+#### Example 2: Regular Class (F prefix)
 
 ```cpp
 /**
@@ -961,6 +1112,33 @@ private:
     TUniquePtr<FRenderComponent> RenderComponent;
     TSharedPtr<FPhysicsComponent> PhysicsComponent;
 };
+```
+
+#### Class Prefix Summary
+
+```cpp
+// UObject-derived classes (Engine objects, Components, Subsystems)
+class UObject { };                    // Base engine object
+class UEngineSubsystem : public UObject { };  // Engine subsystem base
+class URenderer : public UEngineSubsystem { };     // Rendering subsystem
+class UInputManager : public UEngineSubsystem { }; // Input management
+class USceneComponent : public UObject { };        // Scene component base
+class UPrimitiveComponent : public USceneComponent { }; // Renderable component
+
+// Regular classes (Data structures, Utilities, Math, etc.)
+class FVector3 { };                   // Math vector
+class FTransform { };                 // Transformation data
+class FString { };                    // String class
+class FGameSettings { };              // Configuration data
+class FResourceManager { };          // Resource management utility
+
+// Enums
+enum class EGameState { Menu, Playing, Paused };
+enum class ERenderMode { Forward, Deferred };
+
+// Templates
+template<typename T> class TArray { };
+template<typename T> class TSharedPtr { };
 ```
 
 ## Building and Usage
@@ -1036,6 +1214,204 @@ DXEngine/
 ├── Shaders/               # HLSL shader files
 └── Data/                  # Assets and scenes
 ```
+
+## Linter and Code Quality Setup
+
+### Prerequisites
+
+To enforce the coding conventions automatically, install the following tools:
+
+1. **Visual Studio 2019/2022** with C++ development tools
+2. **Clang-Format** (included with Visual Studio or install separately)
+3. **Clang-Tidy** (optional, for advanced static analysis)
+
+### Configuration Files
+
+The project includes several configuration files to enforce coding standards:
+
+- **`.clang-format`** - Code formatting rules (Unreal Engine + Google C++ style)
+- **`.clang-tidy`** - Static analysis and linting rules
+- **`.editorconfig`** - Editor-agnostic formatting settings
+- **`VisualStudio.props`** - Visual Studio project property sheet
+- **`DXEngine.ruleset`** - Visual Studio Code Analysis rules
+
+### Setup Instructions
+
+#### 1. Visual Studio Setup
+
+1. **Import Property Sheet** (recommended):
+   ```
+   Right-click your project → Properties → VC++ Directories
+   → Property Sheets → Add Existing Property Sheet
+   → Select "VisualStudio.props"
+   ```
+
+2. **Enable Clang-Format**:
+   ```
+   Tools → Options → Text Editor → C/C++ → Code Style → Formatting
+   → Enable "Format document on save"
+   → Set "Clang-format" as formatter
+   ```
+
+3. **Enable Code Analysis**:
+   ```
+   Project Properties → Code Analysis → General
+   → Enable "Enable Code Analysis on Build"
+   → Rule Set: Select "DXEngine.ruleset"
+   ```
+
+#### 2. Manual Clang-Format Usage
+
+Format a single file:
+```bash
+clang-format -i Source/MyFile.cpp
+```
+
+Format all project files:
+```bash
+# PowerShell
+Get-ChildItem -Path "." -Recurse -Include "*.cpp","*.h","*.hpp" | ForEach-Object { clang-format -i $_.FullName }
+
+# Command Prompt
+for /r . %i in (*.cpp *.h *.hpp) do clang-format -i "%i"
+```
+
+#### 3. Git Pre-commit Hook (Optional)
+
+Create `.git/hooks/pre-commit` to automatically format code before commits:
+
+```bash
+#!/bin/sh
+# Format all staged C++ files
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp|h|cc|cxx)$'); do
+    if [ -f "$file" ]; then
+        clang-format -i "$file"
+        git add "$file"
+    fi
+done
+```
+
+Make it executable:
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+#### 4. VS Code Setup (Alternative)
+
+If using VS Code, install these extensions:
+- **C/C++** (Microsoft)
+- **Clang-Format** (xaver)
+- **EditorConfig** (EditorConfig)
+
+Add to `.vscode/settings.json`:
+```json
+{
+    "C_Cpp.clang_format_style": "file",
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "files.associations": {
+        "*.h": "cpp",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp",
+        "*.inl": "cpp"
+    }
+}
+```
+
+### Enforced Conventions
+
+The linter configuration enforces these key conventions:
+
+#### Formatting Rules
+- **Indentation**: 4 spaces (no tabs)
+- **Line Length**: 120 characters maximum
+- **Braces**: Allman style (opening brace on new line)
+- **Pointer/Reference**: Left-aligned (`int* ptr`, `int& ref`)
+
+#### Naming Rules
+- **Regular Classes**: PascalCase with `F` prefix (`FGameEngine`, `FVector3`)
+- **UObject-derived Classes**: PascalCase with `U` prefix (`UPlayerController`, `URenderer`)
+- **Structs**: PascalCase with `F` prefix (`FVector3`, `FTransform`)
+- **Enums**: PascalCase with `E` prefix (`EGameState`, `ERenderMode`)
+- **Templates**: PascalCase with `T` prefix (`TArray`, `TSharedPtr`)
+- **Functions/Methods**: PascalCase (`InitializeRenderer`, `ProcessInput`)
+- **Variables**: PascalCase (`PlayerCount`, `ScreenWidth`)
+- **Booleans**: `bIs` prefix (`bIsInitialized`, `bIsVisible`)
+- **Parameters**: `In`/`Out` prefixes when needed (`InPlayerName`, `OutResult`)
+
+#### Code Quality Rules
+- **Modern C++**: Enforces C++17 standards
+- **Performance**: Detects unnecessary copies, inefficient patterns
+- **Safety**: Prevents common bugs and undefined behavior
+- **Maintainability**: Limits function complexity, encourages best practices
+
+### Custom Naming Convention Checker
+
+Since clang-tidy cannot automatically detect UObject inheritance for prefix enforcement, we provide a custom Python script:
+
+#### Using ClassNamingChecker.py
+
+```bash
+# Check current directory
+python ClassNamingChecker.py
+
+# Check specific directory
+python ClassNamingChecker.py ./Engine
+
+# Example output:
+# ❌ Found 2 naming convention violations in 1 files:
+#
+# 📁 Engine/Core/PlayerController.h
+#    Line   15: Class 'FPlayerController' should start with 'U' (found 'F'). UObject-derived classes should use U prefix
+#               Code: class FPlayerController : public UObject
+```
+
+The script automatically:
+- **Detects inheritance chains** to determine if classes derive from UObject
+- **Validates class prefixes** (U for UObject-derived, F for regular classes)
+- **Checks enum prefixes** (E prefix required)
+- **Validates template prefixes** (T prefix required)
+- **Provides line numbers** and code context for violations
+
+### Continuous Integration
+
+For automated enforcement in CI/CD:
+
+```yaml
+# GitHub Actions example
+- name: Check Code Formatting
+  run: |
+    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | xargs clang-format --dry-run --Werror
+
+- name: Check Naming Conventions
+  run: |
+    python ClassNamingChecker.py ./Engine
+
+- name: Run Static Analysis
+  run: |
+    clang-tidy --config-file=.clang-tidy Source/**/*.cpp -- -std=c++17
+```
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Clang-Format not found**:
+   - Install LLVM tools or ensure Visual Studio C++ tools are installed
+   - Add clang-format to system PATH
+
+2. **Format conflicts with existing code**:
+   - Run format on entire codebase once: `clang-format -i **/*.{cpp,h,hpp}`
+   - Commit the formatting changes separately
+
+3. **EditorConfig not working**:
+   - Ensure your editor supports EditorConfig
+   - Check that `.editorconfig` is in the root directory
+
+4. **Visual Studio property sheet not applying**:
+   - Verify the `.props` file is imported in the correct configuration
+   - Check project file (`.vcxproj`) contains the import statement
 
 ### Dependencies
 

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DXEngine Code Analysis Rule Set -->
+<!-- Enforces coding conventions and best practices -->
+<RuleSet Name="DXEngine Rules" Description="Code analysis rules for DXEngine project" ToolsVersion="16.0">
+
+  <!-- Include Microsoft All Rules as base -->
+  <Include Path="allrules.ruleset" Action="Warning" />
+
+  <!-- Design Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1000: Do not declare static members on generic types -->
+    <Rule Id="CA1000" Action="Warning" />
+    <!-- CA1001: Types that own disposable fields should be disposable -->
+    <Rule Id="CA1001" Action="Warning" />
+    <!-- CA1009: Declare event handlers correctly -->
+    <Rule Id="CA1009" Action="Warning" />
+    <!-- CA1016: Mark assemblies with assembly version -->
+    <Rule Id="CA1016" Action="Warning" />
+    <!-- CA1033: Interface methods should be callable by child types -->
+    <Rule Id="CA1033" Action="Warning" />
+    <!-- CA1049: Types that own native resources should be disposable -->
+    <Rule Id="CA1049" Action="Warning" />
+    <!-- CA1060: Move pinvokes to native methods class -->
+    <Rule Id="CA1060" Action="Warning" />
+    <!-- CA1061: Do not hide base class methods -->
+    <Rule Id="CA1061" Action="Warning" />
+    <!-- CA1063: Implement IDisposable correctly -->
+    <Rule Id="CA1063" Action="Warning" />
+    <!-- CA1065: Do not raise exceptions in unexpected locations -->
+    <Rule Id="CA1065" Action="Warning" />
+  </Rules>
+
+  <!-- Globalization Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1300: Specify MessageBoxOptions -->
+    <Rule Id="CA1300" Action="Warning" />
+    <!-- CA1301: Avoid duplicate accelerators -->
+    <Rule Id="CA1301" Action="Warning" />
+    <!-- CA1302: Do not hardcode locale specific strings -->
+    <Rule Id="CA1302" Action="Warning" />
+    <!-- CA1303: Do not pass literals as localized parameters -->
+    <Rule Id="CA1303" Action="None" /> <!-- Disabled for engine code -->
+    <!-- CA1304: Specify CultureInfo -->
+    <Rule Id="CA1304" Action="Warning" />
+    <!-- CA1305: Specify IFormatProvider -->
+    <Rule Id="CA1305" Action="Warning" />
+    <!-- CA1306: Set locale for data types -->
+    <Rule Id="CA1306" Action="Warning" />
+    <!-- CA1307: Specify StringComparison -->
+    <Rule Id="CA1307" Action="Warning" />
+    <!-- CA1308: Normalize strings to uppercase -->
+    <Rule Id="CA1308" Action="Warning" />
+    <!-- CA1309: Use ordinal stringcomparison -->
+    <Rule Id="CA1309" Action="Warning" />
+  </Rules>
+
+  <!-- Interoperability Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1400: P/Invoke entry points should exist -->
+    <Rule Id="CA1400" Action="Warning" />
+    <!-- CA1401: P/Invokes should not be visible -->
+    <Rule Id="CA1401" Action="Warning" />
+    <!-- CA1403: Auto layout types should not be COM visible -->
+    <Rule Id="CA1403" Action="Warning" />
+    <!-- CA1404: Call GetLastError immediately after P/Invoke -->
+    <Rule Id="CA1404" Action="Warning" />
+    <!-- CA1405: COM visible type base types should be COM visible -->
+    <Rule Id="CA1405" Action="Warning" />
+    <!-- CA1410: COM registration methods should be matched -->
+    <Rule Id="CA1410" Action="Warning" />
+    <!-- CA1415: Declare P/Invokes correctly -->
+    <Rule Id="CA1415" Action="Warning" />
+  </Rules>
+
+  <!-- Maintainability Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1500: Variable names should not match field names -->
+    <Rule Id="CA1500" Action="Warning" />
+    <!-- CA1501: Avoid excessive inheritance -->
+    <Rule Id="CA1501" Action="Warning" />
+    <!-- CA1502: Avoid excessive complexity -->
+    <Rule Id="CA1502" Action="Warning" />
+    <!-- CA1504: Review misleading field names -->
+    <Rule Id="CA1504" Action="Warning" />
+    <!-- CA1505: Avoid unmaintainable code -->
+    <Rule Id="CA1505" Action="Warning" />
+    <!-- CA1506: Avoid excessive class coupling -->
+    <Rule Id="CA1506" Action="Warning" />
+  </Rules>
+
+  <!-- Mobility Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1600: Do not use idle process priority -->
+    <Rule Id="CA1600" Action="Warning" />
+    <!-- CA1601: Do not use timers that prevent power state changes -->
+    <Rule Id="CA1601" Action="Warning" />
+  </Rules>
+
+  <!-- Naming Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1700: Do not name enum values 'Reserved' -->
+    <Rule Id="CA1700" Action="Warning" />
+    <!-- CA1701: Resource string compound words should be cased correctly -->
+    <Rule Id="CA1701" Action="Warning" />
+    <!-- CA1702: Compound words should be cased correctly -->
+    <Rule Id="CA1702" Action="Warning" />
+    <!-- CA1703: Resource strings should be spelled correctly -->
+    <Rule Id="CA1703" Action="Warning" />
+    <!-- CA1704: Identifiers should be spelled correctly -->
+    <Rule Id="CA1704" Action="Warning" />
+    <!-- CA1707: Identifiers should not contain underscores -->
+    <Rule Id="CA1707" Action="None" /> <!-- Disabled for Unreal naming conventions -->
+    <!-- CA1708: Identifiers should differ by more than case -->
+    <Rule Id="CA1708" Action="Warning" />
+    <!-- CA1709: Identifiers should be cased correctly -->
+    <Rule Id="CA1709" Action="None" /> <!-- Disabled for Unreal naming conventions -->
+    <!-- CA1710: Identifiers should have correct suffix -->
+    <Rule Id="CA1710" Action="Warning" />
+    <!-- CA1711: Identifiers should not have incorrect suffix -->
+    <Rule Id="CA1711" Action="Warning" />
+    <!-- CA1712: Do not prefix enum values with type name -->
+    <Rule Id="CA1712" Action="Warning" />
+    <!-- CA1713: Events should not have 'Before' or 'After' prefix -->
+    <Rule Id="CA1713" Action="Warning" />
+    <!-- CA1714: Flags enums should have plural names -->
+    <Rule Id="CA1714" Action="Warning" />
+    <!-- CA1715: Identifiers should have correct prefix -->
+    <Rule Id="CA1715" Action="None" /> <!-- Disabled for Unreal naming conventions -->
+    <!-- CA1716: Identifiers should not match keywords -->
+    <Rule Id="CA1716" Action="Warning" />
+    <!-- CA1717: Only FlagsAttribute enums should have plural names -->
+    <Rule Id="CA1717" Action="Warning" />
+    <!-- CA1719: Parameter names should not match member names -->
+    <Rule Id="CA1719" Action="Warning" />
+    <!-- CA1720: Identifier contains type name -->
+    <Rule Id="CA1720" Action="Warning" />
+    <!-- CA1721: Property names should not match get methods -->
+    <Rule Id="CA1721" Action="Warning" />
+    <!-- CA1722: Identifiers should not have incorrect prefix -->
+    <Rule Id="CA1722" Action="Warning" />
+    <!-- CA1724: Type names should not match namespaces -->
+    <Rule Id="CA1724" Action="Warning" />
+    <!-- CA1725: Parameter names should match base declaration -->
+    <Rule Id="CA1725" Action="Warning" />
+    <!-- CA1726: Use preferred terms -->
+    <Rule Id="CA1726" Action="Warning" />
+  </Rules>
+
+  <!-- Performance Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1800: Do not cast unnecessarily -->
+    <Rule Id="CA1800" Action="Warning" />
+    <!-- CA1801: Review unused parameters -->
+    <Rule Id="CA1801" Action="Warning" />
+    <!-- CA1802: Use literals where appropriate -->
+    <Rule Id="CA1802" Action="Warning" />
+    <!-- CA1804: Remove unused locals -->
+    <Rule Id="CA1804" Action="Warning" />
+    <!-- CA1806: Do not ignore method results -->
+    <Rule Id="CA1806" Action="Warning" />
+    <!-- CA1809: Avoid excessive locals -->
+    <Rule Id="CA1809" Action="Warning" />
+    <!-- CA1810: Initialize reference type static fields inline -->
+    <Rule Id="CA1810" Action="Warning" />
+    <!-- CA1811: Avoid uncalled private code -->
+    <Rule Id="CA1811" Action="Warning" />
+    <!-- CA1812: Avoid uninstantiated internal classes -->
+    <Rule Id="CA1812" Action="Warning" />
+    <!-- CA1813: Avoid unsealed attributes -->
+    <Rule Id="CA1813" Action="Warning" />
+    <!-- CA1814: Prefer jagged arrays over multidimensional -->
+    <Rule Id="CA1814" Action="Warning" />
+    <!-- CA1815: Override equals and operator equals on value types -->
+    <Rule Id="CA1815" Action="Warning" />
+    <!-- CA1816: Dispose methods should call SuppressFinalize -->
+    <Rule Id="CA1816" Action="Warning" />
+    <!-- CA1819: Properties should not return arrays -->
+    <Rule Id="CA1819" Action="Warning" />
+    <!-- CA1820: Test for empty strings using string length -->
+    <Rule Id="CA1820" Action="Warning" />
+    <!-- CA1821: Remove empty Finalizers -->
+    <Rule Id="CA1821" Action="Warning" />
+    <!-- CA1822: Mark members as static -->
+    <Rule Id="CA1822" Action="Warning" />
+    <!-- CA1823: Avoid unused private fields -->
+    <Rule Id="CA1823" Action="Warning" />
+    <!-- CA1824: Mark assemblies with NeutralResourcesLanguageAttribute -->
+    <Rule Id="CA1824" Action="Warning" />
+  </Rules>
+
+  <!-- Portability Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA1900: Value type fields should be portable -->
+    <Rule Id="CA1900" Action="Warning" />
+    <!-- CA1901: P/Invoke declarations should be portable -->
+    <Rule Id="CA1901" Action="Warning" />
+  </Rules>
+
+  <!-- Reliability Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA2000: Dispose objects before losing scope -->
+    <Rule Id="CA2000" Action="Warning" />
+    <!-- CA2001: Avoid calling problematic methods -->
+    <Rule Id="CA2001" Action="Warning" />
+    <!-- CA2002: Do not lock on objects with weak identity -->
+    <Rule Id="CA2002" Action="Warning" />
+    <!-- CA2003: Do not treat fibers as threads -->
+    <Rule Id="CA2003" Action="Warning" />
+    <!-- CA2004: Remove calls to GC.KeepAlive -->
+    <Rule Id="CA2004" Action="Warning" />
+    <!-- CA2006: Use SafeHandle to encapsulate native resources -->
+    <Rule Id="CA2006" Action="Warning" />
+  </Rules>
+
+  <!-- Security Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA2100: Review SQL queries for security vulnerabilities -->
+    <Rule Id="CA2100" Action="Warning" />
+    <!-- CA2101: Specify marshaling for P/Invoke string arguments -->
+    <Rule Id="CA2101" Action="Warning" />
+    <!-- CA2102: Catch non-CLSCompliant exceptions in general handlers -->
+    <Rule Id="CA2102" Action="Warning" />
+    <!-- CA2103: Review imperative security -->
+    <Rule Id="CA2103" Action="Warning" />
+    <!-- CA2104: Do not declare read only mutable reference types -->
+    <Rule Id="CA2104" Action="Warning" />
+    <!-- CA2105: Array fields should not be read only -->
+    <Rule Id="CA2105" Action="Warning" />
+    <!-- CA2106: Secure assertions -->
+    <Rule Id="CA2106" Action="Warning" />
+    <!-- CA2107: Review deny and permit only usage -->
+    <Rule Id="CA2107" Action="Warning" />
+    <!-- CA2108: Review declarative security on value types -->
+    <Rule Id="CA2108" Action="Warning" />
+    <!-- CA2109: Review visible event handlers -->
+    <Rule Id="CA2109" Action="Warning" />
+    <!-- CA2111: Pointers should not be visible -->
+    <Rule Id="CA2111" Action="Warning" />
+    <!-- CA2112: Secured types should not expose fields -->
+    <Rule Id="CA2112" Action="Warning" />
+    <!-- CA2114: Method security should be a superset of type -->
+    <Rule Id="CA2114" Action="Warning" />
+    <!-- CA2116: APTCA methods should only call APTCA methods -->
+    <Rule Id="CA2116" Action="Warning" />
+    <!-- CA2117: APTCA types should only extend APTCA base types -->
+    <Rule Id="CA2117" Action="Warning" />
+    <!-- CA2118: Review SuppressUnmanagedCodeSecurityAttribute usage -->
+    <Rule Id="CA2118" Action="Warning" />
+    <!-- CA2119: Seal methods that satisfy private interfaces -->
+    <Rule Id="CA2119" Action="Warning" />
+    <!-- CA2120: Secure serialization constructors -->
+    <Rule Id="CA2120" Action="Warning" />
+    <!-- CA2121: Static constructors should be private -->
+    <Rule Id="CA2121" Action="Warning" />
+    <!-- CA2122: Do not indirectly expose methods with link demands -->
+    <Rule Id="CA2122" Action="Warning" />
+    <!-- CA2123: Override link demands should be identical to base -->
+    <Rule Id="CA2123" Action="Warning" />
+    <!-- CA2124: Wrap vulnerable finally clauses in outer try -->
+    <Rule Id="CA2124" Action="Warning" />
+    <!-- CA2126: Type link demands require inheritance demands -->
+    <Rule Id="CA2126" Action="Warning" />
+    <!-- CA2131: Security critical types may not participate in type equivalence -->
+    <Rule Id="CA2131" Action="Warning" />
+    <!-- CA2132: Default constructors must be at least as critical as base type default constructors -->
+    <Rule Id="CA2132" Action="Warning" />
+    <!-- CA2133: Delegates must bind to methods with consistent transparency -->
+    <Rule Id="CA2133" Action="Warning" />
+    <!-- CA2134: Methods must keep consistent transparency when overriding base methods -->
+    <Rule Id="CA2134" Action="Warning" />
+    <!-- CA2137: Transparent methods must contain only verifiable IL -->
+    <Rule Id="CA2137" Action="Warning" />
+    <!-- CA2138: Transparent methods must not call methods with the SuppressUnmanagedCodeSecurity attribute -->
+    <Rule Id="CA2138" Action="Warning" />
+    <!-- CA2140: Transparent code must not reference security critical items -->
+    <Rule Id="CA2140" Action="Warning" />
+    <!-- CA2141: Transparent methods must not satisfy LinkDemands -->
+    <Rule Id="CA2141" Action="Warning" />
+    <!-- CA2146: Types must be at least as critical as their base types and interfaces -->
+    <Rule Id="CA2146" Action="Warning" />
+    <!-- CA2147: Transparent methods may not use security asserts -->
+    <Rule Id="CA2147" Action="Warning" />
+    <!-- CA2149: Transparent methods must not call into native code -->
+    <Rule Id="CA2149" Action="Warning" />
+    <!-- CA2200: Rethrow to preserve stack details -->
+    <Rule Id="CA2200" Action="Warning" />
+    <!-- CA2202: Do not dispose objects multiple times -->
+    <Rule Id="CA2202" Action="Warning" />
+    <!-- CA2207: Initialize value type static fields inline -->
+    <Rule Id="CA2207" Action="Warning" />
+    <!-- CA2212: Do not mark serviced components with WebMethod -->
+    <Rule Id="CA2212" Action="Warning" />
+    <!-- CA2213: Disposable fields should be disposed -->
+    <Rule Id="CA2213" Action="Warning" />
+    <!-- CA2214: Do not call overridable methods in constructors -->
+    <Rule Id="CA2214" Action="Warning" />
+    <!-- CA2216: Disposable types should declare finalizer -->
+    <Rule Id="CA2216" Action="Warning" />
+    <!-- CA2220: Finalizers should call base class finalizer -->
+    <Rule Id="CA2220" Action="Warning" />
+    <!-- CA2229: Implement serialization constructors -->
+    <Rule Id="CA2229" Action="Warning" />
+    <!-- CA2231: Overload operator equals on overriding value type Equals -->
+    <Rule Id="CA2231" Action="Warning" />
+    <!-- CA2232: Mark Windows Forms entry points with STAThread -->
+    <Rule Id="CA2232" Action="Warning" />
+    <!-- CA2235: Mark all non-serializable fields -->
+    <Rule Id="CA2235" Action="Warning" />
+    <!-- CA2236: Call base class methods on ISerializable types -->
+    <Rule Id="CA2236" Action="Warning" />
+    <!-- CA2237: Mark ISerializable types with SerializableAttribute -->
+    <Rule Id="CA2237" Action="Warning" />
+    <!-- CA2238: Implement serialization methods correctly -->
+    <Rule Id="CA2238" Action="Warning" />
+    <!-- CA2240: Implement ISerializable correctly -->
+    <Rule Id="CA2240" Action="Warning" />
+    <!-- CA2241: Provide correct arguments to formatting methods -->
+    <Rule Id="CA2241" Action="Warning" />
+    <!-- CA2242: Test for NaN correctly -->
+    <Rule Id="CA2242" Action="Warning" />
+  </Rules>
+
+  <!-- Usage Rules -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <!-- CA2200: Rethrow to preserve stack details -->
+    <Rule Id="CA2200" Action="Warning" />
+    <!-- CA2201: Do not raise reserved exception types -->
+    <Rule Id="CA2201" Action="Warning" />
+    <!-- CA2202: Do not dispose objects multiple times -->
+    <Rule Id="CA2202" Action="Warning" />
+    <!-- CA2204: Literals should be spelled correctly -->
+    <Rule Id="CA2204" Action="Warning" />
+    <!-- CA2205: Use managed equivalents of win32 api -->
+    <Rule Id="CA2205" Action="Warning" />
+    <!-- CA2207: Initialize value type static fields inline -->
+    <Rule Id="CA2207" Action="Warning" />
+    <!-- CA2208: Instantiate argument exceptions correctly -->
+    <Rule Id="CA2208" Action="Warning" />
+    <!-- CA2211: Non-constant fields should not be visible -->
+    <Rule Id="CA2211" Action="Warning" />
+    <!-- CA2212: Do not mark serviced components with WebMethod -->
+    <Rule Id="CA2212" Action="Warning" />
+    <!-- CA2213: Disposable fields should be disposed -->
+    <Rule Id="CA2213" Action="Warning" />
+    <!-- CA2214: Do not call overridable methods in constructors -->
+    <Rule Id="CA2214" Action="Warning" />
+    <!-- CA2215: Dispose methods should call base class dispose -->
+    <Rule Id="CA2215" Action="Warning" />
+    <!-- CA2216: Disposable types should declare finalizer -->
+    <Rule Id="CA2216" Action="Warning" />
+    <!-- CA2217: Do not mark enums with FlagsAttribute -->
+    <Rule Id="CA2217" Action="Warning" />
+    <!-- CA2218: Override GetHashCode on overriding Equals -->
+    <Rule Id="CA2218" Action="Warning" />
+    <!-- CA2219: Do not raise exceptions in exception clauses -->
+    <Rule Id="CA2219" Action="Warning" />
+    <!-- CA2220: Finalizers should call base class finalizer -->
+    <Rule Id="CA2220" Action="Warning" />
+    <!-- CA2221: Finalizers should be protected -->
+    <Rule Id="CA2221" Action="Warning" />
+    <!-- CA2222: Do not decrease inherited member visibility -->
+    <Rule Id="CA2222" Action="Warning" />
+    <!-- CA2223: Members should differ by more than return type -->
+    <Rule Id="CA2223" Action="Warning" />
+    <!-- CA2224: Override Equals on overloading operator equals -->
+    <Rule Id="CA2224" Action="Warning" />
+    <!-- CA2225: Operator overloads have named alternates -->
+    <Rule Id="CA2225" Action="Warning" />
+    <!-- CA2226: Operators should have symmetrical overloads -->
+    <Rule Id="CA2226" Action="Warning" />
+    <!-- CA2227: Collection properties should be read only -->
+    <Rule Id="CA2227" Action="Warning" />
+    <!-- CA2228: Do not ship unreleased resource formats -->
+    <Rule Id="CA2228" Action="Warning" />
+    <!-- CA2229: Implement serialization constructors -->
+    <Rule Id="CA2229" Action="Warning" />
+    <!-- CA2230: Use params for variable arguments -->
+    <Rule Id="CA2230" Action="Warning" />
+    <!-- CA2231: Overload operator equals on overriding value type Equals -->
+    <Rule Id="CA2231" Action="Warning" />
+    <!-- CA2232: Mark Windows Forms entry points with STAThread -->
+    <Rule Id="CA2232" Action="Warning" />
+    <!-- CA2233: Operations should not overflow -->
+    <Rule Id="CA2233" Action="Warning" />
+    <!-- CA2234: Pass system uri objects instead of strings -->
+    <Rule Id="CA2234" Action="Warning" />
+    <!-- CA2235: Mark all non-serializable fields -->
+    <Rule Id="CA2235" Action="Warning" />
+    <!-- CA2236: Call base class methods on ISerializable types -->
+    <Rule Id="CA2236" Action="Warning" />
+    <!-- CA2237: Mark ISerializable types with SerializableAttribute -->
+    <Rule Id="CA2237" Action="Warning" />
+    <!-- CA2238: Implement serialization methods correctly -->
+    <Rule Id="CA2238" Action="Warning" />
+    <!-- CA2239: Provide deserialization methods for optional fields -->
+    <Rule Id="CA2239" Action="Warning" />
+    <!-- CA2240: Implement ISerializable correctly -->
+    <Rule Id="CA2240" Action="Warning" />
+    <!-- CA2241: Provide correct arguments to formatting methods -->
+    <Rule Id="CA2241" Action="Warning" />
+    <!-- CA2242: Test for NaN correctly -->
+    <Rule Id="CA2242" Action="Warning" />
+    <!-- CA2243: Attribute string literals should parse correctly -->
+    <Rule Id="CA2243" Action="Warning" />
+  </Rules>
+
+</RuleSet>
