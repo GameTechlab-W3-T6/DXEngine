@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"

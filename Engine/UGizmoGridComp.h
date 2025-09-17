@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UGizmoComponent.h"
 #include "URenderer.h"
@@ -14,7 +14,7 @@ class UGizmoGridComp : public UGizmoComponent
 public:
 	using UGizmoComponent::UGizmoComponent;
 	
-	 virtual LayerID GetLayer() const override { return 1; } 
+	 virtual LayerID GetLayer() const override { return 2; } 
 
 	json::JSON Serialize() const override
 	{

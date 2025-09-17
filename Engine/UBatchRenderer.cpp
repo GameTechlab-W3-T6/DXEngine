@@ -1,9 +1,10 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #include "UBatchRenderer.h"
 #include "UClass.h"
 #include "URenderer.h"
 #include "UPrimitiveComponent.h"
+#include "UTextholderComp.h"
 #include "UGizmoComponent.h"
 
 IMPLEMENT_UCLASS(UBatchRenderer, URenderer)
@@ -27,6 +28,12 @@ void UBatchRenderer::DrawPrimitiveComponent(UPrimitiveComponent* Component)
 void UBatchRenderer::DrawGizmoComponent(UGizmoComponent* Component, bool drawOnTop) 
 {
 	DrawPrimitiveComponent(Component);
+}
+
+/** @todo: Temporary implmentation which draws text holder at last by additional array. */
+void UBatchRenderer::DrawTextholderComponent(UTextholderComp* Component)
+{
+    TextholderComponentArray.push_back(Component);
 }
 
 void UBatchRenderer::Draw()
@@ -97,5 +104,12 @@ void UBatchRenderer::Draw()
 		}
 	}
 
+    GetDeviceContext()->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+    for (auto Component : TextholderComponentArray)
+    {
+        URenderer::DrawTextholderComponent(Component);
+    }
 	PrimitiveComponentArray.clear();
+    TextholderComponentArray.clear();
 }

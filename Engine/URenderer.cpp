@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "URenderer.h"
 #include "UClass.h"
 #include "ConfigManager.h"

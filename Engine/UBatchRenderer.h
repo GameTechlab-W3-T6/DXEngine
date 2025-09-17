@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
 
 #include "URenderer.h"
 
 class UPrimitiveComponent;
+class UTextholderComp;
 class UGizmoComponent;
 
 class UBatchRenderer : public URenderer
@@ -27,11 +28,10 @@ public:
 	virtual void DrawPrimitiveComponent(UPrimitiveComponent* PrimitiveComponent) override;
 	[[deprecated("Use DrawPrimitiveComponent to draw Gizmo.")]]
 	virtual void DrawGizmoComponent(UGizmoComponent* GizmoComponent, bool drawOnTop) override;
+    virtual void DrawTextholderComponent(UTextholderComp* Component) override;
 
 	/** @note: You should call Draw() before moving onto other rendering step(e.g., GUI drawing).*/
 	virtual void Draw() override;
-
-private:
 
 private:
 	// ===============================================
@@ -131,4 +131,5 @@ private:
 	>;
 
 	TArray<std::pair<RenderKeyType, UPrimitiveComponent*>> PrimitiveComponentArray;
+    TArray<UTextholderComp*> TextholderComponentArray;
 };

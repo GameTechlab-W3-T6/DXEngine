@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UClass.h"
 #include "UCamera.h"
 #include "URenderer.h"
@@ -90,7 +90,7 @@ void UTextholderComp::Draw(URenderer& renderer)
 
 	CreateInstanceData();
 
-	renderer.DrawTextholderComponent(this );
+	renderer.DrawTextholderComponent(this);
 }
 
 // ====================================================== //

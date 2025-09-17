@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"
@@ -39,7 +39,7 @@ public:
 
 	virtual void Draw(URenderer& renderer) override;
 
-	virtual LayerID GetLayer() const override { return 3; } 
+	virtual LayerID GetLayer() const override { return 0; } 
 
 	void DrawOnTop(URenderer& renderer);
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UObjectMacros.h"
 #include "UPrimitiveComponent.h"
@@ -50,7 +50,7 @@ public:
 
 	virtual void Draw(URenderer& renderer) override;
 
-	virtual LayerID GetLayer() const { return 4;  }
+	virtual LayerID GetLayer() const { return 0;  }
 
 	// todo : 추후 textholder도 gizmo 필요하면 추가 구현
 	bool IsManageable() override { return false; }
