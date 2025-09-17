@@ -38,6 +38,15 @@ void USceneComponent::AttachToComponent(USceneComponent* Parent)
     Parent->AttachChildren.push_back(this);
 }
 
+void USceneComponent::AttachChild(USceneComponent* Child)
+{
+    if (!Child || Child == this)
+        return;
+
+    // Make the child attach to this component
+    Child->AttachToComponent(this);
+}
+
 void USceneComponent::DetachFromComponent()
 {
     if (AttachParent)
@@ -213,17 +222,36 @@ void USceneComponent::Update(float deltaTime)
     // Call parent update first
     Super::Update(deltaTime);
 
+    // Update all attached child components
+    for (USceneComponent* child : AttachChildren)
+    {
+        if (child)
+        {
+            child->Update(deltaTime);
+        }
+    }
+
     // SceneComponent-specific update logic can go here
 }
 
 void USceneComponent::OnShutdown()
 {
-    // Detach from parent during shutdown
-    DetachFromComponent();
+    // Shutdown and cleanup all attached child components
+    for (USceneComponent* child : AttachChildren)
+    {
+        if (child)
+        {
+            child->OnShutdown();
+            delete child;
+        }
+    }
+    AttachChildren.clear();
 
     UInputManager* inputManager = UEngineStatics::GetSubsystem<UInputManager>();
     inputManager->UnregisterCallbacks(std::to_string(InternalIndex));
 
+    // Detach from parent during shutdown
+    DetachFromComponent();
     // Call parent shutdown
     Super::OnShutdown();
 }

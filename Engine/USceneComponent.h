@@ -35,6 +35,7 @@ public:
 
 	// Attachment functions
 	void AttachToComponent(USceneComponent* Parent);
+	void AttachChild(USceneComponent* Child);
 	void DetachFromComponent();
 	void DetachAllChildren();
 

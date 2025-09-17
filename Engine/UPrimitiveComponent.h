@@ -14,6 +14,7 @@ class UMeshManager; // 전방 선언
 class UTextureManager;
 //class UCamera;
 class FTexture;
+class UTextholderComp;
 
 /**
  * @brief Renderable component with mesh and material properties
@@ -29,9 +30,10 @@ protected:
 	UShader* vertexShader, *pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 	bool cachedIsShaderReflectionEnabled;
+	bool bAutoCreateTextholder;
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr)
+		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr), bAutoCreateTextholder(true)
 	{
 		ConfigData* config = ConfigManager::GetConfig("editor");
 		cachedIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");

@@ -98,17 +98,6 @@ void UControlPanel::SpawnPrimitiveSection()
 		AActor* actor = CreateActorFromChoice(primitiveChoiceIndex);
 		if (actor != nullptr)
 		{
-			// Add UUID text label as a component before initialization
-			auto textComp = MakeUnique<UTextholderComp>();
-			UTextholderComp* labelUUID = actor->AddComponent(std::move(textComp));
-
-			// Debug: Check if component was added successfully
-			if (!labelUUID) {
-				OutputDebugStringA("Failed to add UTextholderComp to actor\n");
-			} else {
-				OutputDebugStringA("Successfully added UTextholderComp to actor\n");
-			}
-
 			USceneComponent* rootComponent = actor->GetRootComponent();
 			if (rootComponent)
 			{
@@ -127,17 +116,6 @@ void UControlPanel::SpawnPrimitiveSection()
 					-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
 					-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
 				));
-			}
-
-			// Set text and parent after transform is set
-			if (labelUUID && rootComponent)
-			{
-				const FString generated = "UID : " + std::to_string(actor->UUID);
-				labelUUID->SetText(generated);
-
-				// Attach as child component instead of just setting parent transform
-				labelUUID->AttachToComponent(rootComponent);
-				labelUUID->SetPosition(FVector(0.0f, 0.0f, 0.5f)); // Relative to parent (above)
 			}
 
 			SceneManager->GetScene()->AddActor(actor);
