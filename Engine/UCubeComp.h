@@ -29,7 +29,7 @@ public:
 		:UPrimitiveComponent(pos, rot, scl)
 	{
 		ID = CubeID++;
-		Name = GetDefaultName();
+		name = FName(GetDefaultName());
 	}
 
 	virtual uint32 GetID() const { return ID;  }

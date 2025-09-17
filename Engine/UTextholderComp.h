@@ -25,8 +25,9 @@ public:
 
 	UTextholderComp()
 	{
-		Name = GetDefaultName();
+		name = FName(GetDefaultName());
 		ID = TextHolderID++;
+		bAutoCreateTextholder = false;  // Prevent textholder from creating another textholder
 	}
 
 	bool Initialize() override;
@@ -48,12 +49,14 @@ public:
 
 	virtual void BindPixelShader(URenderer& renderer) override;
 
+	virtual void Update(float deltaTime) override;
 	virtual void Draw(URenderer& renderer) override;
 
 	virtual LayerID GetLayer() const { return 0;  }
 
 	// todo : 추후 textholder도 gizmo 필요하면 추가 구현
-	bool IsManageable() override { return false; }
+    bool IsManageable() override { return false; }
+    EEngineShowFlags GetShowFlag() const override { return EEngineShowFlags::SF_BillboardText; }
 
 private:
 	// Hold those two subsystem due to caching
@@ -69,9 +72,8 @@ private:
 
 	// ============================= //
 
-	bool isEditable = true;
-	
-	void CaptureTypedChars();                 // 이번 프레임 타이핑된 글자들을 수집
+	bool isEditable = false;
+	FQuaternion billboardRotation = FQuaternion::Identity();
 
 	void CreateInstanceData();
 

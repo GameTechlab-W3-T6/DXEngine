@@ -16,17 +16,17 @@ private:
 	UGizmoManager gizmoManager;
 	TArray<USceneComponent*> sceneComponents;
 
-	USceneComponent* selectedSceneComponent;
+	USceneComponent* selectedSceneComponent = nullptr;
 
-	UControlPanel* controlPanel;
-	USceneComponentPropertyWindow* propertyWindow;
+	UControlPanel* controlPanel = nullptr;
+	USceneComponentPropertyWindow* propertyWindow = nullptr;
 
 	/** @todo: Should manage life-time of other windows through smart pointer. */
 	TUniquePtr<USceneManagerWindow> SceneManagerWindow;
 
 	ConfigData* config;
 	// AABB
-	bool bAABBFlag;
+	bool bAABBFlag = false;
 	FVector MinWSPos, MaxWSPos; 
 	UPrimitiveComponent* SelectedPrimitive = nullptr;
 

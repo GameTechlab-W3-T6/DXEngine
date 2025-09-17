@@ -1,4 +1,3 @@
-
 #pragma once
 #include "stdafx.h"
 #include "UMesh.h"
@@ -8,13 +7,15 @@
 #include "UClass.h"
 #include "ConfigData.h"
 #include "ConfigManager.h"
-
+#include "Constant.h"
 #include "FTextInfo.h"
 
 class UMeshManager; // 전방 선언
 class UTextureManager;
 //class UCamera;
 class FTexture;
+class UTextholderComp;
+class UScene;
 
 /**
  * @brief Renderable component with mesh and material properties
@@ -30,14 +31,15 @@ protected:
 	UShader* vertexShader, *pixelShader;
 	FVector4 Color = { 1, 1, 1, 1 };
 	bool cachedIsShaderReflectionEnabled;
+	bool bAutoCreateTextholder;
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr)
+		: USceneComponent(loc, rot, scl), mesh(nullptr), vertexShader(nullptr),  pixelShader(nullptr), bAutoCreateTextholder(true)
 	{
 		ConfigData* config = ConfigManager::GetConfig("editor");
 		cachedIsShaderReflectionEnabled = config->getBool("Graphics", "ShaderReflection");
 
-		Name = GetDefaultName();
+		name = FName(GetDefaultName());
 		ID = PrimitiveID++;
 	}
 
@@ -55,7 +57,9 @@ public:
 
 	void BindTexture(URenderer& renderer);
 
-	bool Initialize() override;
+	bool Initialize() override;  // TODO: Rename to InitializeComponent() later
+	virtual void Update(float deltaTime) override;  // TODO: Rename to TickComponent() later
+	virtual void OnShutdown() override;  // TODO: Rename to EndPlay() later
 
 	virtual void Draw(URenderer& renderer);
 
@@ -75,13 +79,12 @@ public:
 	FVector4 GetColor() const { return Color; }
 
 public:
-	FString GetName() const { return Name; }
-	void SetName(FString InName) { Name = InName; }
 	virtual uint32 GetID() const { return ID;  }
+    virtual EEngineShowFlags GetShowFlag() const { return EEngineShowFlags::SF_Primitives; }
 
 protected:
 	virtual const char* GetDefaultName() const { return "Primitive"; }
-	FString Name;
+    UScene* cachedScene;
 
 private:
 	static uint32 PrimitiveID;

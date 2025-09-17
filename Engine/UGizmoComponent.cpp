@@ -32,13 +32,23 @@ bool UGizmoComponent::Initialize()
 	return mesh && vertexShader && pixelShader;
 }
 
-FMatrix UGizmoComponent::GetWorldTransform()
+FMatrix UGizmoComponent::GetWorldTransform() const
 {
 	return FMatrix::SRTRowQuaternion(RelativeLocation, (OriginQuaternion * RelativeQuaternion).ToMatrixRow(), RelativeScale3D);
 }
 
 void UGizmoComponent::Update(float deltaTime)
 {
+	// Call parent update first
+	Super::Update(deltaTime);
+}
+
+void UGizmoComponent::OnShutdown()
+{
+	// Cleanup gizmo-specific resources if needed
+
+	// Call parent shutdown
+	Super::OnShutdown();
 }
 
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)

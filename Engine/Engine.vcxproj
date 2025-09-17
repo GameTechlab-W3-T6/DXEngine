@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AActor.cpp" />
+    <ClCompile Include="AStaticMeshActor.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="FTextInfo.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
@@ -208,6 +210,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UActorComponent.cpp" />
     <ClCompile Include="UBatchRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -235,6 +238,7 @@
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UBatchShaderManager.cpp" />
     <ClCompile Include="USceneManagerWindow.cpp" />
     <ClCompile Include="USphereComp.cpp" />
@@ -248,6 +252,8 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AActor.h" />
+    <ClInclude Include="AStaticMeshActor.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="DynamicBuffer.h" />
@@ -260,8 +266,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="UActorComponent.h" />
     <ClInclude Include="USceneManagerWindow.h" />
-    <ClInclude Include="Constant.h" />
+    <ClInclude Include="ViewModeIndex.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderReflection.h" />
     <ClInclude Include="UBatchRenderer.h">
@@ -310,6 +317,7 @@
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UBatchShaderManager.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="UTextholderComp.h" />

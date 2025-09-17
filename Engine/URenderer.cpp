@@ -961,6 +961,7 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 	D3D11_MAPPED_SUBRESOURCE m{}; 
 	DeviceContext->Map(textInstanceVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
 	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
+	memcpy(m.pData, instances.data(), instances.size() * sizeof(FTextInstance));
 	DeviceContext->Unmap(textInstanceVB, 0);
 
 	// 이전 상태 백업하고

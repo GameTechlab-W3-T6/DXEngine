@@ -1,6 +1,9 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UControlPanel.h"
 #include "USceneComponent.h"
+#include "AActor.h"
+#include "AStaticMeshActor.h"
+#include "UMeshManager.h"
 #include "UCamera.h"
 #include "USceneManager.h"
 #include "UScene.h"
@@ -35,24 +38,8 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 {
 	Renderer = renderer;
 	config = ConfigManager::GetConfig("editor");
-
-	for (const auto& registeredType : UClass::GetClassList())
-	{
-		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
-			continue;
-
-		FString displayName = registeredType->GetMeta("DisplayName");
-		if (displayName.empty())
-			continue;
-
-		registeredTypes.push_back(registeredType.get());
-		choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
-	}
-
-	for (const FString& str : choiceStrList)
-	{
-		choices.push_back(str.c_str());
-	}
+	// Initialize mesh-based primitives
+	InitializeMeshBasedPrimitives();
 }
 
 void UControlPanel::RenderContent()
@@ -86,40 +73,44 @@ USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index)
 	return obj->Cast<USceneComponent>();
 }
 
+AActor* UControlPanel::CreateActorFromChoice(int index)
+{
+	// For mesh-based primitives, create AStaticMeshActor
+	if (index < meshChoices.size())
+	{
+		FString meshName = meshChoices[index];
+		FString displayName = GetDisplayNameForMesh(meshName);
+		AStaticMeshActor* actor = new AStaticMeshActor();
+		actor->GetStaticMeshComponent()->SetMeshType(meshName, displayName);
+		actor->name = displayName + "_" + std::to_string(actor->GetID());
+		// Don't initialize here - will be initialized when added to scene
+		return actor;
+	}
+	return nullptr;
+}
+
 void UControlPanel::SpawnPrimitiveSection()
 {
 	ImGui::SetNextItemWidth(150);
-	ImGui::Combo("Type", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
+	ImGui::Combo("Type", &primitiveChoiceIndex, meshChoices.data(), static_cast<int32>(meshChoices.size()));
 
 	int32 objectCount = SceneManager->GetScene()->GetObjectCount();
 	if (ImGui::Button("Spawn"))
 	{
-		USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
-		if (sceneComponent != nullptr)
+		AActor* actor = CreateActorFromChoice(primitiveChoiceIndex);
+		if (actor != nullptr)
 		{
-			sceneComponent->SetPosition(FVector(
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-			));
-			sceneComponent->SetScale(FVector(
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
-			));
-			sceneComponent->SetRotation(FVector(
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
-			));
-			SceneManager->GetScene()->AddObject(sceneComponent);
+			USceneComponent* rootComponent = actor->GetRootComponent();
+			if (rootComponent)
+			{
+				rootComponent->SetPosition(FVector(
+					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
+				));
+			}
 
-			UTextholderComp* labelUUID = new UTextholderComp;
-			labelUUID->Initialize();
-			const FString generated = "UID : " + std::to_string(sceneComponent->UUID);
-			labelUUID->SetText(generated);
-			labelUUID->SetParentTransform(sceneComponent);
-			SceneManager->GetScene()->AddObject(labelUUID);
+			SceneManager->GetScene()->AddActor(actor);
 		}
 	}
 	ImGui::SameLine();
@@ -182,18 +173,12 @@ void UControlPanel::ViewManagementSection()
 	auto* scene = SceneManager->GetScene();
 
 	// Primitives 체크박스
-	bool showPrims = !scene->hidePrimitive; // hidePrimitive=false → 보이는 상태
-	if (ImGui::Checkbox("Primitives", &showPrims))
-	{
-		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_Primitives, !showPrims);
-	}
+    ImGui::Checkbox("Primitives", &showPrims);
+    scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_Primitives, showPrims);
 
 	// Billboard Text 체크박스
-	bool showText = !scene->hideTextholder;
-	if (ImGui::Checkbox("Billboard Text", &showText))
-	{
-		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_BillboardText, !showText);
-	}
+    ImGui::Checkbox("Billboard Text", &showText);
+    scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_BillboardText, showText);
 	ImGui::Separator();
 }
 
@@ -428,4 +413,132 @@ void UControlPanel::PerformanceSection()
 	PrevPixelShaderSwitchCount = PixelShaderSwitchCount;
 	PrevDepthStencilClearCount = DepthStencilClearCount;
 	PrevMeshSwitchCount = MeshSwitchCount;
+}
+
+void UControlPanel::InitializeMeshBasedPrimitives()
+{
+	// Get available meshes from MeshManager
+	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
+	if (!meshManager)
+		return;
+
+	TArray<FString> allMeshNames = meshManager->GetAvailableMeshNames();
+
+	// Define gizmo-related mesh names to filter out
+	TArray<FString> gizmoKeywords = {"Gizmo", "Arrow", "Axis", "Grid"};
+
+	// Filter out gizmo-related meshes and setup display names
+	for (const FString& meshName : allMeshNames)
+	{
+		// Check if mesh name contains any gizmo keywords
+		bool isGizmoMesh = false;
+		for (const FString& keyword : gizmoKeywords)
+		{
+			if (meshName.find(keyword) != std::string::npos)
+			{
+				isGizmoMesh = true;
+				break;
+			}
+		}
+
+		if (isGizmoMesh)
+			continue;
+
+		availableMeshNames.push_back(meshName);
+		displayNames.push_back(GetDisplayNameForMesh(meshName));
+	}
+
+	// Convert to const char* array for ImGui
+	for (const FString& displayName : displayNames)
+	{
+		meshChoices.push_back(displayName.c_str());
+	}
+}
+
+FString UControlPanel::GetDisplayNameForMesh(const FString& meshName)
+{
+	// Define mesh name to display name mapping using TArray
+	struct MeshDisplayMapping
+	{
+		FString meshName;
+		FString displayName;
+	};
+
+	TArray<MeshDisplayMapping> mappings = {
+		{"Cube", "Cube"},
+		{"Sphere", "Sphere"},
+		{"Plane", "Plane"}
+	};
+
+	// Look up display name
+	for (const auto& mapping : mappings)
+	{
+		if (mapping.meshName == meshName)
+			return mapping.displayName;
+	}
+
+	// Use mesh name as display name for others
+	return meshName;
+}
+
+AActor* UControlPanel::CreateActorFromMeshChoice(int index)
+{
+	if (index < 0 || index >= availableMeshNames.size())
+		return nullptr;
+
+	FString meshName = availableMeshNames[index];
+	FString displayName = displayNames[index];
+
+	// Create AStaticMeshActor and configure it
+	AStaticMeshActor* actor = new AStaticMeshActor();
+
+	if (actor->GetStaticMeshComponent())
+	{
+		actor->GetStaticMeshComponent()->SetMeshType(meshName, displayName);
+
+		// Define setup methods mapping using TArray
+		TArray<FString> cubeNames = {"Cube"};
+		TArray<FString> sphereNames = {"Sphere"};
+		TArray<FString> planeNames = {"Plane"};
+
+		// Set up specific mesh type based on name
+		bool found = false;
+		for (const FString& cubeName : cubeNames)
+		{
+			if (meshName == cubeName)
+			{
+				actor->GetStaticMeshComponent()->SetupAsCube();
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			for (const FString& sphereName : sphereNames)
+			{
+				if (meshName == sphereName)
+				{
+					actor->GetStaticMeshComponent()->SetupAsSphere();
+					found = true;
+					break;
+				}
+			}
+		}
+
+		if (!found)
+		{
+			for (const FString& planeName : planeNames)
+			{
+				if (meshName == planeName)
+				{
+					actor->GetStaticMeshComponent()->SetupAsPlane();
+					found = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return actor;
 }
