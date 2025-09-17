@@ -545,6 +545,304 @@ private:
 - Methods where the name clearly describes the functionality
 - Private implementation details that are self-explanatory
 
+### Static Members and Functions
+
+#### Static Member Placement
+
+Static members should be placed in specific locations within class declarations:
+
+```cpp
+class FGameManager
+{
+public:
+    // Static factory methods first
+    static FGameManager& GetInstance();
+    static TSharedPtr<FGameManager> CreateShared();
+
+    // Regular constructors and destructor
+    FGameManager();
+    virtual ~FGameManager() = default;
+
+    // Regular public methods
+    void Initialize();
+    void Update(float32 DeltaTime);
+
+    // Static utility methods after regular methods
+    static bool IsValidGameState(EGameState State);
+    static FString GetGameStateString(EGameState State);
+
+protected:
+    // Static protected members
+    static constexpr int32 MaxPlayers = 64;
+    static constexpr float32 DefaultTickRate = 60.0f;
+
+private:
+    // Static private members
+    static FGameManager* Instance;
+    static bool bIsInitialized;
+
+    // Regular private members
+    EGameState CurrentState;
+    float32 GameTime;
+    TArray<TSharedPtr<FPlayer>> Players;
+};
+```
+
+#### Static Function Definitions
+
+Static functions should be defined in source files, not headers (except for `static inline`):
+
+```cpp
+// GameManager.h
+class FGameManager
+{
+public:
+    static bool IsValidGameState(EGameState State);
+    static FString GetGameStateString(EGameState State);
+
+    // ✅ Good: Simple static inline functions are acceptable in headers
+    static inline bool IsGameRunning() { return bIsGameRunning; }
+    static inline int32 GetMaxPlayers() { return MaxPlayers; }
+
+private:
+    static bool bIsGameRunning;
+    static constexpr int32 MaxPlayers = 64;
+};
+
+// GameManager.cpp
+// ✅ Good: Complex static functions in source files
+bool FGameManager::IsValidGameState(EGameState State)
+{
+    switch (State)
+    {
+        case EGameState::Menu:
+        case EGameState::Playing:
+        case EGameState::Paused:
+        case EGameState::GameOver:
+            return true;
+        default:
+            return false;
+    }
+}
+
+FString FGameManager::GetGameStateString(EGameState State)
+{
+    // Complex implementation here...
+    switch (State)
+    {
+        case EGameState::Menu: return TEXT("Menu");
+        case EGameState::Playing: return TEXT("Playing");
+        case EGameState::Paused: return TEXT("Paused");
+        case EGameState::GameOver: return TEXT("Game Over");
+        default: return TEXT("Unknown");
+    }
+}
+
+// Static member definitions
+bool FGameManager::bIsGameRunning = false;
+```
+
+### ODR (One Definition Rule) Guidelines
+
+#### Understanding ODR Violations
+
+The One Definition Rule states that each entity should have exactly one definition across the entire program:
+
+```cpp
+// ❌ Bad: ODR violation - function defined in header without inline
+// Utils.h
+FString FormatPlayerName(const FString& Name)  // ODR violation if included in multiple translation units
+{
+    return FString::Printf(TEXT("Player: %s"), *Name);
+}
+
+// ✅ Good: Use static inline for header-only functions
+// Utils.h
+static inline FString FormatPlayerName(const FString& Name)
+{
+    return FString::Printf(TEXT("Player: %s"), *Name);
+}
+
+// ✅ Good: Or use regular inline
+// Utils.h
+inline FString FormatPlayerName(const FString& Name)
+{
+    return FString::Printf(TEXT("Player: %s"), *Name);
+}
+
+// ✅ Good: Declare in header, define in source
+// Utils.h
+FString FormatPlayerName(const FString& Name);
+
+// Utils.cpp
+FString FormatPlayerName(const FString& Name)
+{
+    return FString::Printf(TEXT("Player: %s"), *Name);
+}
+```
+
+#### Static Inline Usage Guidelines
+
+Use `static inline` for simple utility functions that should be header-only:
+
+```cpp
+// MathUtils.h
+class FMathUtils
+{
+public:
+    // ✅ Good: Simple mathematical operations
+    static inline float32 DegreesToRadians(float32 Degrees)
+    {
+        return Degrees * (PI / 180.0f);
+    }
+
+    static inline float32 RadiansToDegrees(float32 Radians)
+    {
+        return Radians * (180.0f / PI);
+    }
+
+    static inline bool IsNearlyEqual(float32 A, float32 B, float32 Tolerance = KINDA_SMALL_NUMBER)
+    {
+        return FMath::Abs(A - B) <= Tolerance;
+    }
+
+    // ❌ Bad: Complex functions should not be static inline in headers
+    // static inline FMatrix CalculateViewProjectionMatrix(...) { /* complex code */ }
+
+    // ✅ Good: Declare complex functions, define in source
+    static FMatrix CalculateViewProjectionMatrix(const FVector& Position, const FRotator& Rotation, float32 FOV);
+
+private:
+    static constexpr float32 PI = 3.14159265359f;
+};
+```
+
+#### Template Static Members
+
+Template static members require special handling to avoid ODR violations:
+
+```cpp
+// ResourceManager.h
+template<typename T>
+class TResourceManager
+{
+public:
+    static TResourceManager<T>& GetInstance()
+    {
+        static TResourceManager<T> Instance;  // ✅ Good: Each template instantiation gets its own static
+        return Instance;
+    }
+
+    static void RegisterResource(const FString& Name, TSharedPtr<T> Resource)
+    {
+        GetInstance().Resources[Name] = Resource;
+    }
+
+private:
+    TMap<FString, TSharedPtr<T>> Resources;
+
+    // ✅ Good: Template static members are implicitly inline
+    static inline int32 LoadedResourceCount = 0;
+};
+
+// Usage creates separate instances for each type
+auto& TextureManager = TResourceManager<FTexture>::GetInstance();
+auto& MeshManager = TResourceManager<FMesh>::GetInstance();
+```
+
+#### Global Constants and ODR
+
+Handle global constants properly to avoid ODR violations:
+
+```cpp
+// Constants.h
+
+// ❌ Bad: Non-const global variables cause ODR violations
+// extern int32 GMaxTextureSize;  // Declared in header, defined in source
+
+// ✅ Good: Const/constexpr globals are safe
+constexpr int32 MAX_TEXTURE_SIZE = 4096;
+constexpr float32 DEFAULT_FOV = 90.0f;
+
+// ✅ Good: Static const class members
+class FEngineConstants
+{
+public:
+    static constexpr int32 MaxTextureSize = 4096;
+    static constexpr float32 DefaultFOV = 90.0f;
+    static constexpr TCHAR DefaultWindowTitle[] = TEXT("DXEngine");
+
+    // ✅ Good: Static inline for complex constants
+    static inline const FVector DefaultPlayerSize = FVector(1.0f, 1.0f, 2.0f);
+    static inline const TArray<FString> SupportedFormats = {TEXT("png"), TEXT("jpg"), TEXT("tga")};
+};
+
+// ✅ Good: Namespace constants
+namespace EngineConstants
+{
+    constexpr int32 MaxTextureSize = 4096;
+    constexpr float32 DefaultFOV = 90.0f;
+
+    // For complex types, use static inline
+    static inline const FVector DefaultPlayerSize = FVector(1.0f, 1.0f, 2.0f);
+}
+```
+
+#### ODR-Safe Utility Classes
+
+Create utility classes that are safe to include in multiple translation units:
+
+```cpp
+// StringUtils.h
+class FStringUtils
+{
+public:
+    // ✅ Good: Simple static inline utilities
+    static inline bool IsEmpty(const FString& String)
+    {
+        return String.IsEmpty();
+    }
+
+    static inline FString ToLower(const FString& String)
+    {
+        return String.ToLower();
+    }
+
+    static inline FString ToUpper(const FString& String)
+    {
+        return String.ToUpper();
+    }
+
+    // ✅ Good: Complex operations declared only
+    static FString FormatFileSize(int64 Bytes);
+    static TArray<FString> SplitString(const FString& String, const FString& Delimiter);
+    static bool IsValidEmailAddress(const FString& Email);
+
+private:
+    // ✅ Good: Private helper functions can be static inline
+    static inline bool IsAlphaNumeric(TCHAR Character)
+    {
+        return FChar::IsAlnum(Character);
+    }
+};
+
+// StringUtils.cpp - Complex implementations
+FString FStringUtils::FormatFileSize(int64 Bytes)
+{
+    const TCHAR* Units[] = {TEXT("B"), TEXT("KB"), TEXT("MB"), TEXT("GB"), TEXT("TB")};
+    int32 UnitIndex = 0;
+    float64 Size = static_cast<float64>(Bytes);
+
+    while (Size >= 1024.0 && UnitIndex < 4)
+    {
+        Size /= 1024.0;
+        UnitIndex++;
+    }
+
+    return FString::Printf(TEXT("%.2f %s"), Size, Units[UnitIndex]);
+}
+```
+
 ### Deprecated Code
 
 #### Using [[deprecated]] Attribute
