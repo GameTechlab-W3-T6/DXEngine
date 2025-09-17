@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UGizmoComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
@@ -72,7 +72,7 @@ void UGizmoComponent::BindPixelShader(URenderer& renderer)
 
 void UGizmoComponent::Draw(URenderer& renderer)
 {
-	renderer.DrawGizmoComponent(this);
+	renderer.DrawGizmoComponent(this, true);
 }
 
 void UGizmoComponent::DrawOnTop(URenderer& renderer)

@@ -97,21 +97,21 @@ void UControlPanel::SpawnPrimitiveSection()
 	int32 objectCount = SceneManager->GetScene()->GetObjectCount();
 	if (ImGui::Button("Spawn"))
 	{
-		AActor* actor = CreateActorFromChoice(primitiveChoiceIndex);
-		if (actor != nullptr)
-		{
-			USceneComponent* rootComponent = actor->GetRootComponent();
-			if (rootComponent)
-			{
-				rootComponent->SetPosition(FVector(
-					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-				));
-			}
+        AActor* actor = CreateActorFromChoice(primitiveChoiceIndex);
+        if (actor != nullptr)
+        {
+            USceneComponent* rootComponent = actor->GetRootComponent();
+            if (rootComponent)
+            {
+                rootComponent->SetPosition(FVector(
+                    -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+                    -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+                    -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
+                ));
+            }
 
-			SceneManager->GetScene()->AddActor(actor);
-		}
+            SceneManager->GetScene()->AddActor(actor);
+        }
 	}
 	ImGui::SameLine();
 	ImGui::BeginDisabled();

@@ -32,6 +32,11 @@ void UBatchRenderer::DrawPrimitiveComponent(UPrimitiveComponent* Component)
 /** @todo: Resolve naming collision with URenderer::Draw. */
 void UBatchRenderer::DrawGizmoComponent(UGizmoComponent* Component, bool drawOnTop) 
 {
+    ConfigData* Config = ConfigManager::GetConfig("editor");
+    if (!Config->getBool("Graphics", "BatchRendering"))
+    {
+        return URenderer::DrawGizmoComponent(Component); 
+    }
 	DrawPrimitiveComponent(Component);
 }
 
