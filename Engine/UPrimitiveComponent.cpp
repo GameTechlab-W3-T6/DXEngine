@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "ConfigManager.h"
 #include "FTextInfo.h"
 #include "FTexture.h"
@@ -23,6 +23,8 @@ bool UPrimitiveComponent::Initialize()
 	UMeshManager* meshManager = UEngineStatics::GetSubsystem<UMeshManager>();
 	UBatchShaderManager* batchShaderManager = UEngineStatics::GetSubsystem<UBatchShaderManager>();
 	UTextureManager* textureManager = UEngineStatics::GetSubsystem<UTextureManager>();
+    cachedScene = UEngineStatics::GetSubsystem<USceneManager>()->GetScene();
+
 	if (meshManager)
 	{
 		mesh = meshManager->GetMesh(GetClass()->GetMeta("MeshName"));
@@ -121,7 +123,11 @@ void UPrimitiveComponent::Draw(URenderer& renderer)
 		return;
 	}
 
-	renderer.DrawPrimitiveComponent(this);
+    
+    if (cachedScene->GetVisibilityOfEachPrimitive(GetShowFlag()))
+    {
+        renderer.DrawPrimitiveComponent(this);
+    }
 
 	// Draw attached child components
 	for (USceneComponent* child : AttachChildren)

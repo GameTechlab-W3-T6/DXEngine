@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 #include "ISerializable.h"
 #include "TArray.h"
+#include "UEngineStatics.h"
 #include "UMeshManager.h"
 #include "USceneManager.h"
 #include "json.hpp"
@@ -17,6 +18,9 @@ class AActor;
 class UScene : public UObject
 {
 	DECLARE_UCLASS(UScene, UObject)
+private:
+    TMap<EEngineShowFlags, bool> objectVisibility;
+
 protected:
 	int32 backBufferWidth, backBufferHeight;
 	int32 version;
@@ -81,4 +85,5 @@ public:
 	bool hideTextholder = false;
 
 	void SetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide, bool isOn);
+    bool GetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide);
 };

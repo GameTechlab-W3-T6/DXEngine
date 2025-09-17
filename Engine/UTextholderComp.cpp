@@ -106,6 +106,12 @@ void UTextholderComp::Draw(URenderer& renderer)
     USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
     UCamera* camera = sceneManager->GetScene()->GetCamera();
 
+
+    if (!cachedScene->GetVisibilityOfEachPrimitive(GetShowFlag()))
+    {
+        return;
+    }
+
     // View^-1 = Camera World Transform
     FMatrix view = camera->GetView();
     FMatrix viewInverse = FMatrix::Inverse(view);

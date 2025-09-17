@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Shader.h"
@@ -7,7 +7,7 @@
 #include "UClass.h"
 #include "ConfigData.h"
 #include "ConfigManager.h"
-
+#include "Constant.h"
 #include "FTextInfo.h"
 
 class UMeshManager; // 전방 선언
@@ -15,6 +15,7 @@ class UTextureManager;
 //class UCamera;
 class FTexture;
 class UTextholderComp;
+class UScene;
 
 /**
  * @brief Renderable component with mesh and material properties
@@ -79,9 +80,11 @@ public:
 
 public:
 	virtual uint32 GetID() const { return ID;  }
+    virtual EEngineShowFlags GetShowFlag() const { return EEngineShowFlags::SF_Primitives; }
 
 protected:
 	virtual const char* GetDefaultName() const { return "Primitive"; }
+    UScene* cachedScene;
 
 private:
 	static uint32 PrimitiveID;

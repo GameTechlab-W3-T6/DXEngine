@@ -135,15 +135,24 @@ void EditorApplication::UpdateDragOperation()
 	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
 	if (!camera || SelectedPrimitive == nullptr) return;
 
+	// Additional safety checks for SelectedPrimitive
+	if (!SelectedPrimitive->GetMesh())
+	{
+		bAABBFlag = false;
+		return;
+	}
 
 	FVector localMin, localMax;
 	if (GetRaycastManager().MakeAABBInfo(SelectedPrimitive->GetMesh(), SelectedPrimitive->GetWorldTransform(), localMin, localMax)) {
-		
+
 		MinWSPos = localMin;
 		MaxWSPos = localMax;
 		bAABBFlag = true;
 	}
-
+	else
+	{
+		bAABBFlag = false;
+	}
 
 	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(camera);
 	gizmoManager.UpdateDrag(ray);
@@ -223,13 +232,18 @@ void EditorApplication::CollectRaycastableObjects(TArray<UGizmoComponent*>& outG
 
 void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector& impactPoint)
 {
+	if (!hitGizmo) return;  // Safety check
+
 	auto target = gizmoManager.GetTarget();
 	if (!target || !target->IsManageable()) return;
 
 	target->bIsSelected = true;
 	hitGizmo->bIsSelected = true;
 
-	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
+	if (!camera) return;  // Safety check
+
+	FRay ray = GetRaycastManager().CreateRayFromScreenPosition(camera);
 
 	// Handle different gizmo types
 	if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
@@ -253,13 +267,15 @@ void EditorApplication::HandleGizmoHit(UGizmoComponent* hitGizmo, const FVector&
 
 void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 {
+	if (!hitPrimitive) return;  // Safety check
+
 	hitPrimitive->bIsSelected = true;
-	  
+
 	//hitPrimitive->RelativeQuaternion.ToMatrixRow();
 	///hitPrimitive->RelativeLocation();
-	     
-	FVector localMin, localMax; 
-	
+
+	FVector localMin, localMax;
+
 	bAABBFlag = false;
 
 	if (hitPrimitive->IsManageable())
@@ -267,7 +283,9 @@ void EditorApplication::HandlePrimitiveHit(UPrimitiveComponent* hitPrimitive)
 		gizmoManager.SetTarget(hitPrimitive);
 		propertyWindow->SetTarget(hitPrimitive);
 		SelectedPrimitive = hitPrimitive;
-		if (GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(), localMin, localMax))
+
+		// Additional safety check for mesh
+		if (hitPrimitive->GetMesh() && GetRaycastManager().MakeAABBInfo(hitPrimitive->GetMesh(), hitPrimitive->GetWorldTransform(), localMin, localMax))
 		{
 			MaxWSPos = localMax;
 			MinWSPos = localMin;
@@ -287,8 +305,17 @@ void EditorApplication::HandleEmptySpaceClick()
 
 void EditorApplication::ResetSelectedTarget()
 {
+	if (selectedSceneComponent)
+	{
+		selectedSceneComponent->bIsSelected = false;
+		selectedSceneComponent = nullptr;
+	}
 	gizmoManager.SetTarget(nullptr);
 	propertyWindow->SetTarget(nullptr);
+
+	// Clear AABB display when deselecting
+	bAABBFlag = false;
+	SelectedPrimitive = nullptr;
 }
 
 void EditorApplication::Render()
@@ -373,10 +400,21 @@ void EditorApplication::OnSceneChange()
 	propertyWindow->SetTarget(nullptr);
 	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
 	gizmoManager.SetTarget(nullptr);
+
+	// Reset selection state when scene changes
+	if (selectedSceneComponent)
+	{
+		selectedSceneComponent->bIsSelected = false;
+		selectedSceneComponent = nullptr;
+	}
+	SelectedPrimitive = nullptr;
+	bAABBFlag = false;
 }
 
 void EditorApplication::HandlePrimitiveSelect(UPrimitiveComponent* Component)
 {
+	if (!Component) return;  // Safety check
+
 	if (selectedSceneComponent)
 	{
 		selectedSceneComponent->bIsSelected = false;
@@ -388,6 +426,25 @@ void EditorApplication::HandlePrimitiveSelect(UPrimitiveComponent* Component)
 	if (Component->IsManageable())
 	{
 		propertyWindow->SetTarget(Component);
+		SelectedPrimitive = Component;
+
+		// Set up AABB display for manageable components
+		FVector localMin, localMax;
+		if (Component->GetMesh() && GetRaycastManager().MakeAABBInfo(Component->GetMesh(), Component->GetWorldTransform(), localMin, localMax))
+		{
+			MinWSPos = localMin;
+			MaxWSPos = localMax;
+			bAABBFlag = true;
+		}
+		else
+		{
+			bAABBFlag = false;
+		}
+	}
+	else
+	{
+		bAABBFlag = false;
+		SelectedPrimitive = nullptr;
 	}
 }
 
@@ -398,6 +455,38 @@ void EditorApplication::OnObjectDestroyed(UObject* obj)
 		if (selectedSceneComponent == component)
 		{
 			ResetSelectedTarget();
+		}
+	}
+
+	// Also check if the deleted object is the SelectedPrimitive for AABB display
+	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
+	{
+		if (SelectedPrimitive == primitive)
+		{
+			SelectedPrimitive = nullptr;
+			bAABBFlag = false;
+		}
+	}
+
+	// Handle AActor deletion - check all its components
+	if (AActor* actor = obj->Cast<AActor>())
+	{
+		auto components = actor->GetComponents<UPrimitiveComponent>();
+		for (UPrimitiveComponent* primitive : components)
+		{
+			if (primitive)
+			{
+				// Check if any of the actor's components are currently selected
+				if (selectedSceneComponent == primitive)
+				{
+					ResetSelectedTarget();
+				}
+				if (SelectedPrimitive == primitive)
+				{
+					SelectedPrimitive = nullptr;
+					bAABBFlag = false;
+				}
+			}
 		}
 	}
 }

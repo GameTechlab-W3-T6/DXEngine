@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UControlPanel.h"
 #include "USceneComponent.h"
 #include "AActor.h"
@@ -173,18 +173,12 @@ void UControlPanel::ViewManagementSection()
 	auto* scene = SceneManager->GetScene();
 
 	// Primitives 체크박스
-	bool showPrims = !scene->hidePrimitive; // hidePrimitive=false → 보이는 상태
-	if (ImGui::Checkbox("Primitives", &showPrims))
-	{
-		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_Primitives, !showPrims);
-	}
+    ImGui::Checkbox("Primitives", &showPrims);
+    scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_Primitives, showPrims);
 
 	// Billboard Text 체크박스
-	bool showText = !scene->hideTextholder;
-	if (ImGui::Checkbox("Billboard Text", &showText))
-	{
-		scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_BillboardText, !showText);
-	}
+    ImGui::Checkbox("Billboard Text", &showText);
+    scene->SetVisibilityOfEachPrimitive(EEngineShowFlags::SF_BillboardText, showText);
 	ImGui::Separator();
 }
 

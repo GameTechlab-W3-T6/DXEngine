@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ImGuiWindowWrapper.h"
 #include "ConfigData.h"
 #include "Constant.h"
@@ -34,6 +34,8 @@ class UControlPanel : public ImGuiWindowWrapper
 
 	// Camera Management Section
 	EViewModeIndex CurrentViewMode = EViewModeIndex::VMI_Lit;
+    bool showPrims = true, showText = true;
+
 public:
 	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, URenderer* renderer);
 	void RenderContent() override;

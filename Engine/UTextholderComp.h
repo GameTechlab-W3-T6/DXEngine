@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "stdafx.h"
 #include "UObjectMacros.h"
 #include "UPrimitiveComponent.h"
@@ -55,7 +55,8 @@ public:
 	virtual LayerID GetLayer() const { return 4;  }
 
 	// todo : 추후 textholder도 gizmo 필요하면 추가 구현
-	bool IsManageable() override { return false; }
+    bool IsManageable() override { return false; }
+    EEngineShowFlags GetShowFlag() const override { return EEngineShowFlags::SF_BillboardText; }
 
 private:
 	// Hold those two subsystem due to caching

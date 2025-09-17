@@ -1,4 +1,4 @@
-﻿// UScene.cpp
+// UScene.cpp
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
@@ -205,15 +205,18 @@ bool UScene::Deserialize(const json::JSON& data)
 
 void  UScene::SetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide, bool isOn)
 {
-	switch (InPrimitiveToHide)
-	{
-	case EEngineShowFlags::SF_Primitives:
-		hidePrimitive = isOn;
-		break;
-	case EEngineShowFlags::SF_BillboardText:
-		hideTextholder = isOn;
-		break;
-	}
+    objectVisibility[InPrimitiveToHide] = isOn;
+}
+
+bool UScene::GetVisibilityOfEachPrimitive(EEngineShowFlags InPrimitiveToHide)
+{
+    auto itr = objectVisibility.find(InPrimitiveToHide);
+
+    if (itr != objectVisibility.end())
+        return itr->second;
+
+    else
+        return true;
 }
 
 void UScene::Render()
@@ -228,12 +231,6 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			const bool isText = primitive->IsA<UTextholderComp>();
-			if (hidePrimitive && !isText)
-				continue;
-			if (hideTextholder && isText)
-				continue;
-
 			primitive->Draw(*renderer);
 		}
 	}
@@ -249,12 +246,6 @@ void UScene::Render()
 			{
 				if (primitive && !primitive->GetAttachParent())  // Only draw if no parent (root-level)
 				{
-					const bool isText = primitive->IsA<UTextholderComp>();
-					if (hidePrimitive && !isText)
-						continue;
-					if (hideTextholder && isText)
-						continue;
-
 					primitive->Draw(*renderer);  // This will also draw attached children
 				}
 			}
@@ -298,12 +289,6 @@ void UScene::Update(float deltaTime)
 		}
 	}
 
-	// TODO : delete/move after test
-	if (inputManager->IsKeyPressed(VK_CONTROL))
-	{
-		AddObject(new UTextholderComp);
-	}
-
 	// Delete legacy components
 	for (USceneComponent* component : deleteTarget)
 	{
@@ -339,6 +324,8 @@ void UScene::AddActor(AActor* actor)
 
 	actors.push_back(actor);
 	actor->Initialize();
+
+    ++primitiveCount;
 }
 
 void UScene::RemoveActor(AActor* actor)
@@ -351,6 +338,24 @@ void UScene::RemoveActor(AActor* actor)
 	{
 		actor->OnShutdown();
 		actors.erase(it);
+
+		// Notify application about actor destruction before deleting
+		if (application)
+		{
+			application->OnObjectDestroyed(actor);
+
+			// Also notify about all components in the actor
+			auto components = actor->GetComponents<UActorComponent>();
+			for (UActorComponent* component : components)
+			{
+				if (component)
+				{
+					application->OnObjectDestroyed(component);
+				}
+			}
+		}
+
+        --primitiveCount;
 		delete actor;
 	}
 }
