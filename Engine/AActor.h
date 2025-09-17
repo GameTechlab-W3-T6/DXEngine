@@ -74,10 +74,13 @@ public:
 	// Serialization
 	virtual json::JSON Serialize() const override;
 	virtual bool Deserialize(const json::JSON& data) override;
+	virtual uint32 GetID() const { return ID; }
 
 	bool markedAsDestroyed = false;
 
 private:
+	static inline uint32 ActorID;
 	TArray<TUniquePtr<UActorComponent>> Components;
 	USceneComponent* RootComponent = nullptr;
+	uint32 ID;
 };

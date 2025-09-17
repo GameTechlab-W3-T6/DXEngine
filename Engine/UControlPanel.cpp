@@ -79,8 +79,10 @@ AActor* UControlPanel::CreateActorFromChoice(int index)
 	if (index < meshChoices.size())
 	{
 		FString meshName = meshChoices[index];
+		FString displayName = GetDisplayNameForMesh(meshName);
 		AStaticMeshActor* actor = new AStaticMeshActor();
-		actor->GetStaticMeshComponent()->SetMeshType(meshName, GetDisplayNameForMesh(meshName));
+		actor->GetStaticMeshComponent()->SetMeshType(meshName, displayName);
+		actor->name = displayName + "_" + std::to_string(actor->GetID());
 		// Don't initialize here - will be initialized when added to scene
 		return actor;
 	}
@@ -105,16 +107,6 @@ void UControlPanel::SpawnPrimitiveSection()
 					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
 					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
 					-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-				));
-				rootComponent->SetScale(FVector(
-					0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-					0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-					0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
-				));
-				rootComponent->SetRotation(FVector(
-					-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-					-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-					-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
 				));
 			}
 

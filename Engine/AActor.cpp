@@ -12,6 +12,8 @@ AActor::AActor()
     : RootComponent(nullptr)
 {
     UUID = UEngineStatics::GenUUID();
+    ID = ActorID++;
+    name = "Actor_" + std::to_string(ID);
 }
 
 

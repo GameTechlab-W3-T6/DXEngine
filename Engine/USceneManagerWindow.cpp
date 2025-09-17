@@ -8,12 +8,13 @@ void USceneManagerWindow::RenderContent()
 {
 	UScene* Scene = Editor->GetSceneManager().GetScene();
 
+	ImGui::TextDisabled("Primitives");
 	// Display Actors first
 	for (AActor* actor : Scene->GetActors())
 	{
 		if (!actor) continue;
 
-		FString actorName = "Actor_" + std::to_string(actor->UUID);
+		FString actorName = actor->name.ToString();
 
 		// Create tree node for actor
 		if (ImGui::TreeNode(actorName.c_str()))
@@ -24,7 +25,7 @@ void USceneManagerWindow::RenderContent()
 			{
 				if (UPrimitiveComponent* primitive = comp->Cast<UPrimitiveComponent>())
 				{
-					FString componentName = "  " + primitive->GetName() + "_" + std::to_string(primitive->GetID());
+					FString componentName = "  " + primitive->name.ToString() + "_" + std::to_string(primitive->GetID());
 					bool isSelectable = primitive->IsManageable();
 
 					if (isSelectable)
@@ -65,7 +66,7 @@ void USceneManagerWindow::RenderContent()
 				hasLegacyObjects = true;
 			}
 
-			FString Name = Component->GetName() + std::to_string(Component->GetID());
+			FString Name = Component->name.ToString() + std::to_string(Component->GetID());
 			if (ImGui::Selectable(Name.c_str(), Component->bIsSelected))
 			{
 				Editor->HandlePrimitiveSelect(Component);

@@ -133,7 +133,7 @@ void EditorApplication::EndDragOperation()
 void EditorApplication::UpdateDragOperation()
 {
 	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
-	if (!camera) return;
+	if (!camera || SelectedPrimitive == nullptr) return;
 
 
 	FVector localMin, localMax;

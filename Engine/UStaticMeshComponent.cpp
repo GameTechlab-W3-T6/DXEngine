@@ -9,7 +9,7 @@ uint32 UStaticMeshComponent::StaticMeshID = 0;
 UStaticMeshComponent::UStaticMeshComponent(FVector pos, FVector rot, FVector scl)
     : UPrimitiveComponent(pos, rot, scl)
 {
-    Name = GetDefaultName();
+    name = FName(GetDefaultName());
     ID = StaticMeshID++;
 }
 
@@ -21,22 +21,20 @@ void UStaticMeshComponent::SetMeshType(const FString& meshName, const FString& d
     {
         GetClass()->SetMeta("DisplayName", displayName);
     }
+    name = displayName.empty() ? FName(meshName) : FName(displayName);
 }
 
 void UStaticMeshComponent::SetupAsCube()
 {
     SetMeshType("Cube", "Cube");
-    Name = "Cube";
 }
 
 void UStaticMeshComponent::SetupAsSphere()
 {
     SetMeshType("Sphere", "Sphere");
-    Name = "Sphere";
 }
 
 void UStaticMeshComponent::SetupAsPlane()
 {
     SetMeshType("Plane", "Plane");
-    Name = "Plane";
 }

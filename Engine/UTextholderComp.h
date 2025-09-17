@@ -25,7 +25,7 @@ public:
 
 	UTextholderComp()
 	{
-		Name = GetDefaultName();
+		name = FName(GetDefaultName());
 		ID = TextHolderID++;
 		bAutoCreateTextholder = false;  // Prevent textholder from creating another textholder
 	}
