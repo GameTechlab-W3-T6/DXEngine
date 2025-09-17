@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "UClass.h"
 #include "UCamera.h"
 #include "URenderer.h"
@@ -10,6 +10,7 @@
 #include "USceneManager.h"
 #include "UScene.h"
 #include "UTextureManager.h"
+#include "AActor.h"
 
 IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
@@ -26,7 +27,7 @@ bool UTextholderComp::Initialize()
 	cachedTextureManager = UEngineStatics::GetSubsystem<UTextureManager>();
 	cachedInputManager = UEngineStatics::GetSubsystem<UInputManager>();
 
-	float scaleNumber = 0.3f;
+	float scaleNumber = 1.0f;
 	SetScale({ scaleNumber, scaleNumber, scaleNumber });
 	
 	if (cachedTextureManager && cachedInputManager)
@@ -37,6 +38,7 @@ bool UTextholderComp::Initialize()
 			// 16 x 16 is only fit for "TextInfo" texture(fontBlack.png, font.png)
 			TextInfo.SetParam(textTex, 16, 16);
 		}
+
 		return true;
 	}
 	return false;
@@ -60,10 +62,22 @@ void UTextholderComp::SetText(const FString& textContent)
 // ====================================================== //
 
 void UTextholderComp::UpdateConstantBuffer(URenderer& renderer)
-{ 
-	FMatrix MVP = GetWorldTransform() * renderer.GetViewProj();
+{
+	// Calculate independent transform without parent's rotation/scale influence
+	FVector worldPosition = parentTransform ?
+		parentTransform->GetWorldLocation() + FVector(0.0f, 0.0f, 1.0f) :
+		GetWorldLocation();
+
+	// Create independent transform matrix with billboard rotation and fixed scale
+	FMatrix independentTransform = FMatrix::SRTRowQuaternion(
+		worldPosition,
+		billboardRotation.ToMatrixRow(),
+		FVector(1.0f, 1.0f, 1.0f)  // Fixed scale regardless of parent
+	);
+
+	FMatrix MVP = independentTransform * renderer.GetViewProj();
 	(*vertexShader)["ConstantBuffer"]["MVP"] = MVP;
-	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color; 
+	(*vertexShader)["ConstantBuffer"]["MeshColor"] = Color;
 	vertexShader->BindConstantBuffer(renderer.GetDeviceContext(), "ConstantBuffer");
 }
 
@@ -78,20 +92,41 @@ void UTextholderComp::BindPixelShader(URenderer& renderer)
 	UPrimitiveComponent::BindPixelShader(renderer);
 }
 
+void UTextholderComp::Update(float deltaTime)
+{
+	// Call parent update first
+	Super::Update(deltaTime);
+
+	// Position will be handled in UpdateConstantBuffer
+	// No need to modify scale or rotation here since we're using independent transform
+}
+
 void UTextholderComp::Draw(URenderer& renderer)
 {
-	CaptureTypedChars(); // TODO : will be deprecated, just for test
+    USceneManager* sceneManager = UEngineStatics::GetSubsystem<USceneManager>();
+    UCamera* camera = sceneManager->GetScene()->GetCamera();
 
-	if (parentTransform)
-	{
-		FVector updatedTransform = parentTransform->GetPosition() + FVector{0.0f, 0.0f, 0.7f};
-		SetPosition(updatedTransform);
-	}
+    // View^-1 = Camera World Transform
+    FMatrix view = camera->GetView();
+    FMatrix viewInverse = FMatrix::Inverse(view);
 
-	CreateInstanceData();
+    // Extract rotation only (zero out translation)
+    FMatrix billboardRotation = viewInverse;
+    billboardRotation.M[0][3] = 0.0f;
+    billboardRotation.M[1][3] = 0.0f;
+    billboardRotation.M[2][3] = 0.0f;
+    billboardRotation.M[3][0] = 0.0f;
+    billboardRotation.M[3][1] = 0.0f;
+    billboardRotation.M[3][2] = 0.0f;
+    billboardRotation.M[3][3] = 1.0f;
 
-	renderer.DrawTextholderComponent(this );
+    // Convert to quaternion and store for use in UpdateConstantBuffer
+    this->billboardRotation = FQuaternion::FromMatrixRow(billboardRotation);
+
+    CreateInstanceData();
+    renderer.DrawTextholderComponent(this);
 }
+
 
 // ====================================================== //
 
@@ -102,34 +137,6 @@ void UTextholderComp::Draw(URenderer& renderer)
 * 인스턴스 데이터(월드 변환 행렬, UV 좌표, 색상)를 생성하고
 * 렌더러를 통해 instanced draw call을 호출합니다.
 */
-// TODO : delegate... 필요
-void UTextholderComp::CaptureTypedChars()
-{
-	if (!isEditable || !cachedTextureManager || !cachedInputManager) return;
-
-	// A~Z 키 검사 (이번 프레임 "막 눌린" 키만 받음)
-	for (int vk = 'A'; vk <= 'Z'; ++vk)
-	{
-		if (cachedInputManager->IsKeyPressed(vk))
-		{
-			if (!TextInfo.textTexture)
-			{
-				OutputDebugStringA("TextInfo Error:\n");
-			}
-			else
-			{
-				TextInfo.orderOfChar.push_back(vk);
-			}
-		}
-	}
-	if (cachedInputManager->IsKeyPressed('\b'))
-	{
-		if (!TextInfo.orderOfChar.empty())
-		{
-			TextInfo.orderOfChar.pop_back();
-		}
-	}
-}
 
 void UTextholderComp::CreateInstanceData()
 {
@@ -151,16 +158,15 @@ void UTextholderComp::CreateInstanceData()
 	float penX = -totalWidth * 0.5f;
 	TextInfo.center = totalWidth * 0.5f;
 
-	// 카메라 View의 역행렬에서 Rotation 성분만 추출한 행렬을 사용해서 빌보드 행렬 생성
-	FMatrix view = camera->GetView();
+
+	// Create character instances with simple translation
 	for (int i = 0; i < TextInfo.orderOfChar.size(); i++)
 	{
-		//addobject
 		TextInfo.keyCode = TextInfo.orderOfChar[i];
 
 		FTextInstance inst{};
-		FMatrix bill = TextInfo.MakeBillboard(view);
-		FMatrix M = FMatrix::TranslationRow(penX, 0, 0) * bill;
+		// Simple translation matrix for character positioning
+		FMatrix M = FMatrix::TranslationRow(penX, 0, 0);
 		Build3x4Rows(M, inst.M0, inst.M1, inst.M2);
 
 		// 아틀라스에서 현재 글자의 UV 사각형 계산

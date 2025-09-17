@@ -9,6 +9,7 @@
 
 class UCamera;
 class URaycastManager;
+class AActor;
 
 /**
  * @brief Container for all scene objects with rendering and update functionality
@@ -22,7 +23,8 @@ protected:
 	int32 primitiveCount;
 	bool isInitialized;
 
-	TArray<USceneComponent*> objects;
+	TArray<USceneComponent*> objects;  // TODO: Deprecated, use actors instead
+	TArray<AActor*> actors;  // New actor-based management
 
 	// Reference from outside
 	UApplication* application;
@@ -52,15 +54,22 @@ public:
 
 	static UScene* Create(json::JSON data);
 
-	void AddObject(USceneComponent* obj);
-	void RemoveObject(USceneComponent* obj);
+	void AddObject(USceneComponent* obj);  // TODO: Deprecated
+	void RemoveObject(USceneComponent* obj);  // TODO: Deprecated
+
+	// New actor-based methods
+	void AddActor(AActor* actor);
+	void RemoveActor(AActor* actor);
+
 	void SetVersion(int32 v) { version = v; }
 
 	json::JSON Serialize() const override;
 
 	bool Deserialize(const json::JSON& data) override;
 
-	const TArray<USceneComponent*>& GetObjects() const { return objects; }
+	const TArray<USceneComponent*>& GetObjects() const { return objects; }  // TODO: Deprecated
+	const TArray<AActor*>& GetActors() const { return actors; }  // New method
+
 	UCamera* GetCamera() { return camera; }
 	URenderer* GetRenderer() { return renderer; }
 	UInputManager* GetInputManager() { return inputManager; }

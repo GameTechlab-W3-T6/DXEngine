@@ -25,7 +25,7 @@ UPlaneComp::UPlaneComp(FVector pos, FVector rot, FVector scl)
 		);
 	}
 
-	Name = GetDefaultName();
+	name = FName(GetDefaultName());
 	ID = PlaneID++;
 }
 

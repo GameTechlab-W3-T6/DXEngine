@@ -108,7 +108,7 @@ UMeshManager::UMeshManager()
 	// meshes["Sphere"] = CreateMeshInternal(FlipTriangleWinding(sphere_vertices));
 	//meshes["Sphere"] = CreateMeshInternal(GetNextID(), FVertexPosColorUV::ConvertToVertexPosColorUV(FlipTriangleWinding(sphere_vertices))) ; // CreateMeshInternal(GetNextID(), FlipTriangleWinding(sphere_vertices));
 	meshes["Sphere"] = CreateMeshInternal(GetNextID(), "Meshes/Sphere.obj");
-	// meshes["Plane"] = CreateMeshInternal(GetNextID(), "Meshes/Plane.obj");
+	//meshes["Plane"] = CreateMeshInternal(GetNextID(), "Meshes/Plane.obj");
 	meshes["Plane"] = CreateMeshInternal(GetNextID(), plane_vertices);
 	//meshes["Cube"] = CreateMeshInternal(GetNextID(), cube_vertices);
 	meshes["Cube"] = CreateMeshInternal(GetNextID(), "Meshes/Cube.obj");

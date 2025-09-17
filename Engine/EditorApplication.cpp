@@ -9,6 +9,7 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
+#include "AActor.h"
 
 void EditorApplication::Update(float deltaTime)
 {
@@ -132,7 +133,7 @@ void EditorApplication::EndDragOperation()
 void EditorApplication::UpdateDragOperation()
 {
 	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
-	if (!camera) return;
+	if (!camera || SelectedPrimitive == nullptr) return;
 
 
 	FVector localMin, localMax;
@@ -189,7 +190,7 @@ void EditorApplication::CollectRaycastableObjects(TArray<UGizmoComponent*>& outG
 		gizmo->bIsSelected = false;
 	}
 
-	// Collect primitives
+	// Collect primitives from legacy objects
 	for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
@@ -199,6 +200,23 @@ void EditorApplication::CollectRaycastableObjects(TArray<UGizmoComponent*>& outG
 				outPrimitives.push_back(primitive);
 			}
 			primitive->bIsSelected = false;
+		}
+	}
+
+	// Collect primitives from actors
+	for (AActor* actor : GetSceneManager().GetScene()->GetActors())
+	{
+		if (actor)
+		{
+			auto components = actor->GetComponents<UPrimitiveComponent>();
+			for (UPrimitiveComponent* primitive : components)
+			{
+				if (primitive && primitive->GetMesh())
+				{
+					outPrimitives.push_back(primitive);
+					primitive->bIsSelected = false;
+				}
+			}
 		}
 	}
 }
