@@ -11,13 +11,7 @@
 #include "UScene.h"
 #include "UTextureManager.h"
 
-UObject* UTextholderComp::CreateInstance() {
-	return new UTextholderComp();
-} UClass* UTextholderComp::s_StaticClass = UClass::RegisterToFactory("UTextholderComp", &UTextholderComp::CreateInstance, "UPrimitiveComponent"); UClass* UTextholderComp::StaticClass() {
-	return s_StaticClass;
-} UClass* UTextholderComp::GetClass() const {
-	return StaticClass();
-}
+IMPLEMENT_UCLASS(UTextholderComp, UPrimitiveComponent)
 UCLASS_META(UTextholderComp, DisplayName, "Textholder")
 UCLASS_META(UTextholderComp, MeshName, "Plane")
 UCLASS_META(UTextholderComp, TextInfo, "TextInfo");
@@ -90,7 +84,7 @@ void UTextholderComp::Draw(URenderer& renderer)
 
 	if (parentTransform)
 	{
-		FVector updatedTransform = parentTransform->GetPosition() + FVector{0.0f, 0.0f, 0.3f};
+		FVector updatedTransform = parentTransform->GetPosition() + FVector{0.0f, 0.0f, 0.7f};
 		SetPosition(updatedTransform);
 	}
 

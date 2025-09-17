@@ -12,7 +12,7 @@ bool UTextureManager::Initialize(URenderer* renderer)
 {
 	textures["TextInfo"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\font.dds", true);
 
-	textures["PlaneBaseColor"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\fire.dds", true);
+	textures["PlaneBaseColor"] = LoadFromFile(renderer->GetDevice(), renderer->GetDeviceContext(), L".\\Textures\\fire.png", false);
 
 	BindPS(renderer->GetDeviceContext(), textures["TextInfo"], 0, 0);
 	return true;
