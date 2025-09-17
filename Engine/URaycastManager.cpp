@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "URaycastManager.h"
 
 #include "ImguiConsole.h"
@@ -113,7 +113,6 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 			auto result = RayIntersectsTriangle(triangleVertices);
 			if (result.has_value())
 			{
-				UE_LOG("HIT!!!");
 				float t = (*result - RayOrigin).Length(); // distance along ray
 				if (t < closestHit)
 				{
@@ -298,4 +297,3 @@ bool URaycastManager::MakeAABBInfo(UMesh* mesh, FMatrix M, FVector& outMin, FVec
 	outMax.Y = maxPos[1];
 	outMax.Z = maxPos[2];
 }
-  

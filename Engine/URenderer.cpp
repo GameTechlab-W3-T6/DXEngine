@@ -953,6 +953,8 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 
 	Component->BindShader(*this); 
 	Component->BindTexture(*this);
+    IncrementVertexShaderSwitchCount();
+    IncrementPixelShaderSwitchCount();
 	
 	DeviceContext->IASetInputLayout(InputLayoutTextInst); 
 
@@ -969,6 +971,7 @@ void URenderer::DrawTextholderComponent(UTextholderComp* Component)
 
 	DeviceContext->IASetVertexBuffers(0, 2, bufs, strides, offsets);
 	DeviceContext->IASetPrimitiveTopology(text->PrimitiveType);
+	IncrementMeshSwitchCount();
 
 	DeviceContext->DrawInstanced(text->NumVertices, (UINT)instances.size(), 0, 0);
 }

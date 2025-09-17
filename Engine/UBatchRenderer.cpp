@@ -11,6 +11,11 @@ IMPLEMENT_UCLASS(UBatchRenderer, URenderer)
 
 void UBatchRenderer::DrawPrimitiveComponent(UPrimitiveComponent* Component)
 {
+    ConfigData* Config = ConfigManager::GetConfig("editor");
+    if (!Config->getBool("Graphics", "BatchRendering"))
+    {
+        return URenderer::DrawPrimitiveComponent(Component); 
+    }
 	assert(Component && "Component is not valid.");
 
 	LayerID Layer = Component->GetLayer();
@@ -33,6 +38,11 @@ void UBatchRenderer::DrawGizmoComponent(UGizmoComponent* Component, bool drawOnT
 /** @todo: Temporary implmentation which draws text holder at last by additional array. */
 void UBatchRenderer::DrawTextholderComponent(UTextholderComp* Component)
 {
+    ConfigData* Config = ConfigManager::GetConfig("editor");
+    if (!Config->getBool("Graphics", "BatchRendering"))
+    {
+        return URenderer::DrawTextholderComponent(Component); 
+    }
     TextholderComponentArray.push_back(Component);
 }
 
